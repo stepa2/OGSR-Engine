@@ -87,28 +87,29 @@ struct ENGINE_API SPPInfo {
 	void		validate(LPCSTR str);
 };
 
-DEFINE_LIST				(CEffectorCam*,EffectorCamVec,EffectorCamIt);
-DEFINE_VECTOR				(CEffectorPP*,EffectorPPVec,EffectorPPIt);
+using EffectorCamVec = xr_list<CEffectorCam*>;
+using EffectorPPVec = xr_vector<CEffectorPP*>;
 
+struct SCamEffectorInfo;
 class ENGINE_API CCameraManager
 {
-	Fvector					vPosition;
-	Fvector					vDirection;
-	Fvector					vNormal;
-	Fvector					vRight;
+	float					fFovSecond;
+protected:
+	SCamEffectorInfo m_cam_info{};
 
 	EffectorCamVec			m_EffectorsCam;
 	EffectorCamVec			m_EffectorsCam_added_deffered;
-	EffectorCamVec			m_EffectorsCam_removed_deffered;
 	EffectorPPVec			m_EffectorsPP;
 
-	float					fFov;
-	float					fFovSecond;
-	float					fFar;
-	float					fAspect;
 	bool					m_bAutoApply;
 	SPPInfo					pp_affected;
 	void					UpdateDeffered();
+
+	virtual void UpdateCamEffectors();
+	virtual void UpdatePPEffectors();
+	virtual bool ProcessCameraEffector(CEffectorCam* eff);
+	void OnEffectorReleased(SBaseEffector* e);
+
 public:
 #ifdef DEBUG	
 	u32						dbg_upd_frame;
@@ -125,17 +126,17 @@ public:
 	CEffectorPP*			AddPPEffector			(CEffectorPP*		ef);
 	void					RemovePPEffector		(EEffectorPPType	type);
 
-	IC Fvector				Pos					()	const { return vPosition;	}
-	IC Fvector				Position				()	const { return vPosition;	}
-	IC Fvector				Dir					()	const { return vDirection;}
-	IC Fvector				Direction				()	const { return vDirection;}
-	IC Fvector				Up					()	const { return vNormal;	}
-	IC Fvector				Right				()	const { return vRight;	}
-	
-	IC void					camera_Matrix		(Fmatrix& M){M.set(vRight,vNormal,vDirection,vPosition);}
-	void					Update				(const Fvector& P, const Fvector& D, const Fvector& N, float fFOV_Dest, float fASPECT_Dest, float fFAR_Dest, u32 flags=0);
-	void					Update				(const CCameraBase* C);
-	void					ApplyDevice			(float _viewport_near);
+	IC Fvector Position() const { return m_cam_info.p; }
+	IC Fvector Direction() const { return m_cam_info.d; }
+	IC Fvector Up() const { return m_cam_info.n; }
+	IC Fvector Right() const { return m_cam_info.r; }
+	IC float Fov() const { return m_cam_info.fFov; }
+	IC float Aspect() const { return m_cam_info.fAspect; }
+	IC void camera_Matrix(Fmatrix& M) { M.set(m_cam_info.r, m_cam_info.n, m_cam_info.d, m_cam_info.p); }
+
+	void					Update				(const Fvector& P, const Fvector& D, const Fvector& N, float fFOV_Dest, float fASPECT_Dest, float fFAR_Dest, u32 flags);
+	void					UpdateFromCamera(const CCameraBase* C);
+	void					ApplyDevice			();
 	static void				ResetPP				();
 
 							CCameraManager		(bool bApplyOnUpdate);
