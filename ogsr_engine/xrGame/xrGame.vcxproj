@@ -1309,7 +1309,6 @@
     <ClInclude Include="WeaponStatMgun.h" />
     <ClInclude Include="Artifact.h" />
     <ClInclude Include="CustomDetector.h" />
-    <ClInclude Include="SimpleDetector.h" />
     <ClInclude Include="Torch.h" />
     <ClInclude Include="PDA.h" />
     <ClInclude Include="pda_space.h" />
@@ -2236,7 +2235,6 @@
     <ClCompile Include="artefact_script.cpp" />
     <ClCompile Include="Artifact.cpp" />
     <ClCompile Include="CustomDetector.cpp" />
-    <ClCompile Include="SimpleDetector.cpp" />
     <ClCompile Include="Torch.cpp" />
     <ClCompile Include="torch_script.cpp" />
     <ClCompile Include="PDA.cpp" />
