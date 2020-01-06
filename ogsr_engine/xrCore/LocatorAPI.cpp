@@ -480,11 +480,114 @@ bool CLocatorAPI::Recurse		(const char* path)
     return true;
 }
 
+IReader* CLocatorAPI::OpenFSLtx(LPCSTR config_file)
+{
+	// 1. попытаться открыть из ./
+	IReader* reader = r_open(nullptr, config_file);
+	if (reader) return reader;
 
+	if (m_Flags.is(flScanAppRoot))
+	{
+		reader = r_open("$app_root$", config_file);
+		if (reader) return reader;
+	}
+
+	string_path config_path, buffer;
+	strcpy_s(config_path, Core.ApplicationPath);
+	R_ASSERT(config_path[0] != '\0');
+
+	
+	config_path[xr_strlen(config_path) - 1] = '\0'; // C:\\example\ -> C:\\example
+
+
+	while (true)
+	{
+		Recurse(xr_strconcat(buffer, config_path, "\\"));
+		reader = r_open(nullptr, xr_strconcat(buffer, config_path, "\\", config_file));
+
+		if (reader != nullptr)
+		{
+			append_path("$fs_root$", config_path, nullptr, false);
+			return reader;
+		}
+		
+		auto separator_pointer = strrchr(config_path, '\\');
+		R_ASSERT(separator_pointer != nullptr, "Filesystem config not found in game binaries folder or any parent folders", config_file);
+
+		*separator_pointer = '\0'; // C:\\example\path\0 -> C:\\example\0path\0 == C:\\example\0
+	}
+
+
+}
+
+void CLocatorAPI::LoadFSLtx(LPCSTR config_file)
+{
+	IReader* config_reader = OpenFSLtx(config_file);
+	
+	Log("using fs-ltx", config_file);
+
+		// append all pathes    
+	string_path		id, root, add, def, capt;
+	string16		b_v;
+	string4096		temp;
+	constexpr char _delimiter = '|'; //','
+	
+	while (!config_reader->eof())
+	{
+		string4096		buf;
+		
+		config_reader->r_string(buf, sizeof(buf));
+		if (buf[0] == ';')		continue;
+
+		_GetItem(buf, 0, id, '=');
+
+		if (!m_Flags.is(flBuildCopy) && (0 == xr_strcmp(id, "$build_copy$")))
+			continue;
+
+		_GetItem(buf, 1, temp, '=');
+		int cnt = _GetItemCount(temp, _delimiter);
+		R_ASSERT2(cnt >= 3, temp);
+		u32 fl = 0;
+		_GetItem(temp, 0, b_v, _delimiter);
+
+		if (CInifile::IsBOOL(b_v))
+			fl |= FS_Path::flRecurse;
+
+		_GetItem(temp, 1, b_v, _delimiter);
+		if (CInifile::IsBOOL(b_v))
+			fl |= FS_Path::flNotif;
+
+		_GetItem(temp, 2, root, _delimiter);
+		_GetItem(temp, 3, add, _delimiter);
+		_GetItem(temp, 4, def, _delimiter);
+		_GetItem(temp, 5, capt, _delimiter);
+		xr_strlwr(id);
+
+
+		xr_strlwr(root);
+		LPCSTR lp_add = (cnt >= 4) ? xr_strlwr(add) : nullptr;
+		LPCSTR lp_def = (cnt >= 5) ? def : nullptr;
+		LPCSTR lp_capt = (cnt >= 6) ? capt : nullptr;
+
+		auto p_it = pathes.find(root);
+
+		FS_Path* P = xr_new<FS_Path>((p_it != pathes.end()) ? p_it->second->m_Path : root, lp_add, lp_def, lp_capt, fl);
+		bNoRecurse = !(fl & FS_Path::flRecurse);
+		Recurse(P->m_Path);
+		std::pair<PathPairIt, bool> I = pathes.insert(mk_pair(xr_strdup(id), P));
+#ifndef DEBUG
+		m_Flags.set(flCacheFiles, FALSE);
+#endif // DEBUG
+
+		CHECK_OR_EXIT(I.second, "The file 'fsgame.ltx' is corrupted (it contains duplicated lines).\nPlease reinstall the game or fix the problem manually.");
+	}
+	r_close(config_reader);
+	R_ASSERT(path_exist("$app_data_root$"));
+}
 
 void CLocatorAPI::_initialize	(u32 flags, LPCSTR target_folder, LPCSTR fs_name)
 {
-	char _delimiter = '|'; //','
+	
 	if (m_Flags.is(flReady))return;
 	CTimer t;
 	t.Start();
@@ -495,10 +598,7 @@ void CLocatorAPI::_initialize	(u32 flags, LPCSTR target_folder, LPCSTR fs_name)
 
 	// scan root directory
 	bNoRecurse		= TRUE;
-	string4096		buf;
-	IReader* pFSltx		= nullptr;
-	// append working folder
-	LPCSTR fs_ltx	= nullptr;
+
 
 	// append application path
 	if (m_Flags.is(flScanAppRoot))
@@ -511,130 +611,10 @@ void CLocatorAPI::_initialize	(u32 flags, LPCSTR target_folder, LPCSTR fs_name)
 	}
 	
 	if (!m_Flags.is(flTargetFolderOnly))
-	{ //find nearest fs.ltx and set fs_root correctly
-		fs_ltx					= (fs_name && fs_name[0])?fs_name:FSLTX;
-		pFSltx						= r_open(fs_ltx); 
+	{
 		
-		if (!pFSltx && m_Flags.is(flScanAppRoot) )
-			pFSltx			= r_open("$app_root$",fs_ltx); 
-
-		if (!pFSltx)
-		{
-			string_path tmpAppPath	= "";
-			strcpy_s				(tmpAppPath,sizeof(tmpAppPath), Core.ApplicationPath);
-			if (xr_strlen(tmpAppPath))
-			{
-				tmpAppPath[xr_strlen(tmpAppPath)-1] = 0;
-				if (strrchr(tmpAppPath, '\\'))
-					*(strrchr(tmpAppPath, '\\')+1) = 0;
-
-				append_path				("$fs_root$", tmpAppPath, nullptr, FALSE);
-			}else
-				append_path				("$fs_root$", "", nullptr, FALSE);
-
-			pFSltx							= r_open("$fs_root$",fs_ltx); 
-		}
-		else 
-			append_path("$fs_root$", "", nullptr, FALSE);
-
-		Log								("using fs-ltx",fs_ltx);
-
-		/*
-		LPCSTR fs_ltx	= (fs_name&&fs_name[0])?fs_name:FSLTX;
-		F				= r_open(fs_ltx);
-		if (!F&&m_Flags.is(flScanAppRoot))
-			F			= r_open("$app_root$",fs_ltx);
-
-		if (!F)
-		{
-			string_path tmpAppPath = "";
-			strcpy_s(tmpAppPath,sizeof(tmpAppPath), Core.ApplicationPath);
-			if (xr_strlen(tmpAppPath))
-			{
-				tmpAppPath[xr_strlen(tmpAppPath)-1] = 0;
-				if (strrchr(tmpAppPath, '\\'))
-					*(strrchr(tmpAppPath, '\\')+1) = 0;
-
-				FS_Path* pFSRoot		= FS.get_path("$fs_root$");
-				pFSRoot->_set_root		(tmpAppPath);
-				rescan_path				(pFSRoot->m_Path, pFSRoot->m_Flags.is(FS_Path::flRecurse));
-			}
-			F				= r_open("$fs_root$",fs_ltx);
-		}
-
-		Log				("using fs-ltx",fs_ltx);
-*/
-		CHECK_OR_EXIT(pFSltx, make_string("Cannot open file \"%s\".\nCheck your working folder.", fs_ltx));
-		// append all pathes    
-		string_path		id, root, add, def, capt;
-		LPCSTR			lp_add, lp_def, lp_capt;
-		string16		b_v;
-		string4096		temp;
-
-		while (!pFSltx->eof())
-		{
-			pFSltx->r_string(buf, sizeof(buf));
-			if (buf[0] == ';')		continue;
-
-			_GetItem(buf, 0, id, '=');
-
-			if (!m_Flags.is(flBuildCopy) && (0 == xr_strcmp(id, "$build_copy$")))
-				continue;
-
-			_GetItem(buf, 1, temp, '=');
-			int cnt = _GetItemCount(temp, _delimiter);
-			R_ASSERT2(cnt >= 3, temp);
-			u32 fl = 0;
-			_GetItem(temp, 0, b_v, _delimiter);
-
-			if (CInifile::IsBOOL(b_v))
-				fl |= FS_Path::flRecurse;
-
-			_GetItem(temp, 1, b_v, _delimiter);
-			if (CInifile::IsBOOL(b_v))
-				fl |= FS_Path::flNotif;
-
-			_GetItem(temp, 2, root, _delimiter);
-			_GetItem(temp, 3, add, _delimiter);
-			_GetItem(temp, 4, def, _delimiter);
-			_GetItem(temp, 5, capt, _delimiter);
-			xr_strlwr(id);
-
-
-			xr_strlwr(root);
-			lp_add = (cnt >= 4) ? xr_strlwr(add) : nullptr;
-			lp_def = (cnt >= 5) ? def : nullptr;
-			lp_capt = (cnt >= 6) ? capt : nullptr;
-
-			PathPairIt p_it = pathes.find(root);
-
-			std::pair<PathPairIt, bool> I;
-			FS_Path* P = xr_new<FS_Path>((p_it != pathes.end()) ? p_it->second->m_Path : root, lp_add, lp_def, lp_capt, fl);
-			bNoRecurse = !(fl & FS_Path::flRecurse);
-#ifdef RESTRICT_GAMEDATA
-#if __has_include("..\build_config_overrides\trivial_encryptor_ovr.h")
-#error Something strange...
-#endif
-			bool restricted = false;
-			if ((xr_strcmp(id, "$game_config$") == 0 || xr_strcmp(id, "$game_scripts$") == 0))
-				restricted = !Core.ParamFlags.test(xrCore::ParamFlag::dbg);
-			if (!restricted)
-				Recurse(P->m_Path);
-#elif __has_include("..\build_config_overrides\trivial_encryptor_ovr.h")
-			if (!strcmp(id, "$app_data_root$") || !strcmp(id, "$game_saves$") || !strcmp(id, "$logs$") || !strcmp(id, "$screenshots$"))
-				Recurse(P->m_Path);
-#else
-			Recurse(P->m_Path);
-#endif
-			I = pathes.insert(mk_pair(xr_strdup(id), P));
-#ifndef DEBUG
-			m_Flags.set(flCacheFiles, FALSE);
-#endif // DEBUG
-
-			CHECK_OR_EXIT(I.second, "The file 'fsgame.ltx' is corrupted (it contains duplicated lines).\nPlease reinstall the game or fix the problem manually.");
-		}
-		r_close(pFSltx);
-		R_ASSERT(path_exist("$app_data_root$"));
+		//find nearest fs.ltx and set fs_root correctly
+		LoadFSLtx((fs_name != nullptr && fs_name[0] != '\0') ? fs_name : FSLTX);
 	}
 
 #if !__has_include("..\build_config_overrides\trivial_encryptor_ovr.h")
@@ -1214,6 +1194,8 @@ CLocatorAPI::files_it CLocatorAPI::file_find_it(LPCSTR fname)
 	return files.find(desc_f);
 }
 
+
+
 BOOL CLocatorAPI::dir_delete(LPCSTR path,LPCSTR nm,BOOL remove_files)
 {
 	string_path	fpath;
@@ -1331,7 +1313,7 @@ bool CLocatorAPI::path_exist(LPCSTR path)
 
 FS_Path* CLocatorAPI::append_path(LPCSTR path_alias, LPCSTR root, LPCSTR add, BOOL recursive)
 {
-	VERIFY			(root/**&&root[0]/**/);
+	VERIFY			(root);
 	VERIFY			(false==path_exist(path_alias));
 	FS_Path* P		= xr_new<FS_Path>(root,add,LPCSTR(nullptr),LPCSTR(nullptr),0);
 	bNoRecurse		= !recursive;

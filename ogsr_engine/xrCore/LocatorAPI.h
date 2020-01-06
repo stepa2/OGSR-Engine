@@ -62,6 +62,10 @@ private:
 	bool						Recurse			(LPCSTR path);	
 
 	files_it					file_find_it	(LPCSTR n);
+
+	IReader*					OpenFSLtx(LPCSTR config_file);
+	
+	void						LoadFSLtx(LPCSTR config_file);
 public:
 	enum{
 		flNeedRescan			= (1<<0),
@@ -108,7 +112,7 @@ public:
 
 	CStreamReader*				rs_open			(LPCSTR initial, LPCSTR N);
 	IReader*					r_open			(LPCSTR initial, LPCSTR N);
-	IC IReader*					r_open			(LPCSTR N){return r_open(0,N);}
+	IC IReader*					r_open			(LPCSTR N){return r_open(nullptr,N);}
 	void						r_close			(IReader* &S);
 	void						r_close			(CStreamReader* &fs);
 
