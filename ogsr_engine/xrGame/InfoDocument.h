@@ -10,24 +10,25 @@
 #include "InfoPortionDefs.h"
 #include "script_export_space.h"
 
-class CInfoDocument: public CInventoryItemObject {
+class CInfoDocument : public CInventoryItemObject
+{
 private:
-    typedef	CInventoryItemObject inherited;
+	typedef CInventoryItemObject inherited;
 public:
 	CInfoDocument(void);
 	virtual ~CInfoDocument(void);
 
-	virtual BOOL net_Spawn			(CSE_Abstract* DC);
-	virtual void Load				(LPCSTR section);
-	virtual void net_Destroy		();
-	virtual void shedule_Update		(u32 dt);
-	virtual void UpdateCL			();
-	virtual void renderable_Render	();
+	BOOL net_Spawn(CSE_Abstract* DC) override;
+	void Load(LPCSTR section) override;
+	void net_Destroy() override;
+	void shedule_Update(u32 dt) override;
+	void UpdateCL() override;
+	void renderable_Render() override;
 
-	virtual void OnH_A_Chield		();
-	virtual void OnH_B_Independent	(bool just_before_destroy);
+	void OnH_A_Chield() override;
+	void OnH_B_Independent(bool just_before_destroy) override;
 
-	DECLARE_SCRIPT_REGISTER_FUNCTION
+DECLARE_SCRIPT_REGISTER_FUNCTION
 
 protected:
 	//индекс информации, содержащейся в документе

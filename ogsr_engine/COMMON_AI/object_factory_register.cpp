@@ -117,7 +117,6 @@
 #	include "hairszone.h"
 #	include "amebazone.h"
 #	include "nogravityzone.h"
-#	include "simpledetector.h"
 
 #	include "torch.h"
 #	include "pda.h"

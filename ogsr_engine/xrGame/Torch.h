@@ -8,102 +8,105 @@
 class CLAItem;
 class CMonsterEffector;
 
-class CTorch : public CInventoryItemObject {
+class CTorch : public CInventoryItemObject
+{
 private:
-    typedef	CInventoryItemObject	inherited;
+	typedef CInventoryItemObject inherited;
 
 protected:
-	float			fBrightness;
-	CLAItem*		lanim;
-	float			time2hide;
+	float fBrightness;
+	CLAItem* lanim;
+	float time2hide;
 
-	u16				guid_bone;
-	shared_str		light_trace_bone;
+	u16 guid_bone;
+	shared_str light_trace_bone;
 
-	float			m_delta_h;
-	Fvector2		m_prev_hp;
-	bool			m_switched_on;
-	ref_light		light_render;
-	ref_light		light_omni;
-	ref_glow		glow_render;
-	Fvector			m_focus;
+	float m_delta_h;
+	Fvector2 m_prev_hp;
+	bool m_switched_on;
+	ref_light light_render;
+	ref_light light_omni;
+	ref_glow glow_render;
+	Fvector m_focus;
 private:
-	inline	bool	can_use_dynamic_lights	();
+	inline bool can_use_dynamic_lights();
 
 public:
-					CTorch				(void);
-	virtual			~CTorch				(void);
+	CTorch(void);
+	virtual ~CTorch(void);
 
-	virtual void	Load				(LPCSTR section);
-	virtual BOOL	net_Spawn			(CSE_Abstract* DC);
-	virtual void	net_Destroy			();
-	virtual void	net_Export			(NET_Packet& P);				// export to server
-	virtual void	net_Import			(NET_Packet& P);				// import from server
+	void Load(LPCSTR section) override;
+	BOOL net_Spawn(CSE_Abstract* DC) override;
+	void net_Destroy() override;
+	void net_Export(NET_Packet& P) override; // export to server
+	void net_Import(NET_Packet& P) override; // import from server
 
-	virtual void	OnH_A_Chield		();
-	virtual void	OnH_B_Independent	(bool just_before_destroy);
+	void OnH_A_Chield() override;
+	void OnH_B_Independent(bool just_before_destroy) override;
 
-	virtual void	UpdateCL			();
+	void UpdateCL() override;
 
-			void	Switch				();
-			void	Switch				(bool light_on);
+	void Switch();
+	void Switch(bool light_on);
 
-	virtual bool	can_be_attached		() const;
- 
+	bool can_be_attached() const override;
+
 public:
-			void	SwitchNightVision		  ();
-			void	SwitchNightVision		  (bool light_on);
-			void	UpdateSwitchNightVision   ();
-			float	NightVisionBattery		  ();
+	void SwitchNightVision();
+	void SwitchNightVision(bool light_on);
+	void UpdateSwitchNightVision();
+	float NightVisionBattery();
 protected:
-	bool					m_bNightVisionEnabled;
-	bool					m_bNightVisionOn;
+	bool m_bNightVisionEnabled;
+	bool m_bNightVisionOn;
 
-	HUD_SOUND				m_NightVisionOnSnd;
-	HUD_SOUND				m_NightVisionOffSnd;
-	HUD_SOUND				m_NightVisionIdleSnd;
-	HUD_SOUND				m_NightVisionBrokenSnd;
+	HUD_SOUND m_NightVisionOnSnd;
+	HUD_SOUND m_NightVisionOffSnd;
+	HUD_SOUND m_NightVisionIdleSnd;
+	HUD_SOUND m_NightVisionBrokenSnd;
 
 	/*float					m_NightVisionRechargeTime;
 	float					m_NightVisionRechargeTimeMin;
 	float					m_NightVisionDischargeTime;
 	float					m_NightVisionChargeTime;*/
 
-	enum EStats{
-		eTorchActive				= (1<<0),
-		eNightVisionActive			= (1<<1),
-		eAttached					= (1<<2)
+	enum EStats
+	{
+		eTorchActive = (1 << 0),
+		eNightVisionActive = (1 << 1),
+		eAttached = (1 << 2)
 	};
 
 public:
 
-	virtual bool			use_parent_ai_locations	() const
+	bool use_parent_ai_locations() const override
 	{
-		return				(!H_Parent());
+		return (!H_Parent());
 	}
-	virtual void	create_physic_shell		();
-	virtual void	activate_physic_shell	();
-	virtual void	setup_physic_shell		();
 
-	virtual void	afterDetach				();
-	virtual void	renderable_Render		();
+	void create_physic_shell() override;
+	void activate_physic_shell() override;
+	void setup_physic_shell() override;
+
+	void afterDetach() override;
+	void renderable_Render() override;
 
 	// alpet: управление светом фонаря
-	IRender_Light  *GetLight(int target = 0) const;
+	IRender_Light* GetLight(int target = 0) const;
 
-	void			SetAnimation(LPCSTR name);
-	void			SetBrightness(float brightness);
-	void			SetColor(const Fcolor &color, int target = 0);
-	void			SetRGB(float r, float g, float b, int target = 0);
-	void			SetAngle(float angle, int target = 0);
-	void			SetRange(float range, int target = 0);
-	void			SetTexture(LPCSTR texture, int target = 0);
-	void			SetVirtualSize(float size, int target = 0);
+	void SetAnimation(LPCSTR name);
+	void SetBrightness(float brightness);
+	void SetColor(const Fcolor& color, int target = 0);
+	void SetRGB(float r, float g, float b, int target = 0);
+	void SetAngle(float angle, int target = 0);
+	void SetRange(float range, int target = 0);
+	void SetTexture(LPCSTR texture, int target = 0);
+	void SetVirtualSize(float size, int target = 0);
 
-	DECLARE_SCRIPT_REGISTER_FUNCTION
+DECLARE_SCRIPT_REGISTER_FUNCTION
 };
 
-CTorch *get_torch(CScriptGameObject *script_obj); // alpet: для экспорта в объект CScriptGameObject
+CTorch* get_torch(CScriptGameObject* script_obj); // alpet: для экспорта в объект CScriptGameObject
 
 add_to_type_list(CTorch)
 #undef script_type_list
