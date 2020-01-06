@@ -445,6 +445,7 @@
     <ClInclude Include="ai\monsters\states\monster_state_attack_on_run.h" />
     <ClInclude Include="ai\monsters\states\monster_state_attack_on_run_inline.h" />
     <ClInclude Include="derived_client_classes.h" />
+    <ClInclude Include="GraviArtifact.h" />
     <ClInclude Include="InventoryContainer.h" />
     <ClInclude Include="mt_config.h" />
     <ClInclude Include="damage_manager.h" />
@@ -1654,6 +1655,7 @@
     <ClCompile Include="damage_manager.cpp" />
     <ClCompile Include="action_base_script.cpp" />
     <ClCompile Include="derived_client_classes.cpp" />
+    <ClCompile Include="GraviArtifact.cpp" />
     <ClCompile Include="InventoryContainer.cpp" />
     <ClCompile Include="script_action_wrapper.cpp" />
     <ClCompile Include="action_planner_script.cpp" />

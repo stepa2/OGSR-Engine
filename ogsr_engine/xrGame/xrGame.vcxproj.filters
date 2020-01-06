@@ -6009,6 +6009,9 @@
       <Filter>AI\AScript\ScriptClasses\UI\LoadScreen</Filter>
     </ClInclude>
     <ClInclude Include="ui\UIHelper.h" />
+    <ClInclude Include="GraviArtifact.h">
+      <Filter>Core\Client\Objects\items &amp; weapons\Artifacts</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -8757,6 +8760,9 @@
       <Filter>AI\AScript\ScriptClasses\UI\LoadScreen</Filter>
     </ClCompile>
     <ClCompile Include="ui\UIHelper.cpp" />
+    <ClCompile Include="GraviArtifact.cpp">
+      <Filter>Core\Client\Objects\items &amp; weapons\Artifacts</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuildStep Include="Explosive.h">
