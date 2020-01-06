@@ -1549,44 +1549,8 @@
     <Filter Include="Core\Client\Objects\items &amp; weapons\Artifacts">
       <UniqueIdentifier>{324b2f53-0c94-49b4-82b0-5904227f2701}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Core\Client\Objects\items &amp; weapons\Artifacts\Mercury Ball">
-      <UniqueIdentifier>{54a73e13-0e65-4858-84bf-2ffc32b995d4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\Client\Objects\items &amp; weapons\Artifacts\GraviArtifact">
-      <UniqueIdentifier>{5cc363b1-be32-4679-aceb-6e2016337209}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\Client\Objects\items &amp; weapons\Artifacts\BlackDrops">
-      <UniqueIdentifier>{faec46c3-8872-44a4-9d07-53c234e102ac}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\Client\Objects\items &amp; weapons\Artifacts\Needles">
-      <UniqueIdentifier>{2ecbc654-54de-49de-8544-c8afd58a9f90}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Core\Client\Objects\items &amp; weapons\Artifacts\BastArtifact">
       <UniqueIdentifier>{92048edd-11e7-4cba-8360-8b90e27f9096}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\Client\Objects\items &amp; weapons\Artifacts\BlackGraviArtifact">
-      <UniqueIdentifier>{1a7703eb-b74f-4de0-b1c2-2f16f7dfcb57}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\Client\Objects\items &amp; weapons\Artifacts\DummyArtifact">
-      <UniqueIdentifier>{0a63797d-6d1a-4d92-b462-4595e2b64300}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\Client\Objects\items &amp; weapons\Artifacts\ZudaArtifact">
-      <UniqueIdentifier>{cb8b2a3e-05fa-4a94-b57c-e673527292b9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\Client\Objects\items &amp; weapons\Artifacts\ThornArtifact">
-      <UniqueIdentifier>{10c32546-1cc0-4674-ae54-c308a9e46f96}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\Client\Objects\items &amp; weapons\Artifacts\Faded Ball">
-      <UniqueIdentifier>{7bca44d3-71cd-42a7-9e3d-b1d6842bd61c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\Client\Objects\items &amp; weapons\Artifacts\Electric Ball">
-      <UniqueIdentifier>{8482e0cd-7071-4e9b-98df-27f63eeaba2d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\Client\Objects\items &amp; weapons\Artifacts\RustyHairArtifact">
-      <UniqueIdentifier>{9b0d862d-e51a-4a5f-8143-d1375e7ac055}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\Client\Objects\items &amp; weapons\Artifacts\GalantineArtifact">
-      <UniqueIdentifier>{04bc5edd-bc32-45ba-ad6a-ab3fe9799a15}</UniqueIdentifier>
     </Filter>
     <Filter Include="Core\Client\Objects\items &amp; weapons\Devices">
       <UniqueIdentifier>{17e9e2dd-a8c3-4f27-94e9-8d586f6ee45e}</UniqueIdentifier>
@@ -4665,45 +4629,6 @@
     <ClInclude Include="Artifact.h">
       <Filter>Core\Client\Objects\items &amp; weapons\Artifacts</Filter>
     </ClInclude>
-    <ClInclude Include="MercuryBall.h">
-      <Filter>Core\Client\Objects\items &amp; weapons\Artifacts\Mercury Ball</Filter>
-    </ClInclude>
-    <ClInclude Include="GraviArtifact.h">
-      <Filter>Core\Client\Objects\items &amp; weapons\Artifacts\GraviArtifact</Filter>
-    </ClInclude>
-    <ClInclude Include="BlackDrops.h">
-      <Filter>Core\Client\Objects\items &amp; weapons\Artifacts\BlackDrops</Filter>
-    </ClInclude>
-    <ClInclude Include="Needles.h">
-      <Filter>Core\Client\Objects\items &amp; weapons\Artifacts\Needles</Filter>
-    </ClInclude>
-    <ClInclude Include="BastArtifact.h">
-      <Filter>Core\Client\Objects\items &amp; weapons\Artifacts\BastArtifact</Filter>
-    </ClInclude>
-    <ClInclude Include="BlackGraviArtifact.h">
-      <Filter>Core\Client\Objects\items &amp; weapons\Artifacts\BlackGraviArtifact</Filter>
-    </ClInclude>
-    <ClInclude Include="DummyArtifact.h">
-      <Filter>Core\Client\Objects\items &amp; weapons\Artifacts\DummyArtifact</Filter>
-    </ClInclude>
-    <ClInclude Include="ZudaArtifact.h">
-      <Filter>Core\Client\Objects\items &amp; weapons\Artifacts\ZudaArtifact</Filter>
-    </ClInclude>
-    <ClInclude Include="ThornArtifact.h">
-      <Filter>Core\Client\Objects\items &amp; weapons\Artifacts\ThornArtifact</Filter>
-    </ClInclude>
-    <ClInclude Include="FadedBall.h">
-      <Filter>Core\Client\Objects\items &amp; weapons\Artifacts\Faded Ball</Filter>
-    </ClInclude>
-    <ClInclude Include="ElectricBall.h">
-      <Filter>Core\Client\Objects\items &amp; weapons\Artifacts\Electric Ball</Filter>
-    </ClInclude>
-    <ClInclude Include="RustyHairArtifact.h">
-      <Filter>Core\Client\Objects\items &amp; weapons\Artifacts\RustyHairArtifact</Filter>
-    </ClInclude>
-    <ClInclude Include="GalantineArtifact.h">
-      <Filter>Core\Client\Objects\items &amp; weapons\Artifacts\GalantineArtifact</Filter>
-    </ClInclude>
     <ClInclude Include="CustomDetector.h">
       <Filter>Core\Client\Objects\items &amp; weapons\Devices\Detectors</Filter>
     </ClInclude>
@@ -7765,45 +7690,6 @@
     </ClCompile>
     <ClCompile Include="Artifact.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Artifacts</Filter>
-    </ClCompile>
-    <ClCompile Include="MercuryBall.cpp">
-      <Filter>Core\Client\Objects\items &amp; weapons\Artifacts\Mercury Ball</Filter>
-    </ClCompile>
-    <ClCompile Include="GraviArtifact.cpp">
-      <Filter>Core\Client\Objects\items &amp; weapons\Artifacts\GraviArtifact</Filter>
-    </ClCompile>
-    <ClCompile Include="BlackDrops.cpp">
-      <Filter>Core\Client\Objects\items &amp; weapons\Artifacts\BlackDrops</Filter>
-    </ClCompile>
-    <ClCompile Include="Needles.cpp">
-      <Filter>Core\Client\Objects\items &amp; weapons\Artifacts\Needles</Filter>
-    </ClCompile>
-    <ClCompile Include="BastArtifact.cpp">
-      <Filter>Core\Client\Objects\items &amp; weapons\Artifacts\BastArtifact</Filter>
-    </ClCompile>
-    <ClCompile Include="BlackGraviArtifact.cpp">
-      <Filter>Core\Client\Objects\items &amp; weapons\Artifacts\BlackGraviArtifact</Filter>
-    </ClCompile>
-    <ClCompile Include="DummyArtifact.cpp">
-      <Filter>Core\Client\Objects\items &amp; weapons\Artifacts\DummyArtifact</Filter>
-    </ClCompile>
-    <ClCompile Include="ZudaArtifact.cpp">
-      <Filter>Core\Client\Objects\items &amp; weapons\Artifacts\ZudaArtifact</Filter>
-    </ClCompile>
-    <ClCompile Include="ThornArtifact.cpp">
-      <Filter>Core\Client\Objects\items &amp; weapons\Artifacts\ThornArtifact</Filter>
-    </ClCompile>
-    <ClCompile Include="FadedBall.cpp">
-      <Filter>Core\Client\Objects\items &amp; weapons\Artifacts\Faded Ball</Filter>
-    </ClCompile>
-    <ClCompile Include="ElectricBall.cpp">
-      <Filter>Core\Client\Objects\items &amp; weapons\Artifacts\Electric Ball</Filter>
-    </ClCompile>
-    <ClCompile Include="RustyHairArtifact.cpp">
-      <Filter>Core\Client\Objects\items &amp; weapons\Artifacts\RustyHairArtifact</Filter>
-    </ClCompile>
-    <ClCompile Include="GalantineArtifact.cpp">
-      <Filter>Core\Client\Objects\items &amp; weapons\Artifacts\GalantineArtifact</Filter>
     </ClCompile>
     <ClCompile Include="CustomDetector.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Devices\Detectors</Filter>

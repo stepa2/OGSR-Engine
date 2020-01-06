@@ -37,6 +37,12 @@
     <Filter Include="intrusive_ptr">
       <UniqueIdentifier>{8c0b93f8-63e4-4abd-b6ab-ffb508cd22ad}</UniqueIdentifier>
     </Filter>
+    <Filter Include="XML_Parser">
+      <UniqueIdentifier>{c21187ca-a254-4508-b106-203dce0324bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Threading">
+      <UniqueIdentifier>{1359157e-93cd-4161-8071-b7f71df34faf}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Compression">
       <UniqueIdentifier>{0cd59bba-b771-438a-8c04-08bf07c29af7}</UniqueIdentifier>
     </Filter>
@@ -45,12 +51,6 @@
     </Filter>
     <Filter Include="Compression\lz">
       <UniqueIdentifier>{7497b182-8ea0-4fc8-aef1-7544413b4f18}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="XML_Parser">
-      <UniqueIdentifier>{c21187ca-a254-4508-b106-203dce0324bb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Threading">
-      <UniqueIdentifier>{1359157e-93cd-4161-8071-b7f71df34faf}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
