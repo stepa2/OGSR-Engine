@@ -1549,9 +1549,6 @@
     <Filter Include="Core\Client\Objects\items &amp; weapons\Artifacts">
       <UniqueIdentifier>{324b2f53-0c94-49b4-82b0-5904227f2701}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Core\Client\Objects\items &amp; weapons\Artifacts\BastArtifact">
-      <UniqueIdentifier>{92048edd-11e7-4cba-8360-8b90e27f9096}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Core\Client\Objects\items &amp; weapons\Devices">
       <UniqueIdentifier>{17e9e2dd-a8c3-4f27-94e9-8d586f6ee45e}</UniqueIdentifier>
     </Filter>
