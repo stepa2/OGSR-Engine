@@ -24,18 +24,18 @@ namespace detail
 	} // dog
 } // detail
 
-CStateManagerDog::CStateManagerDog(CAI_Dog *monster) : inherited(monster)
+CStateManagerDog::CStateManagerDog(CAI_Dog* monster) : inherited(monster)
 {
-	add_state(eStateRest,					xr_new<CStateGroupRest<CAI_Dog> >					(monster));
-	add_state(eStatePanic,					xr_new<CStateGroupPanic<CAI_Dog> >					(monster));
-	add_state(eStateAttack,					xr_new<CStateGroupAttack<CAI_Dog> >					(monster));
-	add_state(eStateEat,					xr_new<CStateGroupEat<CAI_Dog> >					(monster));
-	add_state(eStateHearInterestingSound,	xr_new<CStateMonsterHearInterestingSound<CAI_Dog> >	(monster));
-	add_state(eStateHearDangerousSound,		xr_new<CStateGroupHearDangerousSound<CAI_Dog> >		(monster));
-	add_state(eStateHitted,					xr_new<CStateMonsterHitted<CAI_Dog> >				(monster));
-	add_state(eStateControlled,				xr_new<CStateMonsterControlled<CAI_Dog> >			(monster));
-	add_state(eStateHearHelpSound,			xr_new<CStateMonsterHearHelpSound<CAI_Dog> >		(monster));
-	object->EatedCorpse	= NULL;
+	add_state(eStateRest, xr_new<CStateGroupRest<CAI_Dog>>(monster));
+	add_state(eStatePanic, xr_new<CStateGroupPanic<CAI_Dog>>(monster));
+	add_state(eStateAttack, xr_new<CStateGroupAttack<CAI_Dog>>(monster));
+	add_state(eStateEat, xr_new<CStateGroupEat<CAI_Dog>>(monster));
+	add_state(eStateHearInterestingSound, xr_new<CStateMonsterHearInterestingSound<CAI_Dog>>(monster));
+	add_state(eStateHearDangerousSound, xr_new<CStateGroupHearDangerousSound<CAI_Dog>>(monster));
+	add_state(eStateHitted, xr_new<CStateMonsterHitted<CAI_Dog>>(monster));
+	add_state(eStateControlled, xr_new<CStateMonsterControlled<CAI_Dog>>(monster));
+	add_state(eStateHearHelpSound, xr_new<CStateMonsterHearHelpSound<CAI_Dog>>(monster));
+	object->EatedCorpse = NULL;
 }
 
 void CStateManagerDog::execute()
@@ -72,8 +72,10 @@ void CStateManagerDog::execute()
 			CMonsterSquad* squad = monster_squad().get_squad(object);
 			switch (object->EnemyMan.get_danger_type())
 			{
-			case eStrong: state_id = eStatePanic;  break;
-			case eWeak:   state_id = eStateAttack; break;
+			case eStrong: state_id = eStatePanic;
+				break;
+			case eWeak: state_id = eStateAttack;
+				break;
 			}
 			if (state_id == eStatePanic && squad->squad_alife_count() > 2)
 			{
@@ -127,7 +129,9 @@ void CStateManagerDog::execute()
 		object->anim_end_reinit();
 	}
 
-	if (prev_substate == eStateEat && current_substate != eStateEat && object->character_physics_support()->movement()->PHCapture())
+	if (prev_substate == eStateEat && current_substate != eStateEat && object
+	                                                                   ->character_physics_support()->movement()->
+	                                                                   PHCapture())
 	{
 		object->character_physics_support()->movement()->PHReleaseObject();
 	}
@@ -140,5 +144,5 @@ void CStateManagerDog::execute()
 
 bool CStateManagerDog::check_eat()
 {
-	return (!object->CorpseMan.get_corpse() && !object->EatedCorpse) ? false :inherited::check_state(eStateEat);
+	return (!object->CorpseMan.get_corpse() && !object->EatedCorpse) ? false : inherited::check_state(eStateEat);
 }

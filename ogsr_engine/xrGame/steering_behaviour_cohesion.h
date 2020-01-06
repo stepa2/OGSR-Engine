@@ -14,23 +14,22 @@
 
 class CAI_Rat;
 
-namespace steering_behaviour {
-
-class cohesion :
-	public base,
-	private debug::make_final<cohesion>
+namespace steering_behaviour
 {
-public:
-						cohesion	(CAI_Rat const *object);
+	class cohesion :
+		public base,
+		private debug::make_final<cohesion>
+	{
+	public:
+		cohesion(CAI_Rat const* object);
 
-    cohesion(const cohesion& other) = delete;
-    cohesion& operator=(const cohesion& other) = delete;
-	virtual	Fvector		direction	();
+		cohesion(const cohesion& other) = delete;
+		cohesion& operator=(const cohesion& other) = delete;
+		virtual Fvector direction();
 
-private:
-	typedef base		inherited;
-};
-
+	private:
+		typedef base inherited;
+	};
 } // namespace steering_behaviour
 
 #endif // STEERING_BEHAVIOUR_COHESION_H_INCLUDED

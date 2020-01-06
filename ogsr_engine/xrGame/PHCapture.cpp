@@ -9,32 +9,33 @@
 #include "../Include/xrRender/Kinematics.h"
 #include "characterphysicssupport.h"
 #include "Actor.h"
+
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////
 
 
 void CPHCapture::CreateBody()
 {
-	m_body= dBodyCreate(0);
+	m_body = dBodyCreate(0);
 	m_island.AddBody(m_body);
 	dMass m;
-	dMassSetSphere(&m,1.f,1000000.f);
-	dMassAdjust(&m,100000.f);
-	dBodySetMass(m_body,&m);
-	dBodySetGravityMode(m_body,0);
+	dMassSetSphere(&m, 1.f, 1000000.f);
+	dMassAdjust(&m, 100000.f);
+	dBodySetMass(m_body, &m);
+	dBodySetGravityMode(m_body, 0);
 }
 
 CPHCapture::~CPHCapture()
 {
-	
 	Deactivate();
 }
+
 void CPHCapture::PhDataUpdate(dReal /**step/**/)
 {
-	if(b_failed) return;
-	switch(e_state) 
+	if (b_failed) return;
+	switch (e_state)
 	{
-	case cstPulling:  PullingUpdate();
+	case cstPulling: PullingUpdate();
 		break;
 	case cstCaptured: CapturedUpdate();
 		break;
@@ -46,46 +47,45 @@ void CPHCapture::PhDataUpdate(dReal /**step/**/)
 
 void CPHCapture::PhTune(dReal /**step/**/)
 {
-	if(b_failed) return;
+	if (b_failed) return;
 	//if(!m_taget_object->PPhysicsShell())	{
 	//	b_failed=true;
 	//	return;			//. hack
 	//}
-	bool act_capturer=m_character->CPHObject::is_active();
-	bool act_taget=m_taget_object->PPhysicsShell()->isEnabled();
-	b_disabled=!act_capturer&&!act_taget;
-	if(act_capturer)
+	bool act_capturer = m_character->CPHObject::is_active();
+	bool act_taget = m_taget_object->PPhysicsShell()->isEnabled();
+	b_disabled = !act_capturer && !act_taget;
+	if (act_capturer)
 	{
 		m_taget_element->Enable();
 	}
-	if(act_taget)
+	if (act_taget)
 	{
 		m_character->Enable();
 	}
-	switch(e_state) 
+	switch (e_state)
 	{
-	case cstPulling:  ;
+	case cstPulling: ;
 		break;
-	case cstCaptured: 
+	case cstCaptured:
 		{
-				if(b_disabled) dBodyDisable(m_body);
-				else 
-				{
-					m_character->Island().Merge(&m_island);
-					m_taget_element->PhysicsShell()->PIsland()->Merge(&m_island);
-				}
+			if (b_disabled) dBodyDisable(m_body);
+			else
+			{
+				m_character->Island().Merge(&m_island);
+				m_taget_element->PhysicsShell()->PIsland()->Merge(&m_island);
+			}
 		}
 		break;
 	case cstReleased: ;
 		break;
 	default: NODEFAULT;
 	}
-
 }
 
 void CPHCapture::PullingUpdate()
 {
-	if(!m_taget_element->isActive()||Device.dwTimeGlobal-m_time_start>m_capture_time)
+	if (!m_taget_element->isActive() || Device.dwTimeGlobal - m_time_start > m_capture_time)
 	{
 		Release();
 		return;
@@ -94,8 +94,8 @@ void CPHCapture::PullingUpdate()
 	Fvector dir;
 	Fvector capture_bone_position = GetCapturePosition();
 	m_taget_element->GetGlobalPositionDynamic(&dir);
-	dir.sub(capture_bone_position,dir);
-	float dist=dir.magnitude();
+	dir.sub(capture_bone_position, dir);
+	float dist = dir.magnitude();
 	if (dist > m_pull_distance)
 	{
 		Release();
@@ -114,12 +114,12 @@ void CPHCapture::PullingUpdate()
 		dJointSetAMotorNumAxes(m_ajoint, 3);
 
 		CreateBody();
-		dBodySetPosition(m_body,capture_bone_position.x,capture_bone_position.y,capture_bone_position.z);
-		dJointAttach(m_joint,m_body,m_taget_element->get_body());
-		dJointAttach(m_ajoint,m_body,m_taget_element->get_body());
-		dJointSetFeedback (m_joint, &m_joint_feedback);
-		dJointSetFeedback (m_ajoint, &m_joint_feedback);
-		dJointSetBallAnchor(m_joint,capture_bone_position.x,capture_bone_position.y,capture_bone_position.z);
+		dBodySetPosition(m_body, capture_bone_position.x, capture_bone_position.y, capture_bone_position.z);
+		dJointAttach(m_joint, m_body, m_taget_element->get_body());
+		dJointAttach(m_ajoint, m_body, m_taget_element->get_body());
+		dJointSetFeedback(m_joint, &m_joint_feedback);
+		dJointSetFeedback(m_ajoint, &m_joint_feedback);
+		dJointSetBallAnchor(m_joint, capture_bone_position.x, capture_bone_position.y, capture_bone_position.z);
 
 		dJointSetAMotorAxis(m_ajoint, 0, 1, dir.x, dir.y, dir.z);
 
@@ -127,12 +127,12 @@ void CPHCapture::PullingUpdate()
 		{
 			if (dir.y > EPS)
 			{
-				float mag = dir.x*dir.x + dir.y*dir.y;
+				float mag = dir.x * dir.x + dir.y * dir.y;
 				dJointSetAMotorAxis(m_ajoint, 2, 2, -dir.y / mag, dir.x / mag, 0.f);
 			}
 			else if (dir.z > EPS)
 			{
-				float mag = dir.x*dir.x + dir.z*dir.z;
+				float mag = dir.x * dir.x + dir.z * dir.z;
 				dJointSetAMotorAxis(m_ajoint, 2, 2, -dir.z / mag, 0.f, dir.x / mag);
 			}
 			else
@@ -146,7 +146,7 @@ void CPHCapture::PullingUpdate()
 			{
 				if (dir.z > EPS)
 				{
-					float mag = dir.y*dir.y + dir.z*dir.z;
+					float mag = dir.y * dir.y + dir.z * dir.z;
 					dJointSetAMotorAxis(m_ajoint, 2, 2, 0.f, -dir.z / mag, dir.y / mag);
 				}
 				else
@@ -160,13 +160,13 @@ void CPHCapture::PullingUpdate()
 			}
 		}
 
-		dJointSetAMotorParam(m_ajoint, dParamFMax, m_capture_force*0.2f);
+		dJointSetAMotorParam(m_ajoint, dParamFMax, m_capture_force * 0.2f);
 		dJointSetAMotorParam(m_ajoint, dParamVel, 0.f);
 
-		dJointSetAMotorParam(m_ajoint, dParamFMax2, m_capture_force*0.2f);
+		dJointSetAMotorParam(m_ajoint, dParamFMax2, m_capture_force * 0.2f);
 		dJointSetAMotorParam(m_ajoint, dParamVel2, 0.f);
 
-		dJointSetAMotorParam(m_ajoint, dParamFMax3, m_capture_force*0.2f);
+		dJointSetAMotorParam(m_ajoint, dParamFMax3, m_capture_force * 0.2f);
 		dJointSetAMotorParam(m_ajoint, dParamVel3, 0.f);
 
 		///////////////////////////////////
@@ -209,7 +209,8 @@ void CPHCapture::CapturedUpdate()
 		m_taget_element->Enable();
 	}
 
-	if ( !m_taget_element->isActive() || ( !m_hard_mode && dDOT( m_joint_feedback.f2, m_joint_feedback.f2 ) > m_capture_force*m_capture_force ) )
+	if (!m_taget_element->isActive() || (!m_hard_mode && dDOT(m_joint_feedback.f2, m_joint_feedback.f2) >
+		m_capture_force * m_capture_force))
 	{
 		Release();
 		return;
@@ -217,14 +218,14 @@ void CPHCapture::CapturedUpdate()
 
 	float mag = dSqrt(dDOT(m_joint_feedback.f1, m_joint_feedback.f1));
 
-	if (b_character_feedback&&mag > m_capture_force / 2.2f)
+	if (b_character_feedback && mag > m_capture_force / 2.2f)
 	{
 		float f = mag / (m_capture_force / 15.f);
 		m_character->ApplyForce(m_joint_feedback.f1[0] / f, m_joint_feedback.f1[1] / f, m_joint_feedback.f1[2] / f);
 	}
 
 	Fvector capture_bone_position = GetCapturePosition();
-	dBodySetPosition(m_body,capture_bone_position.x,capture_bone_position.y,capture_bone_position.z);
+	dBodySetPosition(m_body, capture_bone_position.x, capture_bone_position.y, capture_bone_position.z);
 }
 
 void CPHCapture::ReleasedUpdate()
@@ -232,7 +233,7 @@ void CPHCapture::ReleasedUpdate()
 	if (b_disabled) return;
 	if (!b_collide)
 	{
-		b_failed=true;
+		b_failed = true;
 		m_taget_element->Enable();
 	}
 	b_collide = false;
@@ -241,13 +242,14 @@ void CPHCapture::ReleasedUpdate()
 void CPHCapture::ReleaseInCallBack()
 {
 	//	if(!b_failed) return;
-	b_collide=true;
+	b_collide = true;
 }
 
-void CPHCapture::object_contactCallbackFun(bool& do_colide, bool bo1, dContact& c, SGameMtl * /*material_1*/, SGameMtl * /*material_2*/)
+void CPHCapture::object_contactCallbackFun(bool& do_colide, bool bo1, dContact& c, SGameMtl* /*material_1*/,
+                                           SGameMtl* /*material_2*/)
 {
-	dxGeomUserData *l_pUD1 = NULL;
-	dxGeomUserData *l_pUD2 = NULL;
+	dxGeomUserData* l_pUD1 = NULL;
+	dxGeomUserData* l_pUD2 = NULL;
 	l_pUD1 = retrieveGeomUserData(c.geom.g1);
 	l_pUD2 = retrieveGeomUserData(c.geom.g2);
 
@@ -289,22 +291,24 @@ void CPHCapture::object_contactCallbackFun(bool& do_colide, bool bo1, dContact& 
 		}
 	}
 }
+
 void CPHCapture::net_Relcase(CObject* O)
 {
-	if(static_cast<CObject*>(m_taget_object)==O)
+	if (static_cast<CObject*>(m_taget_object) == O)
 	{
 		Deactivate();
 	}
 }
 
 
-Fvector CPHCapture::GetCapturePosition() {
-  Fvector pos;
-  CObject* object = smart_cast<CObject*>( m_character->PhysicsRefObject() );
-  pos.set( m_capture_bone->mTransform.c );
-  object->XFORM().transform_tiny( pos );
-  CActor* A = smart_cast<CActor*>( m_character->PhysicsRefObject() );
-  if ( A )
-    pos.mad( pos, A->Direction(), .5f );
-  return pos;
+Fvector CPHCapture::GetCapturePosition()
+{
+	Fvector pos;
+	CObject* object = smart_cast<CObject*>(m_character->PhysicsRefObject());
+	pos.set(m_capture_bone->mTransform.c);
+	object->XFORM().transform_tiny(pos);
+	CActor* A = smart_cast<CActor*>(m_character->PhysicsRefObject());
+	if (A)
+		pos.mad(pos, A->Direction(), .5f);
+	return pos;
 }

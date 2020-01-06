@@ -7,7 +7,7 @@
 #pragma once
 #include "artifact.h"
 
-class CGraviArtefact : public CArtefact 
+class CGraviArtefact : public CArtefact
 {
 private:
 	typedef CArtefact inherited;
@@ -15,10 +15,10 @@ public:
 	CGraviArtefact(void);
 	virtual ~CGraviArtefact(void);
 
-	virtual void Load				(LPCSTR section);
+	virtual void Load(LPCSTR section);
 
 protected:
-	virtual void	UpdateCLChild	();
+	virtual void UpdateCLChild();
 	//параметры артефакта
 	float m_fJumpHeight;
 	float m_fEnergy;

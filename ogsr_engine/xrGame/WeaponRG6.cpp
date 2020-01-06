@@ -15,7 +15,7 @@ CWeaponRG6::~CWeaponRG6()
 {
 }
 
-BOOL	CWeaponRG6::net_Spawn				(CSE_Abstract* DC)
+BOOL CWeaponRG6::net_Spawn(CSE_Abstract* DC)
 {
 	BOOL l_res = inheritedSG::net_Spawn(DC);
 	if (!l_res) return l_res;
@@ -27,16 +27,16 @@ BOOL	CWeaponRG6::net_Spawn				(CSE_Abstract* DC)
 
 		if (fake_grenade_name.size())
 		{
-			int k=iAmmoElapsed;
+			int k = iAmmoElapsed;
 			while (k)
 			{
 				k--;
 				inheritedRL::SpawnRocket(*fake_grenade_name, this);
 			}
 		}
-//			inheritedRL::SpawnRocket(*fake_grenade_name, this);
+		//			inheritedRL::SpawnRocket(*fake_grenade_name, this);
 	}
-	
+
 	return l_res;
 };
 
@@ -51,14 +51,15 @@ void CWeaponRG6::Load(LPCSTR section)
 
 void CWeaponRG6::LaunchGrenade(const Fvector& p1, const Fvector& d1)
 {
-	if(getRocketCount() ) 
-	{	
+	if (getRocketCount())
+	{
 		Fvector p, d;
 		p = p1;
 		d = d1;
 
 		CEntity* E = smart_cast<CEntity*>(H_Parent());
-		if (E){
+		if (E)
+		{
 #ifdef DEBUG
 			CInventoryOwner* io		= smart_cast<CInventoryOwner*>(H_Parent());
 			if(NULL == io->inventory().ActiveItem())
@@ -77,14 +78,14 @@ void CWeaponRG6::LaunchGrenade(const Fvector& p1, const Fvector& d1)
 		launch_matrix.identity();
 		launch_matrix.k.set(d);
 		Fvector::generate_orthonormal_basis(launch_matrix.k,
-											launch_matrix.j, launch_matrix.i);
+		                                    launch_matrix.j, launch_matrix.i);
 		launch_matrix.c.set(p);
 
 		if (IsZoomed() && H_Parent()->CLS_ID == CLSID_OBJECT_ACTOR)
 		{
 			H_Parent()->setEnabled(FALSE);
 			setEnabled(FALSE);
-		
+
 			collide::rq_result RQ;
 			BOOL HasPick = Level().ObjectSpace.RayPick(p, d, 300.0f, collide::rqtStatic, RQ, this);
 
@@ -102,7 +103,8 @@ void CWeaponRG6::LaunchGrenade(const Fvector& p1, const Fvector& d1)
 				DBG_OpenCashedDraw();
 				DBG_DrawLine(p1,Fvector().add(p1,d),D3DCOLOR_XRGB(255,0,0));
 #endif
-				u8 canfire0 = TransferenceAndThrowVelToThrowDir(Transference, CRocketLauncher::m_fLaunchSpeed, EffectiveGravity(), res);
+				u8 canfire0 = TransferenceAndThrowVelToThrowDir(Transference, CRocketLauncher::m_fLaunchSpeed,
+				                                                EffectiveGravity(), res);
 #ifdef DEBUG
 				if(canfire0>0)DBG_DrawLine(p1,Fvector().add(p1,res[0]),D3DCOLOR_XRGB(0,255,0));
 				if(canfire0>1)DBG_DrawLine(p1,Fvector().add(p1,res[1]),D3DCOLOR_XRGB(0,0,255));
@@ -110,7 +112,7 @@ void CWeaponRG6::LaunchGrenade(const Fvector& p1, const Fvector& d1)
 #endif
 				if (canfire0 != 0)
 				{
-//					Msg ("d[%f,%f,%f] - res [%f,%f,%f]", d.x, d.y, d.z, res[0].x, res[0].y, res[0].z);
+					//					Msg ("d[%f,%f,%f] - res [%f,%f,%f]", d.x, d.y, d.z, res[0].x, res[0].y, res[0].z);
 					d = res[0];
 				};
 			}
@@ -118,18 +120,18 @@ void CWeaponRG6::LaunchGrenade(const Fvector& p1, const Fvector& d1)
 
 		d.normalize();
 		d.mul(m_fLaunchSpeed);
-		VERIFY2(_valid(launch_matrix),"CWeaponRG6::LaunchGrenade. Invalid launch_matrix");
+		VERIFY2(_valid(launch_matrix), "CWeaponRG6::LaunchGrenade. Invalid launch_matrix");
 		CRocketLauncher::LaunchRocket(launch_matrix, d, zero_vel);
 
 		CExplosiveRocket* pGrenade = smart_cast<CExplosiveRocket*>(getCurrentRocket());
 		VERIFY(pGrenade);
 		pGrenade->SetInitiator(H_Parent()->ID());
-		pGrenade->SetRealGrenadeName( m_ammoTypes[ m_ammoType ] );
+		pGrenade->SetRealGrenadeName(m_ammoTypes[m_ammoType]);
 
 		if (OnServer())
 		{
 			NET_Packet P;
-			u_EventGen(P,GE_LAUNCH_ROCKET,ID());
+			u_EventGen(P, GE_LAUNCH_ROCKET, ID());
 			P.w_u16(u16(getCurrentRocket()->ID()));
 			u_EventSend(P);
 		}
@@ -146,34 +148,39 @@ void CWeaponRG6::FireTrace(const Fvector& P, const Fvector& D)
 	}
 }
 
-u8 CWeaponRG6::AddCartridge		(u8 cnt)
+u8 CWeaponRG6::AddCartridge(u8 cnt)
 {
 	u8 t = inheritedSG::AddCartridge(cnt);
-	u8 k = cnt-t;
+	u8 k = cnt - t;
 	shared_str fake_grenade_name = pSettings->r_string(*m_ammoTypes[m_ammoType], "fake_grenade_name");
-	while(k){
+	while (k)
+	{
 		--k;
 		inheritedRL::SpawnRocket(*fake_grenade_name, this);
 	}
 	return k;
 }
 
-void CWeaponRG6::OnEvent(NET_Packet& P, u16 type) 
+void CWeaponRG6::OnEvent(NET_Packet& P, u16 type)
 {
-	inheritedSG::OnEvent(P,type);
+	inheritedSG::OnEvent(P, type);
 
 	u16 id;
-	switch (type) {
-	case GE_OWNERSHIP_TAKE: {
-		P.r_u16(id);
-		inheritedRL::AttachRocket(id, this);
-	} break;
+	switch (type)
+	{
+	case GE_OWNERSHIP_TAKE:
+		{
+			P.r_u16(id);
+			inheritedRL::AttachRocket(id, this);
+		}
+		break;
 	case GE_OWNERSHIP_REJECT:
 	case GE_LAUNCH_ROCKET:
-	{
-		bool bLaunch = (type == GE_LAUNCH_ROCKET);
-		P.r_u16(id);
-		inheritedRL::DetachRocket(id, bLaunch);
-	} break;
+		{
+			bool bLaunch = (type == GE_LAUNCH_ROCKET);
+			P.r_u16(id);
+			inheritedRL::DetachRocket(id, bLaunch);
+		}
+		break;
 	}
 }

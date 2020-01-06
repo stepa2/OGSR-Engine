@@ -13,13 +13,13 @@ void DestroyUIGeom()
 }
 
 CUIStaticItem::CUIStaticItem()
-{    
-	dwColor			= 0xffffffff;
-	iTileX			= 1;
-	iTileY			= 1;
-	iRemX			= 0.0f;
-	iRemY			= 0.0f;
-	alpha_ref		= -1;
+{
+	dwColor = 0xffffffff;
+	iTileX = 1;
+	iTileY = 1;
+	iRemX = 0.0f;
+	iRemY = 0.0f;
+	alpha_ref = -1;
 #ifdef DEBUG
 	dbg_tex_name = NULL;
 #endif
@@ -48,9 +48,9 @@ void CUIStaticItem::Init(LPCSTR tex, LPCSTR sh, float left, float top, u32 align
 {
 	uFlags.set(flValidRect, FALSE);
 
-	CreateShader	(tex,sh);
-	SetPos			(left,top);
-	SetAlign		(align);
+	CreateShader(tex, sh);
+	SetPos(left, top);
+	SetAlign(align);
 }
 
 void CUIStaticItem::Render()
@@ -62,38 +62,38 @@ void CUIStaticItem::Render()
 		UIRender->SetAlphaRef(alpha_ref);
 
 	// convert&set pos
-	Fvector2		bp;
-	UI()->ClientToScreenScaled	(bp,float(iPos.x),float(iPos.y));
-	bp.x						= (float)iFloor(bp.x);
-	bp.y						= (float)iFloor(bp.y);
+	Fvector2 bp;
+	UI()->ClientToScreenScaled(bp, float(iPos.x), float(iPos.y));
+	bp.x = (float)iFloor(bp.x);
+	bp.y = (float)iFloor(bp.y);
 
 	// actual rendering
-	Fvector2					pos;
-	Fvector2					f_len;
-	UI()->ClientToScreenScaled	(f_len, iVisRect.x2, iVisRect.y2 );
+	Fvector2 pos;
+	Fvector2 f_len;
+	UI()->ClientToScreenScaled(f_len, iVisRect.x2, iVisRect.y2);
 
-	int tile_x					= fis_zero(iRemX)?iTileX:iTileX+1;
-	int tile_y					= fis_zero(iRemY)?iTileY:iTileY+1;
-	if (!(tile_x&&tile_y))		return;
+	int tile_x = fis_zero(iRemX) ? iTileX : iTileX + 1;
+	int tile_y = fis_zero(iRemY) ? iTileY : iTileY + 1;
+	if (!(tile_x && tile_y)) return;
 
 	// render
-	UIRender->StartPrimitive(8 * tile_x*tile_y, IUIRender::ptTriList, UI()->m_currentPointType);
+	UIRender->StartPrimitive(8 * tile_x * tile_y, IUIRender::ptTriList, UI()->m_currentPointType);
 	for (int x = 0; x < tile_x; ++x)
 	{
 		for (int y = 0; y < tile_y; ++y)
 		{
-			pos.set(bp.x + f_len.x*x, bp.y + f_len.y*y);
+			pos.set(bp.x + f_len.x * x, bp.y + f_len.y * y);
 			inherited::Render(pos, dwColor);
 		}
 	}
 
 	// set scissor
-	Frect clip_rect				= {iPos.x,iPos.y,iPos.x+iVisRect.x2*iTileX+iRemX,iPos.y+iVisRect.y2*iTileY+iRemY};
-	UI()->PushScissor			(clip_rect);
+	Frect clip_rect = {iPos.x, iPos.y, iPos.x + iVisRect.x2 * iTileX + iRemX, iPos.y + iVisRect.y2 * iTileY + iRemY};
+	UI()->PushScissor(clip_rect);
 
 	UIRender->FlushPrimitive();
 
-	UI()->PopScissor			();
+	UI()->PopScissor();
 
 	if (alpha_ref != -1)
 		UIRender->SetAlphaRef(0);
@@ -108,7 +108,7 @@ void CUIStaticItem::Render(float angle)
 		UIRender->SetAlphaRef(alpha_ref);
 
 	// convert&set pos
-	Fvector2		bp_ns;
+	Fvector2 bp_ns;
 	bp_ns.set(iPos);
 
 

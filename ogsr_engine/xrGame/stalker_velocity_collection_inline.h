@@ -8,17 +8,19 @@
 
 #pragma once
 
-inline float CStalkerVelocityCollection::velocity	(
-		const MonsterSpace::EMentalState		&mental_state,
-		const MonsterSpace::EBodyState			&body_state,
-		const MonsterSpace::EMovementType		&movement_type,
-		const MonsterSpace::EMovementDirection	&movement_direction
-	) const
+inline float CStalkerVelocityCollection::velocity(
+	const MonsterSpace::EMentalState& mental_state,
+	const MonsterSpace::EBodyState& body_state,
+	const MonsterSpace::EMovementType& movement_type,
+	const MonsterSpace::EMovementDirection& movement_direction
+) const
 {
-	VERIFY				(movement_type != MonsterSpace::eMovementTypeStand);
+	VERIFY(movement_type != MonsterSpace::eMovementTypeStand);
 
-	switch (mental_state) {
-		case MonsterSpace::eMentalStateDanger : {
+	switch (mental_state)
+	{
+	case MonsterSpace::eMentalStateDanger:
+		{
 #ifdef DEBUG
 			switch (body_state) {
 				case MonsterSpace::eBodyStateStand	:
@@ -38,11 +40,12 @@ inline float CStalkerVelocityCollection::velocity	(
 				default												:	NODEFAULT;
 			}
 #endif
-			return		(m_danger[body_state][movement_type][movement_direction]);
+			return (m_danger[body_state][movement_type][movement_direction]);
 		}
-		case MonsterSpace::eMentalStateFree : {
-			VERIFY		(body_state == MonsterSpace::eBodyStateStand);
-			VERIFY		(movement_direction == MonsterSpace::eMovementDirectionForward);
+	case MonsterSpace::eMentalStateFree:
+		{
+			VERIFY(body_state == MonsterSpace::eBodyStateStand);
+			VERIFY(movement_direction == MonsterSpace::eMovementDirectionForward);
 #ifdef DEBUG
 			switch (movement_type) {
 				case MonsterSpace::eMovementTypeWalk:
@@ -50,15 +53,16 @@ inline float CStalkerVelocityCollection::velocity	(
 				default								:	NODEFAULT;
 			}
 #endif
-			return		(m_free[movement_type]);
+			return (m_free[movement_type]);
 		}
-		case MonsterSpace::eMentalStatePanic : {
-			VERIFY		(body_state == MonsterSpace::eBodyStateStand);
-			VERIFY		(movement_type == MonsterSpace::eMovementTypeRun);
-			VERIFY		(movement_direction == MonsterSpace::eMovementDirectionForward);
-			return		(m_panic);
+	case MonsterSpace::eMentalStatePanic:
+		{
+			VERIFY(body_state == MonsterSpace::eBodyStateStand);
+			VERIFY(movement_type == MonsterSpace::eMovementTypeRun);
+			VERIFY(movement_direction == MonsterSpace::eMovementDirectionForward);
+			return (m_panic);
 		};
-		default			: NODEFAULT;
+	default: NODEFAULT;
 	};
 #ifdef DEBUG
 	volatile float		a = 0.f;

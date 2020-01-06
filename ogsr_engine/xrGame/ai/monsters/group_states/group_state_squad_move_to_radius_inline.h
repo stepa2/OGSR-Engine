@@ -14,16 +14,17 @@ TEMPLATE_SPECIALIZATION
 void CStateGroupSquadMoveToRadiusExAbstract::initialize()
 {
 	inherited::initialize();
-	object->path().prepare_builder();	
+	object->path().prepare_builder();
 }
 
 TEMPLATE_SPECIALIZATION
 void CStateGroupSquadMoveToRadiusExAbstract::execute()
 {
-	CMonsterSquad *squad	= monster_squad().get_squad(object);
+	CMonsterSquad* squad = monster_squad().get_squad(object);
 	if (squad && squad->SquadActive())
 	{
-		if (squad->get_index(object) != u8(-1)) {
+		if (squad->get_index(object) != u8(-1))
+		{
 			float m_Angle = (PI - PI_DIV_2) / (squad->squad_alife_count() - 1) * (squad->get_index(object) - 1);
 			float m_Delta_Angle = Random.randF(PI_DIV_3 / (squad->squad_alife_count() - 1));
 			float m_heading, m_pitch;
@@ -43,38 +44,46 @@ void CStateGroupSquadMoveToRadiusExAbstract::execute()
 			{
 				data.point = object->EnemyMan.get_enemy()->Position();
 			}
-		} else {
+		}
+		else
+		{
 			data.point = object->EnemyMan.get_enemy()->Position();
 		}
-	} else {
+	}
+	else
+	{
 		data.point = object->EnemyMan.get_enemy()->Position();
 	}
-	object->set_action									(data.action.action);
-	object->anim().SetSpecParams						(data.action.spec_params);
+	object->set_action(data.action.action);
+	object->anim().SetSpecParams(data.action.spec_params);
 
-	object->path().set_target_point			(data.point,data.vertex);
-	object->path().set_rebuild_time			(data.time_to_rebuild);
-	object->path().set_distance_to_end		(2.f);
-	object->path().set_use_covers			();
-	object->path().set_cover_params			(5.f, 30.f, 1.f, 30.f);
+	object->path().set_target_point(data.point, data.vertex);
+	object->path().set_rebuild_time(data.time_to_rebuild);
+	object->path().set_distance_to_end(2.f);
+	object->path().set_use_covers();
+	object->path().set_cover_params(5.f, 30.f, 1.f, 30.f);
 
-	if (data.accelerated) {
-		object->anim().accel_activate	(EAccelType(data.accel_type));
-		object->anim().accel_set_braking (data.braking);
+	if (data.accelerated)
+	{
+		object->anim().accel_activate(EAccelType(data.accel_type));
+		object->anim().accel_set_braking(data.braking);
 	}
 
-	if (data.action.sound_type != u32(-1)) {
+	if (data.action.sound_type != u32(-1))
+	{
 		object->set_state_sound(data.action.sound_type, data.action.sound_delay == u32(-1));
 	}
 }
 
 TEMPLATE_SPECIALIZATION
 bool CStateGroupSquadMoveToRadiusExAbstract::check_completion()
-{	
-	if (data.action.time_out !=0) {
+{
+	if (data.action.time_out != 0)
+	{
 		if (time_state_started + data.action.time_out < Device.dwTimeGlobal) return true;
 	}
-	if (object->Position().distance_to_xz(object->EnemyMan.get_enemy()->Position()) < data.completion_dist - 2.f) return true;
+	if (object->Position().distance_to_xz(object->EnemyMan.get_enemy()->Position()) < data.completion_dist - 2.f) return
+		true;
 	if (data.point.distance_to_xz(object->Position()) <= 2.f) return true;
 	return false;
 }
@@ -89,7 +98,7 @@ TEMPLATE_SPECIALIZATION
 void CStateGroupSquadMoveToRadiusAbstract::initialize()
 {
 	inherited::initialize();
-	object->path().prepare_builder();	
+	object->path().prepare_builder();
 }
 
 TEMPLATE_SPECIALIZATION
@@ -109,29 +118,32 @@ void CStateGroupSquadMoveToRadiusAbstract::execute()
 		data.point = object->EnemyMan.get_enemy()->Position();
 	}
 
-	object->set_action									(data.action.action);
-	object->anim().SetSpecParams						(data.action.spec_params);
+	object->set_action(data.action.action);
+	object->anim().SetSpecParams(data.action.spec_params);
 
-	object->path().set_target_point			(data.point,data.vertex);
-	object->path().set_rebuild_time			(data.time_to_rebuild);
-	object->path().set_distance_to_end		(1.f);
-	object->path().set_use_covers			();
-	object->path().set_cover_params			(5.f, 30.f, 1.f, 30.f);
+	object->path().set_target_point(data.point, data.vertex);
+	object->path().set_rebuild_time(data.time_to_rebuild);
+	object->path().set_distance_to_end(1.f);
+	object->path().set_use_covers();
+	object->path().set_cover_params(5.f, 30.f, 1.f, 30.f);
 
-	if (data.accelerated) {
-		object->anim().accel_activate	(EAccelType(data.accel_type));
-		object->anim().accel_set_braking (data.braking);
+	if (data.accelerated)
+	{
+		object->anim().accel_activate(EAccelType(data.accel_type));
+		object->anim().accel_set_braking(data.braking);
 	}
 
-	if (data.action.sound_type != u32(-1)) {
+	if (data.action.sound_type != u32(-1))
+	{
 		object->set_state_sound(data.action.sound_type, data.action.sound_delay == u32(-1));
 	}
 }
 
 TEMPLATE_SPECIALIZATION
 bool CStateGroupSquadMoveToRadiusAbstract::check_completion()
-{	
-	if (data.action.time_out !=0) {
+{
+	if (data.action.time_out != 0)
+	{
 		if (time_state_started + data.action.time_out < Device.dwTimeGlobal) return true;
 	}
 
@@ -139,4 +151,3 @@ bool CStateGroupSquadMoveToRadiusAbstract::check_completion()
 
 	return false;
 }
-

@@ -19,7 +19,7 @@ CUIProgressBar::CUIProgressBar()
 	m_inertion = 0.0f;
 	m_last_render_frame = u32(-1);
 	m_orient_mode = om_horz;
-        m_animated = !Core.Features.test( xrCore::Feature::no_progress_bar_animation );
+	m_animated = !Core.Features.test(xrCore::Feature::no_progress_bar_animation);
 }
 
 void CUIProgressBar::InitProgressBar(Fvector2 pos, Fvector2 size, EOrientMode mode)
@@ -72,12 +72,13 @@ void CUIProgressBar::SetProgressPos(float _Pos)
 {
 	m_ProgressPos.y = _Pos;
 	clamp(m_ProgressPos.y, m_MinPos, m_MaxPos);
-        if ( !m_animated && m_last_render_frame + 1 != Device.dwFrame )
-          m_ProgressPos.x = m_ProgressPos.y;
+	if (!m_animated && m_last_render_frame + 1 != Device.dwFrame)
+		m_ProgressPos.x = m_ProgressPos.y;
 	UpdateProgressBar();
 }
 
 float _sign(const float& v) { return (v > 0.0f) ? +1.0f : -1.0f; }
+
 void CUIProgressBar::Update()
 {
 	inherited::Update();
@@ -113,23 +114,28 @@ void CUIProgressBar::Draw()
 
 	switch (m_orient_mode)
 	{
-	case om_horz: progress_rect.set(0, 0, m_CurrentLength, GetHeight()); break;
-	case om_vert: progress_rect.set(0, GetHeight() - m_CurrentLength, GetWidth(), GetHeight()); break;
-	case om_back: progress_rect.set(GetWidth() - m_CurrentLength * 1.01f, 0, GetWidth(), GetHeight()); break;
-	case om_down: progress_rect.set(0, 0, GetWidth(), m_CurrentLength); break;
+	case om_horz: progress_rect.set(0, 0, m_CurrentLength, GetHeight());
+		break;
+	case om_vert: progress_rect.set(0, GetHeight() - m_CurrentLength, GetWidth(), GetHeight());
+		break;
+	case om_back: progress_rect.set(GetWidth() - m_CurrentLength * 1.01f, 0, GetWidth(), GetHeight());
+		break;
+	case om_down: progress_rect.set(0, 0, GetWidth(), m_CurrentLength);
+		break;
 	case om_fromcenter:
-	{
-		const float center = GetWidth() / 2.f;
-		progress_rect.set(center - m_CurrentLength, 0, center + m_CurrentLength, GetHeight());
-		break;
-	}
+		{
+			const float center = GetWidth() / 2.f;
+			progress_rect.set(center - m_CurrentLength, 0, center + m_CurrentLength, GetHeight());
+			break;
+		}
 	case om_vfromcenter:
-	{
-		const float center = GetHeight() / 2.f;
-		progress_rect.set(0, center - m_CurrentLength, GetWidth(), center + m_CurrentLength);
+		{
+			const float center = GetHeight() / 2.f;
+			progress_rect.set(0, center - m_CurrentLength, GetWidth(), center + m_CurrentLength);
+			break;
+		}
+	default: NODEFAULT;
 		break;
-	}
-	default: NODEFAULT; break;
 	}
 
 	if (m_CurrentLength > 0)

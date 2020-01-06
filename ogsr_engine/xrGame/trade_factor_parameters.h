@@ -13,21 +13,22 @@
 
 #include <regex>
 
-class CTradeFactorParameters {
+class CTradeFactorParameters
+{
 public:
-	typedef associative_vector<shared_str,CTradeFactors>	FACTORS;
+	typedef associative_vector<shared_str, CTradeFactors> FACTORS;
 
 private:
-	FACTORS					m_factors;
-        std::vector< std::pair<std::regex, CTradeFactors> > m_factors_re;
+	FACTORS m_factors;
+	std::vector<std::pair<std::regex, CTradeFactors>> m_factors_re;
 
 public:
-	IC						CTradeFactorParameters	();
-	IC	void				clear					();
-	IC	void				enable					(const shared_str &section, const CTradeFactors &factors);
-	IC	bool				enabled					(const shared_str &section) const;
-	IC	bool				disabled				(const shared_str &section) const;
-	IC	const CTradeFactors	&factors				(const shared_str &section) const;
+	IC CTradeFactorParameters();
+	IC void clear();
+	IC void enable(const shared_str& section, const CTradeFactors& factors);
+	IC bool enabled(const shared_str& section) const;
+	IC bool disabled(const shared_str& section) const;
+	IC const CTradeFactors& factors(const shared_str& section) const;
 };
 
 #include "trade_factor_parameters_inline.h"

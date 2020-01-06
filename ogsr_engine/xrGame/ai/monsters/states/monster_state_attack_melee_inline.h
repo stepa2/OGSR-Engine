@@ -7,7 +7,7 @@
 #define CStateMonsterAttackMeleeAbstract CStateMonsterAttackMelee<_Object>
 
 TEMPLATE_SPECIALIZATION
-CStateMonsterAttackMeleeAbstract::CStateMonsterAttackMelee(_Object *obj) : inherited(obj)
+CStateMonsterAttackMeleeAbstract::CStateMonsterAttackMelee(_Object* obj) : inherited(obj)
 {
 }
 
@@ -20,13 +20,13 @@ CStateMonsterAttackMeleeAbstract::~CStateMonsterAttackMelee()
 TEMPLATE_SPECIALIZATION
 void CStateMonsterAttackMeleeAbstract::execute()
 {
-	object->set_action			(ACT_ATTACK);
+	object->set_action(ACT_ATTACK);
 	if (object->control().direction().is_face_target(object->EnemyMan.get_enemy(), PI_DIV_3))
-		object->dir().face_target	(object->EnemyMan.get_enemy(), 800);
-	else 
-		object->dir().face_target	(object->EnemyMan.get_enemy(), 0, deg(15));
+		object->dir().face_target(object->EnemyMan.get_enemy(), 800);
+	else
+		object->dir().face_target(object->EnemyMan.get_enemy(), 0, deg(15));
 
-	object->set_state_sound		(MonsterSound::eMonsterSoundAggressive);
+	object->set_state_sound(MonsterSound::eMonsterSoundAggressive);
 }
 
 TEMPLATE_SPECIALIZATION

@@ -1,26 +1,31 @@
 #pragma once
 
-enum EPointType{
-    ptRPoint=0,
-    ptEnvMod,
-    ptSpawnPoint,
-    ptMaxType,
-    pt_force_dword=u32(-1)
+enum EPointType
+{
+	ptRPoint=0,
+	ptEnvMod,
+	ptSpawnPoint,
+	ptMaxType,
+	pt_force_dword=u32(-1)
 };
 
-enum EWayType{
-    wtPatrolPath=0,
-    wtMaxType,
-    wt_force_dword=u32(-1)
+enum EWayType
+{
+	wtPatrolPath=0,
+	wtMaxType,
+	wt_force_dword=u32(-1)
 };
 
-enum ERPpointType {		// [0..255]
+enum ERPpointType
+{
+	// [0..255]
 	rptActorSpawn = 0,
 	rptArtefactSpawn,
 	rptItemSpawn,
 };
 
-enum EEnvModUsedParams {
+enum EEnvModUsedParams
+{
 	eViewDist = (1 << 0),
 	eFogColor = (1 << 1),
 	eFogDensity = (1 << 2),

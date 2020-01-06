@@ -19,10 +19,14 @@ private:
 public:
 	CUIListItemEx(void);
 	virtual ~CUIListItemEx(void);
-	virtual void SendMessage(CUIWindow *pWnd, s16 msg, void* pData);
+	virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData);
 	virtual void SetSelectionColor(u32 dwColor);
 	virtual void Draw();
-	virtual void dummy			(){}
+
+	virtual void dummy()
+	{
+	}
+
 protected:
 	u32 m_dwSelectionColor;
 };

@@ -89,66 +89,104 @@ class CALifeSmartTerrainTask;
 	DEFINE_LUA_WRAPPER_METHOD_0			(bfUseful,	bool)
 
 template <typename T>
-struct CWrapperPure : public T, public luabind::wrap_base {
-	typedef T							inherited;
-	typedef CWrapperPure<T>				self_type;
-	CWrapperPure						(LPCSTR section) : inherited(section){}
+struct CWrapperPure : public T, public luabind::wrap_base
+{
+	typedef T inherited;
+	typedef CWrapperPure<T> self_type;
+
+	CWrapperPure(LPCSTR section) : inherited(section)
+	{
+	}
 };
 
 template <typename T>
-struct CWrapperAbstract : public T, public luabind::wrap_base {
-	typedef T							inherited;
-	typedef CWrapperAbstract<T>			self_type;
+struct CWrapperAbstract : public T, public luabind::wrap_base
+{
+	typedef T inherited;
+	typedef CWrapperAbstract<T> self_type;
 
-	CWrapperAbstract					(LPCSTR section) : inherited(section){}
+	CWrapperAbstract(LPCSTR section) : inherited(section)
+	{
+	}
+
 	INHERIT_ABSTRACT;
 };
 
 template <typename T>
-struct CWrapperAbstractALife : public T, public luabind::wrap_base {
-	typedef T							inherited;
-	typedef CWrapperAbstractALife<T>	self_type;
-	CWrapperAbstractALife				(LPCSTR section) : inherited(section){}
+struct CWrapperAbstractALife : public T, public luabind::wrap_base
+{
+	typedef T inherited;
+	typedef CWrapperAbstractALife<T> self_type;
+
+	CWrapperAbstractALife(LPCSTR section) : inherited(section)
+	{
+	}
+
 	INHERIT_ALIFE;
 };
 
 template <typename T>
-struct CWrapperAbstractDynamicALife : public T, public luabind::wrap_base {
-	typedef T								inherited;
-	typedef CWrapperAbstractDynamicALife<T>	self_type;
-	CWrapperAbstractDynamicALife		(LPCSTR section) : inherited(section){}
+struct CWrapperAbstractDynamicALife : public T, public luabind::wrap_base
+{
+	typedef T inherited;
+	typedef CWrapperAbstractDynamicALife<T> self_type;
+
+	CWrapperAbstractDynamicALife(LPCSTR section) : inherited(section)
+	{
+	}
+
 	INHERIT_DYNAMIC_ALIFE;
 };
 
 template <typename T>
-struct CWrapperAbstractZone : public T, public luabind::wrap_base {
-	typedef T							inherited;
-	typedef CWrapperAbstractZone<T>		self_type;
-	CWrapperAbstractZone				(LPCSTR section) : inherited(section){}
+struct CWrapperAbstractZone : public T, public luabind::wrap_base
+{
+	typedef T inherited;
+	typedef CWrapperAbstractZone<T> self_type;
+
+	CWrapperAbstractZone(LPCSTR section) : inherited(section)
+	{
+	}
+
 	INHERIT_ZONE;
 };
 
 template <typename T>
-struct CWrapperAbstractCreature : public T, public luabind::wrap_base {
-	typedef T							inherited;
-	typedef CWrapperAbstractCreature<T>	self_type;
-	CWrapperAbstractCreature			(LPCSTR section) : inherited(section){}
+struct CWrapperAbstractCreature : public T, public luabind::wrap_base
+{
+	typedef T inherited;
+	typedef CWrapperAbstractCreature<T> self_type;
+
+	CWrapperAbstractCreature(LPCSTR section) : inherited(section)
+	{
+	}
+
 	INHERIT_CREATURE;
 };
 
 template <typename T>
-struct CWrapperAbstractMonster : public T, public luabind::wrap_base {
-	typedef T							inherited;
-	typedef CWrapperAbstractMonster<T>	self_type;
-	CWrapperAbstractMonster				(LPCSTR section) : inherited(section){}
+struct CWrapperAbstractMonster : public T, public luabind::wrap_base
+{
+	typedef T inherited;
+	typedef CWrapperAbstractMonster<T> self_type;
+
+	CWrapperAbstractMonster(LPCSTR section) : inherited(section)
+	{
+	}
+
 	INHERIT_MONSTER;
 };
 
 template <typename T>
-struct CWrapperAbstractItem : public T, public luabind::wrap_base {
-	typedef T							inherited;
-	typedef CWrapperAbstractItem<T>		self_type;
-	CWrapperAbstractItem				(LPCSTR section) : inherited(section){}
+struct CWrapperAbstractItem : public T, public luabind::wrap_base
+{
+	typedef T inherited;
+	typedef CWrapperAbstractItem<T> self_type;
+
+	CWrapperAbstractItem(LPCSTR section) : inherited(section)
+	{
+	}
+
 	INHERIT_ITEM;
 };
 
@@ -421,4 +459,3 @@ struct CWrapperAbstractItem : public T, public luabind::wrap_base {
 #define luabind_class_item4(a,b,c,d,e,f) \
 	DEFINE_LUABIND_CLASS_WRAPPER_4(a,CWrapperAbstractItem<a>,b,c,d,e,f) \
 	luabind_virtual_Item(a,CWrapperAbstractItem<a>)
-

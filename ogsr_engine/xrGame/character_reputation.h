@@ -13,17 +13,17 @@
 
 struct REPUTATION_DATA
 {
-	REPUTATION_DATA (int, shared_str, LPCSTR);
+	REPUTATION_DATA(int, shared_str, LPCSTR);
 
-	shared_str					id;
-	int							index;
-	CHARACTER_REPUTATION_VALUE	threshold;
+	shared_str id;
+	int index;
+	CHARACTER_REPUTATION_VALUE threshold;
 };
 
 
 class CHARACTER_REPUTATION;
 
-class CHARACTER_REPUTATION: 
+class CHARACTER_REPUTATION :
 	public CIni_IdToIndex<1, REPUTATION_DATA, shared_str, int, CHARACTER_REPUTATION>
 {
 private:
@@ -31,28 +31,33 @@ private:
 	friend inherited;
 
 public:
-	CHARACTER_REPUTATION		():m_current_value(NO_REPUTATION){};
-	~CHARACTER_REPUTATION		(){};
+	CHARACTER_REPUTATION(): m_current_value(NO_REPUTATION)
+	{
+	};
 
-	void						set				(CHARACTER_REPUTATION_VALUE);
+	~CHARACTER_REPUTATION()
+	{
+	};
 
-	shared_str					id				() const;
-	int							index			() const	{return m_current_index;};
-	CHARACTER_REPUTATION_VALUE	value			() const	{return m_current_value;};
+	void set(CHARACTER_REPUTATION_VALUE);
 
-	static int					ValueToIndex    (CHARACTER_REPUTATION_VALUE);
+	shared_str id() const;
+	int index() const { return m_current_index; };
+	CHARACTER_REPUTATION_VALUE value() const { return m_current_value; };
+
+	static int ValueToIndex(CHARACTER_REPUTATION_VALUE);
 
 private:
-	CHARACTER_REPUTATION_VALUE	m_current_value;
-	int							m_current_index;
+	CHARACTER_REPUTATION_VALUE m_current_value;
+	int m_current_index;
 
-	static	void				InitIdToIndex	();
+	static void InitIdToIndex();
 public:
 	//отношение между репутациями
-	static CHARACTER_GOODWILL	relation			(int from, int to);
-	CHARACTER_GOODWILL			relation			(int to);
+	static CHARACTER_GOODWILL relation(int from, int to);
+	CHARACTER_GOODWILL relation(int to);
 
-	static void					DeleteIdToIndexData	();
+	static void DeleteIdToIndexData();
 
 private:
 	typedef CIni_Table<CHARACTER_GOODWILL, CHARACTER_REPUTATION> GOODWILL_TABLE;

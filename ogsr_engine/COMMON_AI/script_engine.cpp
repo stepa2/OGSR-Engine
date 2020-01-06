@@ -11,7 +11,7 @@
 #include "ai_space.h"
 #include "object_factory.h"
 
-void export_classes(lua_State *L);
+void export_classes(lua_State* L);
 
 CScriptEngine::CScriptEngine()
 {
@@ -19,7 +19,7 @@ CScriptEngine::CScriptEngine()
 	//
 	m_stack_level = 0;
 	m_reload_modules = false;
-	m_last_no_file_cnt    = 0;
+	m_last_no_file_cnt = 0;
 	m_last_no_file_length = 0;
 	*m_last_no_file = 0;
 }
@@ -27,7 +27,7 @@ CScriptEngine::CScriptEngine()
 void CScriptEngine::unload()
 {
 	lua_settop(lua(), m_stack_level);
-	m_last_no_file_cnt    = 0;
+	m_last_no_file_cnt = 0;
 	m_last_no_file_length = 0;
 	*m_last_no_file = 0;
 }
@@ -37,22 +37,25 @@ void CScriptEngine::unload()
 print_output( L, "[" __FUNCTION__ "]", LUA_ERRRUN ); \
 FATAL( "[%s]: %s", __FUNCTION__, lua_isstring( L, -1 ) ? lua_tostring( L, -1 ) : "" );
 
-int CScriptEngine::lua_panic( lua_State* L ) {
-  DEF_LUA_ERROR_TEMPLATE( L )
-  return 0;
+int CScriptEngine::lua_panic(lua_State* L)
+{
+	DEF_LUA_ERROR_TEMPLATE(L)
+	return 0;
 }
 
 #ifdef LUABIND_NO_EXCEPTIONS
-void CScriptEngine::lua_error( lua_State* L ) {
-  DEF_LUA_ERROR_TEMPLATE( L )
+void CScriptEngine::lua_error(lua_State* L)
+{
+	DEF_LUA_ERROR_TEMPLATE(L)
 }
 #endif
 
-int CScriptEngine::lua_pcall_failed( lua_State* L ) {
-  DEF_LUA_ERROR_TEMPLATE( L )
-  if ( lua_isstring( L, -1 ) )
-    lua_pop( L, 1 );
-  return LUA_ERRRUN;
+int CScriptEngine::lua_pcall_failed(lua_State* L)
+{
+	DEF_LUA_ERROR_TEMPLATE(L)
+	if (lua_isstring(L, -1))
+		lua_pop(L, 1);
+	return LUA_ERRRUN;
 }
 
 
@@ -60,21 +63,21 @@ int CScriptEngine::lua_pcall_failed( lua_State* L ) {
 #ifdef LUABIND_09
 void lua_cast_failed( lua_State* L, const luabind::type_id& info )
 #else
-void lua_cast_failed( lua_State* L, LUABIND_TYPE_INFO info )
+void lua_cast_failed(lua_State* L, LUABIND_TYPE_INFO info)
 #endif
 {
-  CScriptEngine::print_output( L, "[" __FUNCTION__ "]", LUA_ERRRUN );
+	CScriptEngine::print_output(L, "[" __FUNCTION__ "]", LUA_ERRRUN);
 #ifdef LUABIND_09
   const char* info_name = info.name();
 #else
-  const char* info_name = info->name();
+	const char* info_name = info->name();
 #endif
-  Msg( "!![%s] LUA error: cannot cast lua value to [%s]", __FUNCTION__, info_name );
-  //FATAL("[%s] LUA error: cannot cast lua value to [%s]", __FUNCTION__, info_name); //KRodin: Тут наверное вылетать не надо.
+	Msg("!![%s] LUA error: cannot cast lua value to [%s]", __FUNCTION__, info_name);
+	//FATAL("[%s] LUA error: cannot cast lua value to [%s]", __FUNCTION__, info_name); //KRodin: Тут наверное вылетать не надо.
 }
 #endif
 
-int auto_load(lua_State *L)
+int auto_load(lua_State* L)
 {
 	if ((lua_gettop(L) < 2) || !lua_istable(L, 1) || !lua_isstring(L, 2))
 	{
@@ -94,7 +97,7 @@ void CScriptEngine::setup_auto_load()
 {
 	lua_pushstring(lua(), GlobalNamespace);
 	lua_gettable(lua(), LUA_GLOBALSINDEX);
-	int value_index = lua_gettop(lua());  // alpet: во избежания оставления в стеке лишней метатаблицы
+	int value_index = lua_gettop(lua()); // alpet: во избежания оставления в стеке лишней метатаблицы
 	luaL_newmetatable(lua(), "XRAY_AutoLoadMetaTable");
 	lua_pushstring(lua(), "__index");
 	lua_pushcfunction(lua(), auto_load);
@@ -156,7 +159,7 @@ void CScriptEngine::init()
 	//Msg("[CScriptEngine::init] LuaJIT Started!");
 }
 
-void CScriptEngine::parse_script_namespace(const char *name, char *ns, u32 nsSize, char *func, u32 funcSize)
+void CScriptEngine::parse_script_namespace(const char* name, char* ns, u32 nsSize, char* func, u32 funcSize)
 {
 	auto p = strrchr(name, '.');
 	if (!p)
@@ -220,7 +223,7 @@ const char* ExtractFileName(const char* fname)
 	return result;
 }
 
-void CollectScriptFiles(script_list_type &map, const char* path)
+void CollectScriptFiles(script_list_type& map, const char* path)
 {
 	if (!strlen(path))
 		return;
@@ -252,13 +255,13 @@ void CollectScriptFiles(script_list_type &map, const char* path)
 			strcpy_s(buff, sizeof(buff), fstart);
 			_strlwr_s(buff, sizeof(buff));
 			const char* nspace = strtok(buff, ".");
-			map.insert({ nspace, fname });
+			map.insert({nspace, fname});
 		}
 	});
 	FS.file_list_close(files);
 }
 
-bool LookupScript(string_path &fname, const char* base)
+bool LookupScript(string_path& fname, const char* base)
 {
 	string_path lc_base;
 	if (xray_scripts.empty())
@@ -277,10 +280,12 @@ bool LookupScript(string_path &fname, const char* base)
 	return false;
 }
 
-bool CScriptEngine::process_file_if_exists(const char* file_name, bool warn_if_not_exist) //KRodin: Функция проверяет существует ли скрипт на диске. Если существует - отправляет его в do_file. Вызывается из process_file, auto_load и не только.
+bool CScriptEngine::process_file_if_exists(const char* file_name, bool warn_if_not_exist)
+//KRodin: Функция проверяет существует ли скрипт на диске. Если существует - отправляет его в do_file. Вызывается из process_file, auto_load и не только.
 {
 	u32 string_length = strlen(file_name);
-	if (!warn_if_not_exist && no_file_exists(file_name, string_length)) //Это походу для оптимизации только, чтоб типа если один раз убедились что файла нет, постоянно не проверять, есть ли он.
+	if (!warn_if_not_exist && no_file_exists(file_name, string_length))
+		//Это походу для оптимизации только, чтоб типа если один раз убедились что файла нет, постоянно не проверять, есть ли он.
 		return false;
 	if (m_reload_modules || (*file_name && !namespace_loaded(file_name)))
 	{
@@ -288,11 +293,15 @@ bool CScriptEngine::process_file_if_exists(const char* file_name, bool warn_if_n
 		if (!LookupScript(S, file_name))
 		{
 			if (warn_if_not_exist)
-				MsgDbg("[CScriptEngine::process_file_if_exists] Variable %s not found; No script by this name exists, either.", file_name);
+				MsgDbg(
+					"[CScriptEngine::process_file_if_exists] Variable %s not found; No script by this name exists, either.",
+					file_name);
 			else
 			{
 				LogDbg("-------------------------");
-				MsgDbg("[CScriptEngine::process_file_if_exists] WARNING: Access to nonexistent variable or loading nonexistent script '%s'", file_name);
+				MsgDbg(
+					"[CScriptEngine::process_file_if_exists] WARNING: Access to nonexistent variable or loading nonexistent script '%s'",
+					file_name);
 				FuncDbg(print_stack());
 				LogDbg("-------------------------");
 				add_no_file(file_name, string_length);
@@ -323,13 +332,14 @@ bool CScriptEngine::process_file(const char* file_name, bool reload_modules)
 	return result;
 }
 
-void CScriptEngine::register_script_classes() {
-  luabind::functor<void> result;
-  ASSERT_FMT( functor( "class_registrator.register", result ), "[%s] Cannot load class_registrator!", __FUNCTION__ );
-  result( const_cast<CObjectFactory*>( &object_factory() ) );
+void CScriptEngine::register_script_classes()
+{
+	luabind::functor<void> result;
+	ASSERT_FMT(functor( "class_registrator.register", result ), "[%s] Cannot load class_registrator!", __FUNCTION__);
+	result(const_cast<CObjectFactory*>(&object_factory()));
 }
 
-bool CScriptEngine::function_object(const char* function_to_call, luabind::object &object, int type)
+bool CScriptEngine::function_object(const char* function_to_call, luabind::object& object, int type)
 {
 	if (!strlen(function_to_call))
 		return false;
@@ -364,7 +374,7 @@ bool CScriptEngine::no_file_exists(const char* file_name, u32 string_length)
 
 void CScriptEngine::add_no_file(const char* file_name, u32 string_length)
 {
-	m_last_no_file_cnt    = 0;
+	m_last_no_file_cnt = 0;
 	m_last_no_file_length = string_length;
 	std::memcpy(m_last_no_file, file_name, string_length + 1);
 }

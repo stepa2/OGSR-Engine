@@ -26,10 +26,13 @@ void dump_list_sublines(){
 		Msg("--leak detected ---- SubLine = %d",(*_it).num);
 }
 #else
-void dump_list_sublines(){}
+void dump_list_sublines()
+{
+}
 #endif
 
-CUISubLine::CUISubLine(const CUISubLine& other){
+CUISubLine::CUISubLine(const CUISubLine& other)
+{
 	m_color = other.m_color;
 	m_last_in_line = other.m_last_in_line;
 	m_text = other.m_text;
@@ -42,7 +45,8 @@ CUISubLine::CUISubLine(const CUISubLine& other){
 #endif
 }
 
-CUISubLine& CUISubLine::operator=(const CUISubLine& other){
+CUISubLine& CUISubLine::operator=(const CUISubLine& other)
+{
 	m_color = other.m_color;
 	m_text = other.m_text;
 	m_last_in_line = other.m_last_in_line;
@@ -50,7 +54,8 @@ CUISubLine& CUISubLine::operator=(const CUISubLine& other){
 	return (*this);
 }
 
-CUISubLine::CUISubLine(){
+CUISubLine::CUISubLine()
+{
 	m_color = 0;
 	m_pTempLine = NULL;
 	m_last_in_line = false;
@@ -60,10 +65,10 @@ CUISubLine::CUISubLine(){
 	dbg_list_sublines.back().wnd = this;
 	dbg_list_sublines.back().num = ListSubLinesCount;
 #endif
-
 }
 
-CUISubLine::~CUISubLine(){
+CUISubLine::~CUISubLine()
+{
 	xr_delete(m_pTempLine);
 	m_pTempLine = NULL;
 #ifdef LOG_ALL_LINES
@@ -79,30 +84,32 @@ CUISubLine::~CUISubLine(){
 	if(!bOK)
 		Msg("CUISubLine::~CUISubLine()!!!!!!!!!!!!!!!!!!!!!!! cannot find window in list");
 #endif
-
 }
 
-const CUISubLine* CUISubLine::Cut2Pos(int i){
-	R_ASSERT2(i < (int)m_text.size(), make_string("CUISubLine::Cut2Pos - invalid parameter [%d][%d]",i,m_text.size()).c_str());
+const CUISubLine* CUISubLine::Cut2Pos(int i)
+{
+	R_ASSERT2(i < (int)m_text.size(),
+	          make_string("CUISubLine::Cut2Pos - invalid parameter [%d][%d]",i,m_text.size()).c_str());
 
-//	xr_delete(m_pTempLine);
+	//	xr_delete(m_pTempLine);
 	if (!m_pTempLine) m_pTempLine = xr_new<CUISubLine>();
 	m_pTempLine->m_color = m_color;
-	m_pTempLine->m_text.assign(m_text,0,i+1);	
-	m_text.replace(0, i+1, "");
+	m_pTempLine->m_text.assign(m_text, 0, i + 1);
+	m_text.replace(0, i + 1, "");
 
 	return m_pTempLine;
 }
 
 void CUISubLine::FreeBuffer()
 {
-//	xr_delete(m_pTempLine);
+	//	xr_delete(m_pTempLine);
 }
 
-void CUISubLine::Draw(CGameFont* pFont, float x, float y) const{
+void CUISubLine::Draw(CGameFont* pFont, float x, float y) const
+{
 	pFont->SetColor(m_color);
-	Fvector2			pos;
-	pos.set				(x, y);
+	Fvector2 pos;
+	pos.set(x, y);
 	UI()->ClientToScreenScaled(pos);
-	pFont->Out			(pos.x, pos.y, "%s", m_text.c_str() );
+	pFont->Out(pos.x, pos.y, "%s", m_text.c_str());
 }

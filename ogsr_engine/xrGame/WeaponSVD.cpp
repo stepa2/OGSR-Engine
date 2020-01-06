@@ -10,14 +10,14 @@ CWeaponSVD::~CWeaponSVD(void)
 {
 }
 
-void CWeaponSVD::switch2_Fire	()
+void CWeaponSVD::switch2_Fire()
 {
 	m_bPending = true;
 
 	inherited::switch2_Fire();
 }
 
-void CWeaponSVD::OnAnimationEnd(u32 state) 
+void CWeaponSVD::OnAnimationEnd(u32 state)
 {
 	inherited::OnAnimationEnd(state);
 }
@@ -25,11 +25,11 @@ void CWeaponSVD::OnAnimationEnd(u32 state)
 using namespace luabind;
 
 #pragma optimize("s",on)
-void CWeaponSVD::script_register	(lua_State *L)
+void CWeaponSVD::script_register(lua_State* L)
 {
 	module(L)
 	[
-		class_<CWeaponSVD,CGameObject>("CWeaponSVD")
-			.def(constructor<>())
+		class_<CWeaponSVD, CGameObject>("CWeaponSVD")
+		.def(constructor<>())
 	];
 }

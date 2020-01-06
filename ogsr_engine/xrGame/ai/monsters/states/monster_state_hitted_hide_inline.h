@@ -14,19 +14,18 @@ TEMPLATE_SPECIALIZATION
 void CStateMonsterHittedHideAbstract::initialize()
 {
 	inherited::initialize();
-	object->path().prepare_builder	();	
+	object->path().prepare_builder();
 }
 
 TEMPLATE_SPECIALIZATION
 void CStateMonsterHittedHideAbstract::execute()
 {
-	object->set_action									(ACT_RUN);
-	object->set_state_sound								(MonsterSound::eMonsterSoundPanic);
-	object->anim().accel_activate					(eAT_Aggressive);
-	object->anim().accel_set_braking					(false);
-	object->path().set_retreat_from_point	(object->HitMemory.get_last_hit_position());
-	object->path().set_generic_parameters	();
-
+	object->set_action(ACT_RUN);
+	object->set_state_sound(MonsterSound::eMonsterSoundPanic);
+	object->anim().accel_activate(eAT_Aggressive);
+	object->anim().accel_set_braking(false);
+	object->path().set_retreat_from_point(object->HitMemory.get_last_hit_position());
+	object->path().set_generic_parameters();
 }
 
 TEMPLATE_SPECIALIZATION

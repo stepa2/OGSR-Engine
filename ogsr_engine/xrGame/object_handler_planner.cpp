@@ -21,45 +21,50 @@
 
 using namespace ObjectHandlerSpace;
 
-IC	ObjectHandlerSpace::EWorldProperties CObjectHandlerPlanner::object_property(MonsterSpace::EObjectAction object_action) const
+IC ObjectHandlerSpace::EWorldProperties CObjectHandlerPlanner::object_property(
+	MonsterSpace::EObjectAction object_action) const
 {
-	switch (object_action) {
-		case MonsterSpace::eObjectActionSwitch1			: return(ObjectHandlerSpace::eWorldPropertySwitch1);
-		case MonsterSpace::eObjectActionSwitch2			: return(ObjectHandlerSpace::eWorldPropertySwitch2);
-		case MonsterSpace::eObjectActionAim1			: return(ObjectHandlerSpace::eWorldPropertyAimingReady1);
-		case MonsterSpace::eObjectActionAim2			: return(ObjectHandlerSpace::eWorldPropertyAiming2);
-		case MonsterSpace::eObjectActionFire1			: return(ObjectHandlerSpace::eWorldPropertyFiring1);
-		case MonsterSpace::eObjectActionFire2			: return(ObjectHandlerSpace::eWorldPropertyFiring2);
-		case MonsterSpace::eObjectActionIdle			: return(ObjectHandlerSpace::eWorldPropertyIdle);
-		case MonsterSpace::eObjectActionStrapped		: return(ObjectHandlerSpace::eWorldPropertyIdleStrap);
-		case MonsterSpace::eObjectActionDrop			: return(ObjectHandlerSpace::eWorldPropertyDropped);
-		case MonsterSpace::eObjectActionActivate		: return(ObjectHandlerSpace::eWorldPropertyIdle);
-		case MonsterSpace::eObjectActionDeactivate		: return(ObjectHandlerSpace::eWorldPropertyNoItemsIdle);
-		case MonsterSpace::eObjectActionAimReady1		: return(ObjectHandlerSpace::eWorldPropertyAimingReady1);
-		case MonsterSpace::eObjectActionAimReady2		: return(ObjectHandlerSpace::eWorldPropertyAimingReady2);
-		case MonsterSpace::eObjectActionAimForceFull1	: return(ObjectHandlerSpace::eWorldPropertyAimForceFull1);
-		case MonsterSpace::eObjectActionAimForceFull2	: return(ObjectHandlerSpace::eWorldPropertyAimForceFull2);
-		case MonsterSpace::eObjectActionUse				: return(ObjectHandlerSpace::eWorldPropertyUsed);
-		default							: NODEFAULT;
+	switch (object_action)
+	{
+	case MonsterSpace::eObjectActionSwitch1: return (ObjectHandlerSpace::eWorldPropertySwitch1);
+	case MonsterSpace::eObjectActionSwitch2: return (ObjectHandlerSpace::eWorldPropertySwitch2);
+	case MonsterSpace::eObjectActionAim1: return (ObjectHandlerSpace::eWorldPropertyAimingReady1);
+	case MonsterSpace::eObjectActionAim2: return (ObjectHandlerSpace::eWorldPropertyAiming2);
+	case MonsterSpace::eObjectActionFire1: return (ObjectHandlerSpace::eWorldPropertyFiring1);
+	case MonsterSpace::eObjectActionFire2: return (ObjectHandlerSpace::eWorldPropertyFiring2);
+	case MonsterSpace::eObjectActionIdle: return (ObjectHandlerSpace::eWorldPropertyIdle);
+	case MonsterSpace::eObjectActionStrapped: return (ObjectHandlerSpace::eWorldPropertyIdleStrap);
+	case MonsterSpace::eObjectActionDrop: return (ObjectHandlerSpace::eWorldPropertyDropped);
+	case MonsterSpace::eObjectActionActivate: return (ObjectHandlerSpace::eWorldPropertyIdle);
+	case MonsterSpace::eObjectActionDeactivate: return (ObjectHandlerSpace::eWorldPropertyNoItemsIdle);
+	case MonsterSpace::eObjectActionAimReady1: return (ObjectHandlerSpace::eWorldPropertyAimingReady1);
+	case MonsterSpace::eObjectActionAimReady2: return (ObjectHandlerSpace::eWorldPropertyAimingReady2);
+	case MonsterSpace::eObjectActionAimForceFull1: return (ObjectHandlerSpace::eWorldPropertyAimForceFull1);
+	case MonsterSpace::eObjectActionAimForceFull2: return (ObjectHandlerSpace::eWorldPropertyAimForceFull2);
+	case MonsterSpace::eObjectActionUse: return (ObjectHandlerSpace::eWorldPropertyUsed);
+	default: NODEFAULT;
 	}
 #ifdef DEBUG
 	return	(ObjectHandlerSpace::eWorldPropertyDummy);
 #endif
 }
 
-void CObjectHandlerPlanner::set_goal	(MonsterSpace::EObjectAction object_action, CGameObject *game_object, u32 min_queue_size, u32 max_queue_size, u32 min_queue_interval, u32 max_queue_interval)
+void CObjectHandlerPlanner::set_goal(MonsterSpace::EObjectAction object_action, CGameObject* game_object,
+                                     u32 min_queue_size, u32 max_queue_size, u32 min_queue_interval,
+                                     u32 max_queue_interval)
 {
-	EWorldProperties		goal = object_property(object_action);
-	u32						condition_id = goal;
+	EWorldProperties goal = object_property(object_action);
+	u32 condition_id = goal;
 
-	if (game_object && (eWorldPropertyNoItemsIdle != goal)) {
-		CWeapon				*weapon = smart_cast<CWeapon*>(game_object);
+	if (game_object && (eWorldPropertyNoItemsIdle != goal))
+	{
+		CWeapon* weapon = smart_cast<CWeapon*>(game_object);
 		if (weapon && (goal == eWorldPropertyIdleStrap) && !weapon->can_be_strapped())
-			goal			= eWorldPropertyIdle;
-		condition_id		= uid(game_object->ID(), goal);
+			goal = eWorldPropertyIdle;
+		condition_id = uid(game_object->ID(), goal);
 	}
 	else
-		condition_id		= u32(eWorldPropertyNoItemsIdle);
+		condition_id = u32(eWorldPropertyNoItemsIdle);
 
 #ifdef DEBUG
 	if (m_use_log) {
@@ -67,45 +72,47 @@ void CObjectHandlerPlanner::set_goal	(MonsterSpace::EObjectAction object_action,
 		Msg					("%6d : Goal %s",Device.dwTimeGlobal,property2string(condition_id));
 	}
 #endif
-	CState					condition;
-	condition.add_condition	(CWorldProperty(condition_id,true));
-	set_target_state		(condition);
+	CState condition;
+	condition.add_condition(CWorldProperty(condition_id, true));
+	set_target_state(condition);
 
 	if (!game_object || (min_queue_size < 0))
 		return;
 
-	CWeaponMagazined		*weapon = smart_cast<CWeaponMagazined*>(game_object);
+	CWeaponMagazined* weapon = smart_cast<CWeaponMagazined*>(game_object);
 	if (!weapon)
 		return;
 
-	if	(
-			(m_min_queue_size != min_queue_size) ||
-			(m_max_queue_size != max_queue_size) ||
-			(m_min_queue_interval != min_queue_interval) ||
-			(m_max_queue_interval != max_queue_interval) ||
-			(m_next_time_change <= Device.dwTimeGlobal)
-		)
+	if (
+		(m_min_queue_size != min_queue_size) ||
+		(m_max_queue_size != max_queue_size) ||
+		(m_min_queue_interval != min_queue_interval) ||
+		(m_max_queue_interval != max_queue_interval) ||
+		(m_next_time_change <= Device.dwTimeGlobal)
+	)
 	{
-		m_min_queue_size		= min_queue_size;
-		m_max_queue_size		= max_queue_size;
-		m_min_queue_interval	= min_queue_interval;
-		m_max_queue_interval	= max_queue_interval;
+		m_min_queue_size = min_queue_size;
+		m_max_queue_size = max_queue_size;
+		m_min_queue_interval = min_queue_interval;
+		m_max_queue_interval = max_queue_interval;
 
 		if (m_max_queue_size == m_min_queue_size)
-			m_queue_size		= _max(1,m_min_queue_size);
+			m_queue_size = _max(1, m_min_queue_size);
 		else
-			m_queue_size		= _max(1,::Random.randI(m_min_queue_size,m_max_queue_size));
+			m_queue_size = _max(1, ::Random.randI(m_min_queue_size, m_max_queue_size));
 
 		if (m_max_queue_interval == m_min_queue_interval)
-			m_queue_interval	= m_min_queue_interval;
+			m_queue_interval = m_min_queue_interval;
 		else
-			m_queue_interval	= ::Random.randI(m_min_queue_interval,m_max_queue_interval);
+			m_queue_interval = ::Random.randI(m_min_queue_interval, m_max_queue_interval);
 
-		m_next_time_change		= Device.dwTimeGlobal + m_queue_interval;
+		m_next_time_change = Device.dwTimeGlobal + m_queue_interval;
 
-		weapon->SetQueueSize	(m_queue_size);
-		this->action(uid(weapon->ID(),eWorldOperatorQueueWait1)).set_inertia_time(m_queue_interval ? m_queue_interval : 300);
-		this->action(uid(weapon->ID(),eWorldOperatorQueueWait2)).set_inertia_time(m_queue_interval ? m_queue_interval : 300);
+		weapon->SetQueueSize(m_queue_size);
+		this->action(uid(weapon->ID(), eWorldOperatorQueueWait1)).set_inertia_time(
+			m_queue_interval ? m_queue_interval : 300);
+		this->action(uid(weapon->ID(), eWorldOperatorQueueWait2)).set_inertia_time(
+			m_queue_interval ? m_queue_interval : 300);
 	}
 }
 
@@ -215,118 +222,128 @@ LPCSTR CObjectHandlerPlanner::property2string(const _condition_type &id)
 #endif
 
 
-void CObjectHandlerPlanner::remove_evaluators( CObject *object ) {
-#pragma todo( "Dima to Dima : safe, but not optimal!" )
-  for ( ;; ) {
-    EVALUATORS::iterator I = m_evaluators.lower_bound( uid( object->ID(), 0 ) );
-    if ( I == m_evaluators.end() || !object_action( (*I).first, object ) )
-      break;
-    remove_evaluator( (*I).first );
-  }
-}
-
-
-void CObjectHandlerPlanner::remove_operators( CObject *object ) {
-#pragma todo( "Dima to Dima : safe, but not optimal!" )
-  for ( ;; ) {
-    OPERATOR_VECTOR::iterator I = std::lower_bound( m_operators.begin(), m_operators.end(), uid( object->ID(), 0 ) );
-    if ( I == m_operators.end() || !object_action( (*I).m_operator_id, object ) )
-      break;
-    remove_operator( (*I).m_operator_id );
-  }
-}
-
-
-void CObjectHandlerPlanner::init_storage	()
+void CObjectHandlerPlanner::remove_evaluators(CObject* object)
 {
-	m_storage.set_property		(eWorldPropertyAimed1,false);
-	m_storage.set_property		(eWorldPropertyAimed2,false);
-	m_storage.set_property		(eWorldPropertyUseEnough,false);
-	m_storage.set_property		(eWorldPropertyStrapped,false);
-	m_storage.set_property		(eWorldPropertyStrapped2Idle,false);
+#pragma todo( "Dima to Dima : safe, but not optimal!" )
+	for (;;)
+	{
+		EVALUATORS::iterator I = m_evaluators.lower_bound(uid(object->ID(), 0));
+		if (I == m_evaluators.end() || !object_action((*I).first, object))
+			break;
+		remove_evaluator((*I).first);
+	}
 }
 
-void CObjectHandlerPlanner::setup	(CAI_Stalker *object)
+
+void CObjectHandlerPlanner::remove_operators(CObject* object)
 {
-	inherited::setup			(object);
-	CActionBase<CAI_Stalker>	*action;
+#pragma todo( "Dima to Dima : safe, but not optimal!" )
+	for (;;)
+	{
+		OPERATOR_VECTOR::iterator I = std::lower_bound(m_operators.begin(), m_operators.end(), uid(object->ID(), 0));
+		if (I == m_operators.end() || !object_action((*I).m_operator_id, object))
+			break;
+		remove_operator((*I).m_operator_id);
+	}
+}
 
-	m_min_queue_size			= 0;
-	m_max_queue_size			= 0;
-	m_min_queue_interval		= 0;
-	m_max_queue_interval		= 0;
-	m_next_time_change			= 0;
 
-	clear						();
+void CObjectHandlerPlanner::init_storage()
+{
+	m_storage.set_property(eWorldPropertyAimed1, false);
+	m_storage.set_property(eWorldPropertyAimed2, false);
+	m_storage.set_property(eWorldPropertyUseEnough, false);
+	m_storage.set_property(eWorldPropertyStrapped, false);
+	m_storage.set_property(eWorldPropertyStrapped2Idle, false);
+}
 
-	init_storage				();
+void CObjectHandlerPlanner::setup(CAI_Stalker* object)
+{
+	inherited::setup(object);
+	CActionBase<CAI_Stalker>* action;
 
-	add_evaluator				(u32(eWorldPropertyNoItems),			xr_new<CObjectPropertyEvaluatorNoItems>(m_object));
-	add_evaluator				(u32(eWorldPropertyNoItemsIdle),		xr_new<CObjectPropertyEvaluatorConst>(false));
-	action						= xr_new<CSObjectActionBase>(m_object,m_object,&m_storage,"no items idle");
-	add_condition				(action,0xffff,eWorldPropertyItemID,true);
-	add_effect					(action,0xffff,eWorldPropertyIdle,	true);
-	add_operator				(u32(eWorldOperatorNoItemsIdle),action);
+	m_min_queue_size = 0;
+	m_max_queue_size = 0;
+	m_min_queue_interval = 0;
+	m_max_queue_interval = 0;
+	m_next_time_change = 0;
 
-	set_goal					(MonsterSpace::eObjectActionIdle,0,0,0,0,0);
+	clear();
+
+	init_storage();
+
+	add_evaluator(u32(eWorldPropertyNoItems), xr_new<CObjectPropertyEvaluatorNoItems>(m_object));
+	add_evaluator(u32(eWorldPropertyNoItemsIdle), xr_new<CObjectPropertyEvaluatorConst>(false));
+	action = xr_new<CSObjectActionBase>(m_object, m_object, &m_storage, "no items idle");
+	add_condition(action, 0xffff, eWorldPropertyItemID, true);
+	add_effect(action, 0xffff, eWorldPropertyIdle, true);
+	add_operator(u32(eWorldOperatorNoItemsIdle), action);
+
+	set_goal(MonsterSpace::eObjectActionIdle, 0, 0, 0, 0, 0);
 
 #ifdef LOG_ACTION
 	set_use_log					(!!psAI_Flags.test(aiGOAPObject));
 #endif
 }
 
-void CObjectHandlerPlanner::add_item			(CInventoryItem *inventory_item)
+void CObjectHandlerPlanner::add_item(CInventoryItem* inventory_item)
 {
-	CWeapon						*weapon		= smart_cast<CWeapon*>		(inventory_item);
-	if (weapon) {
-		add_evaluators			(weapon);
-		add_operators			(weapon);
+	CWeapon* weapon = smart_cast<CWeapon*>(inventory_item);
+	if (weapon)
+	{
+		add_evaluators(weapon);
+		add_operators(weapon);
 		return;
 	}
 
-	CMissile					*missile	= smart_cast<CMissile*>		(inventory_item);
-	if (missile) {
-		add_evaluators			(missile);
-		add_operators			(missile);
+	CMissile* missile = smart_cast<CMissile*>(inventory_item);
+	if (missile)
+	{
+		add_evaluators(missile);
+		add_operators(missile);
 		return;
 	}
 }
 
-void CObjectHandlerPlanner::remove_item		(CInventoryItem *inventory_item)
+void CObjectHandlerPlanner::remove_item(CInventoryItem* inventory_item)
 {
-	VERIFY					(target_state().conditions().size() == 1);
-	if (action_object_id(target_state().conditions().back().condition()) == inventory_item->object().ID()) {
-		init_storage		();
-		set_goal			(MonsterSpace::eObjectActionIdle,0,0,0,0,0);
+	VERIFY(target_state().conditions().size() == 1);
+	if (action_object_id(target_state().conditions().back().condition()) == inventory_item->object().ID())
+	{
+		init_storage();
+		set_goal(MonsterSpace::eObjectActionIdle, 0, 0, 0, 0, 0);
 	}
 
-	if ( !Level().is_removing_objects() )
-	  for ( ;; ) {
-	    const auto it = std::find_if(
-	      m_current_state.conditions().begin(), m_current_state.conditions().end(), [ & ]( const auto& it ) {
-	        return action_object_id( it.condition() ) == inventory_item->object().ID();
-	      }
-	    );
-	    if ( it == m_current_state.conditions().end() )
-	      break;
-	    m_current_state.remove_condition( it->condition() );
-	  }
+	if (!Level().is_removing_objects())
+		for (;;)
+		{
+			const auto it = std::find_if(
+				m_current_state.conditions().begin(), m_current_state.conditions().end(), [ & ](const auto& it)
+				{
+					return action_object_id(it.condition()) == inventory_item->object().ID();
+				}
+			);
+			if (it == m_current_state.conditions().end())
+				break;
+			m_current_state.remove_condition(it->condition());
+		}
 
-	remove_evaluators		(&inventory_item->object());
-	remove_operators		(&inventory_item->object());
+	remove_evaluators(&inventory_item->object());
+	remove_operators(&inventory_item->object());
 }
 
-void CObjectHandlerPlanner::update			()
+void CObjectHandlerPlanner::update()
 {
 #ifdef LOG_ACTION
 	if ((psAI_Flags.test(aiGOAPObject) && !m_use_log) || (!psAI_Flags.test(aiGOAPObject) && m_use_log))
 		set_use_log			(!!psAI_Flags.test(aiGOAPObject));
 #endif
-	inherited::update		();
+	inherited::update();
 }
 
 //Вынесено из object_handler_planner_impl.h
-/*IC*/ CObjectHandlerPlanner::_condition_type CObjectHandlerPlanner::uid(const u32 id0, const u32 id1) const
+/*IC*/
+CObjectHandlerPlanner::_condition_type CObjectHandlerPlanner::uid(const u32 id0, const u32 id1) const
 {
 	VERIFY(!((id0 << 16) & id1));
 	return ((id0 << 16) | id1);

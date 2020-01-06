@@ -11,18 +11,19 @@ struct ActorRestoreParams;
 class CUIOutfitInfo : public CUIWindow
 {
 public:
-					CUIOutfitInfo			();
-	virtual			~CUIOutfitInfo			();
+	CUIOutfitInfo();
+	virtual ~CUIOutfitInfo();
 
-			void 	Update					(CCustomOutfit* outfit);	
-			void 	InitFromXml				(CUIXml& xml_doc);
+	void Update(CCustomOutfit* outfit);
+	void InitFromXml(CUIXml& xml_doc);
 protected:
 
-	float			GetArtefactParam		(ActorRestoreParams params, u32 i);
+	float GetArtefactParam(ActorRestoreParams params, u32 i);
 
-	CUIScrollView*	m_listWnd;
+	CUIScrollView* m_listWnd;
 
-	enum{
+	enum
+	{
 		_item_start = 0,
 		_item_health_restore_speed = _item_start,
 		_item_radiation_restore_speed,
@@ -46,5 +47,6 @@ protected:
 
 		_max_item_index,
 	};
-	CUIStatic*		m_items[_max_item_index];
+
+	CUIStatic* m_items[_max_item_index];
 };

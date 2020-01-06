@@ -8,35 +8,42 @@
 
 #pragma once
 
-template <typename T>				class CEmptyClassTemplate	{};
-template <typename T1, typename T2> class CEmptyClassTemplate2	{};
+template <typename T>
+class CEmptyClassTemplate
+{
+};
+
+template <typename T1, typename T2>
+class CEmptyClassTemplate2
+{
+};
 
 #include "manager_builder_allocator_constructor.h"
 
 template <
-	typename _algorithm, 
-	typename _manager, 
-	typename _builder, 
+	typename _algorithm,
+	typename _manager,
+	typename _builder,
 	typename _allocator,
 	template <typename _T> class _vertex = CEmptyClassTemplate,
 	template <
 		typename _1,
 		typename _2
 	>
-	class	 _builder_allocator_constructor = CBuilderAllocatorConstructor,
+	class _builder_allocator_constructor = CBuilderAllocatorConstructor,
 	template <
-		typename _1, 
+		typename _1,
 		typename _2,
 		typename _3,
 		template <
 			typename _1,
 			typename _2
 		>
-		class	 _4
+		class _4
 	>
-	class	 _manager_builder_allocator_constructor = CManagerBuilderAllocatorConstructor
+	class _manager_builder_allocator_constructor = CManagerBuilderAllocatorConstructor
 >
-struct CDataStorageConstructor : 
+struct CDataStorageConstructor :
 	public _algorithm::template CDataStorage<
 		_manager_builder_allocator_constructor<
 			_manager,
@@ -55,12 +62,12 @@ struct CDataStorageConstructor :
 			_builder_allocator_constructor
 		>,
 		_vertex
-	> inherited; 
+	> inherited;
 
-	typedef typename inherited::CGraphVertex	CGraphVertex;
-	typedef typename CGraphVertex::_index_type	_index_type;
+	typedef typename inherited::CGraphVertex CGraphVertex;
+	typedef typename CGraphVertex::_index_type _index_type;
 
-	IC	CDataStorageConstructor (const u32 vertex_count) :
+	IC CDataStorageConstructor(const u32 vertex_count) :
 		inherited(vertex_count)
 	{
 	}

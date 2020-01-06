@@ -17,15 +17,15 @@
 #include "../states/monster_state_hitted.h"
 #include "../../../entitycondition.h"
 
-CStateManagerPoltergeist::CStateManagerPoltergeist(CPoltergeist *obj) : inherited(obj)
+CStateManagerPoltergeist::CStateManagerPoltergeist(CPoltergeist* obj) : inherited(obj)
 {
-	add_state(eStateRest,					xr_new<CPoltergeistStateRest<CPoltergeist> > (obj));
-	add_state(eStateEat,					xr_new<CStateMonsterEat<CPoltergeist> >(obj));
-	add_state(eStateAttack_AttackHidden,	xr_new<CStatePoltergeistAttackHidden<CPoltergeist> > (obj));
-	add_state(eStatePanic,					xr_new<CStateMonsterPanic<CPoltergeist> >(obj));
-	add_state(eStateHitted,					xr_new<CStateMonsterHitted<CPoltergeist> >(obj));
-	add_state(eStateHearInterestingSound,	xr_new<CStateMonsterHearInterestingSound<CPoltergeist> >(obj));
-	add_state(eStateHearDangerousSound,		xr_new<CStateMonsterHearDangerousSound<CPoltergeist> >(obj));
+	add_state(eStateRest, xr_new<CPoltergeistStateRest<CPoltergeist>>(obj));
+	add_state(eStateEat, xr_new<CStateMonsterEat<CPoltergeist>>(obj));
+	add_state(eStateAttack_AttackHidden, xr_new<CStatePoltergeistAttackHidden<CPoltergeist>>(obj));
+	add_state(eStatePanic, xr_new<CStateMonsterPanic<CPoltergeist>>(obj));
+	add_state(eStateHitted, xr_new<CStateMonsterHitted<CPoltergeist>>(obj));
+	add_state(eStateHearInterestingSound, xr_new<CStateMonsterHearInterestingSound<CPoltergeist>>(obj));
+	add_state(eStateHearDangerousSound, xr_new<CStateMonsterHearDangerousSound<CPoltergeist>>(obj));
 }
 
 CStateManagerPoltergeist::~CStateManagerPoltergeist()
@@ -35,18 +35,17 @@ CStateManagerPoltergeist::~CStateManagerPoltergeist()
 void CStateManagerPoltergeist::reinit()
 {
 	inherited::reinit();
-	
-	time_next_flame_attack	= 0;
-	time_next_tele_attack	= 0;
-	time_next_scare_attack	= 0;
 
+	time_next_flame_attack = 0;
+	time_next_tele_attack = 0;
+	time_next_scare_attack = 0;
 }
 
 void CStateManagerPoltergeist::execute()
 {
 	u32 state_id = u32(-1);
 
-	if ( object->EnemyMan.get_enemy() && object->detected_enemy() )
+	if (object->EnemyMan.get_enemy() && object->detected_enemy())
 	{
 		state_id = eStateAttack_AttackHidden;
 	}
@@ -94,7 +93,7 @@ void CStateManagerPoltergeist::execute()
 	//	object->EnableHide();
 
 
-	select_state(state_id); 
+	select_state(state_id);
 
 	// выполнить текущее состояние
 	get_state_current()->execute();

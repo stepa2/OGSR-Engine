@@ -8,7 +8,7 @@
 #include "UILines.h"
 
 CUICheckButton::CUICheckButton(void)
-{	
+{
 	SetTextAlignment(CGameFont::alLeft);
 	m_bCheckMode = true;
 	m_pDependControl = NULL;
@@ -18,11 +18,13 @@ CUICheckButton::~CUICheckButton(void)
 {
 }
 
-void CUICheckButton::SetDependControl(CUIWindow* pWnd){
+void CUICheckButton::SetDependControl(CUIWindow* pWnd)
+{
 	m_pDependControl = pWnd;
 }
 
-void CUICheckButton::Update(){
+void CUICheckButton::Update()
+{
 	CUI3tButton::Update();
 
 	if (m_pDependControl)
@@ -30,16 +32,19 @@ void CUICheckButton::Update(){
 }
 
 
-void CUICheckButton::SetCurrentValue(){
+void CUICheckButton::SetCurrentValue()
+{
 	SetCheck(GetOptBoolValue());
 }
 
-void CUICheckButton::SaveValue(){
+void CUICheckButton::SaveValue()
+{
 	CUIOptionsItem::SaveValue();
 	SaveOptBoolValue(GetCheck());
 }
 
-bool CUICheckButton::IsChanged(){
+bool CUICheckButton::IsChanged()
+{
 	return b_backup_val != GetCheck();
 }
 
@@ -54,12 +59,14 @@ void CUICheckButton::Undo()
 	SaveValue();
 }
 
-void CUICheckButton::Init(float x, float y, float width, float height){
+void CUICheckButton::Init(float x, float y, float width, float height)
+{
 	CUI3tButton::Init(x, y, width, height);
 	InitTexture("ui_checker");
 }
 
-void CUICheckButton::InitTexture(LPCSTR tex_name) {
+void CUICheckButton::InitTexture(LPCSTR tex_name)
+{
 	CUI3tButton::InitTexture(tex_name);
 	Frect r = m_background.GetE()->GetStaticItem()->GetOriginalRect();
 	CUI3tButton::SetTextX(r.width());

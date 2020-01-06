@@ -9,15 +9,17 @@
 #pragma once
 
 template <typename T>
-IC T &CALifeRegistryContainer::operator()(const T*)
+IC T& CALifeRegistryContainer::operator()(const T*)
 {
-	static_assert(TYPE_LIST::contains(imdexlib::identity<T>()), "There is no specified registry in the registry container");
+	static_assert(TYPE_LIST::contains(imdexlib::identity<T>()),
+		"There is no specified registry in the registry container");
 	return (*static_cast<T*>(this));
 }
 
 template <typename T>
-IC const T &CALifeRegistryContainer::operator()(const T*) const
+IC const T& CALifeRegistryContainer::operator()(const T*) const
 {
-	static_assert(TYPE_LIST::contains(imdexlib::identity<T>()), "There is no specified registry in the registry container");
+	static_assert(TYPE_LIST::contains(imdexlib::identity<T>()),
+		"There is no specified registry in the registry container");
 	return (*static_cast<T*>(this));
 }

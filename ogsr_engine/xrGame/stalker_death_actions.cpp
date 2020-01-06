@@ -26,35 +26,35 @@ using namespace StalkerDecisionSpace;
 // CStalkerActionDead
 //////////////////////////////////////////////////////////////////////////
 
-CStalkerActionDead::CStalkerActionDead	(CAI_Stalker *object, LPCSTR action_name) :
-	inherited							(object,action_name)
+CStalkerActionDead::CStalkerActionDead(CAI_Stalker* object, LPCSTR action_name) :
+	inherited(object, action_name)
 {
 }
 
-bool CStalkerActionDead::fire			() const
+bool CStalkerActionDead::fire() const
 {
 	if (object().inventory().TotalWeight() <= 0)
-		return							(false);
-	
-	CWeapon								*weapon = smart_cast<CWeapon*>(object().inventory().ActiveItem());
+		return (false);
+
+	CWeapon* weapon = smart_cast<CWeapon*>(object().inventory().ActiveItem());
 	if (!weapon)
-		return							(false);
+		return (false);
 
 	if (!weapon->GetAmmoElapsed())
-		return							(false);
+		return (false);
 
 	if (!object().hammer_is_clutched())
-		return							(false);
+		return (false);
 
 	if (Device.dwTimeGlobal - object().GetLevelDeathTime() > 500)
-		return							(false);
+		return (false);
 
-	return								(true);
+	return (true);
 }
 
-void CStalkerActionDead::initialize		()
+void CStalkerActionDead::initialize()
 {
-	inherited::initialize				();
+	inherited::initialize();
 
 	if (object().getDestroy())
 		return;
@@ -62,23 +62,26 @@ void CStalkerActionDead::initialize		()
 	if (!fire())
 		return;
 
-	object().inventory().Action			(kWPN_FIRE,CMD_START);
+	object().inventory().Action(kWPN_FIRE,CMD_START);
 
-	u16 active_slot						= object().inventory().GetActiveSlot();
-	if (active_slot == SECOND_WEAPON_SLOT) {
-		CInventoryItem*					item = object().inventory().ItemFromSlot(active_slot);
-		if (item) {
-			CWeaponMagazined*			weapon = smart_cast<CWeaponMagazined*>(item);
-			VERIFY						(weapon);
-			weapon->SetQueueSize		(weapon->GetAmmoElapsed());
+	u16 active_slot = object().inventory().GetActiveSlot();
+	if (active_slot == SECOND_WEAPON_SLOT)
+	{
+		CInventoryItem* item = object().inventory().ItemFromSlot(active_slot);
+		if (item)
+		{
+			CWeaponMagazined* weapon = smart_cast<CWeaponMagazined*>(item);
+			VERIFY(weapon);
+			weapon->SetQueueSize(weapon->GetAmmoElapsed());
 		}
 	}
-		
-	typedef xr_vector<CInventorySlot>	SLOTS;
 
-	SLOTS::iterator						I = object().inventory().m_slots.begin(), B = I;
-	SLOTS::iterator						E = object().inventory().m_slots.end();
-	for ( ; I != E; ++I) {
+	typedef xr_vector<CInventorySlot> SLOTS;
+
+	SLOTS::iterator I = object().inventory().m_slots.begin(), B = I;
+	SLOTS::iterator E = object().inventory().m_slots.end();
+	for (; I != E; ++I)
+	{
 		if ((I - B) == (int)object().inventory().GetActiveSlot())
 			continue;
 
@@ -88,13 +91,13 @@ void CStalkerActionDead::initialize		()
 		if ((*I).m_pIItem->object().CLS_ID == CLSID_IITEM_BOLT)
 			continue;
 
-		object().inventory().Ruck		((*I).m_pIItem);
+		object().inventory().Ruck((*I).m_pIItem);
 	}
 }
 
-void CStalkerActionDead::execute		()
+void CStalkerActionDead::execute()
 {
-	inherited::execute					();
+	inherited::execute();
 
 	if (object().getDestroy())
 		return;
@@ -104,24 +107,26 @@ void CStalkerActionDead::execute		()
 	if (fire())
 		return;
 
-	typedef xr_vector<CInventorySlot>	SLOTS;
+	typedef xr_vector<CInventorySlot> SLOTS;
 
-	SLOTS::iterator						I = object().inventory().m_slots.begin(), B = I;
-	SLOTS::iterator						E = object().inventory().m_slots.end();
-	for ( ; I != E; ++I) {
+	SLOTS::iterator I = object().inventory().m_slots.begin(), B = I;
+	SLOTS::iterator E = object().inventory().m_slots.end();
+	for (; I != E; ++I)
+	{
 		if (!(*I).m_pIItem)
 			continue;
-		
+
 		if ((*I).m_pIItem->object().CLS_ID == CLSID_IITEM_BOLT)
 			continue;
 
-		if ((I - B) == (int)object().inventory().GetActiveSlot()) {
-			(*I).m_pIItem->SetDropManual	(TRUE);
+		if ((I - B) == (int)object().inventory().GetActiveSlot())
+		{
+			(*I).m_pIItem->SetDropManual(TRUE);
 			continue;
 		}
 
-		object().inventory().Ruck		((*I).m_pIItem);
+		object().inventory().Ruck((*I).m_pIItem);
 	}
 
-	set_property						(eWorldPropertyDead,true);
+	set_property(eWorldPropertyDead, true);
 }

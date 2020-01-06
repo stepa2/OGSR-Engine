@@ -13,32 +13,35 @@ void CMonsterStateManagerAbstract::reinit()
 }
 
 namespace detail
-{ // helper function implemented in file alife_simulator.cpp
-	bool object_exists_in_alife_registry (u32 id);
+{
+	// helper function implemented in file alife_simulator.cpp
+	bool object_exists_in_alife_registry(u32 id);
 } // namespace detail
 
 TEMPLATE_SPECIALIZATION
 void CMonsterStateManagerAbstract::update()
 {
 	// Lain: added
-	if ( !detail::object_exists_in_alife_registry (object->ID()) )
+	if (!detail::object_exists_in_alife_registry(object->ID()))
 	{
 		return;
 	}
 
-	if ( !object->g_Alive() )
+	if (!object->g_Alive())
 	{
-		return;		
-	}	
+		return;
+	}
 
 	execute();
 }
+
 TEMPLATE_SPECIALIZATION
 void CMonsterStateManagerAbstract::force_script_state(EMonsterState state)
 {
 	// установить текущее состояние
 	select_state(state);
 }
+
 TEMPLATE_SPECIALIZATION
 void CMonsterStateManagerAbstract::execute_script_state()
 {
@@ -55,12 +58,15 @@ bool CMonsterStateManagerAbstract::can_eat()
 }
 
 TEMPLATE_SPECIALIZATION
-bool CMonsterStateManagerAbstract::check_state(u32 state_id) 
+bool CMonsterStateManagerAbstract::check_state(u32 state_id)
 {
-	if (prev_substate == state_id) {
-		if (!get_state_current()->check_completion())		return true;
-	} else {
-		if (get_state(state_id)->check_start_conditions())	return true;
+	if (prev_substate == state_id)
+	{
+		if (!get_state_current()->check_completion()) return true;
+	}
+	else
+	{
+		if (get_state(state_id)->check_start_conditions()) return true;
 	}
 
 	return false;
@@ -73,11 +79,11 @@ void CMonsterStateManagerAbstract::critical_finalize()
 }
 
 TEMPLATE_SPECIALIZATION
-EMonsterState CMonsterStateManagerAbstract::get_state_type() 
+EMonsterState CMonsterStateManagerAbstract::get_state_type()
 {
 	return inherited::get_state_type();
 }
 
 
-#undef CMonsterStateManagerAbstract 
+#undef CMonsterStateManagerAbstract
 #undef TEMPLATE_SPECIALIZATION

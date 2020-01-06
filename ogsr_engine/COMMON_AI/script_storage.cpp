@@ -13,7 +13,8 @@
 
 // KRodin: this не убирать ни в коем случае! Он нужен для того, чтобы классы luabind'а регистрировались внутри модуля в котором находятся, а не в _G
 // см. luabind/src/create_class.cpp
-static constexpr const char* FILE_HEADER = "\
+static constexpr const char* FILE_HEADER =
+	"\
 local function script_name() \
 return '%s' \
 end; \
@@ -21,7 +22,7 @@ local this; \
 module('%s', package.seeall, function(m) this = m end); \
 %s";
 
-const char* get_lua_traceback(lua_State *L)
+const char* get_lua_traceback(lua_State* L)
 {
 #if LUAJIT_VERSION_NUM < 20000
 	static char buffer[32768]; // global buffer
@@ -64,18 +65,19 @@ void CScriptStorage::dump_state()
 	if (reentrantGuard) return;
 	reentrantGuard = true;
 
-	lua_State				*L = lua();
-	lua_Debug				l_tDebugInfo;
-	for (int i = 0; lua_getstack(L, i, &l_tDebugInfo); ++i) {
+	lua_State* L = lua();
+	lua_Debug l_tDebugInfo;
+	for (int i = 0; lua_getstack(L, i, &l_tDebugInfo); ++i)
+	{
 		lua_getinfo(L, "nSlu", &l_tDebugInfo);
 		Msg("\tLocals: ");
-		const char *name = nullptr;
+		const char* name = nullptr;
 		int VarID = 1;
 		while ((name = lua_getlocal(L, &l_tDebugInfo, VarID++)) != NULL)
 		{
 			LogVariable(L, name, 1);
 
-			lua_pop(L, 1);  /* remove variable value */
+			lua_pop(L, 1); /* remove variable value */
 		}
 		m_dumpedObjList.clear();
 		Msg("\tEnd");
@@ -83,30 +85,31 @@ void CScriptStorage::dump_state()
 	reentrantGuard = false;
 }
 
-void CScriptStorage::LogTable(lua_State *l, LPCSTR S, int level)
+void CScriptStorage::LogTable(lua_State* l, LPCSTR S, int level)
 {
 	if (!lua_istable(l, -1))
 		return;
 
-	lua_pushnil(l);  /* first key */
-	while (lua_next(l, -2) != 0) {
+	lua_pushnil(l); /* first key */
+	while (lua_next(l, -2) != 0)
+	{
 		char sname[256];
 		char sFullName[256];
 		xr_sprintf(sname, "%s", lua_tostring(l, -2));
 		xr_sprintf(sFullName, "%s.%s", S, sname);
 		LogVariable(l, sFullName, level + 1);
 
-		lua_pop(l, 1);  /* removes `value'; keeps `key' for next iteration */
+		lua_pop(l, 1); /* removes `value'; keeps `key' for next iteration */
 	}
 }
 
-void CScriptStorage::LogVariable(lua_State * l, const char* name, int level)
+void CScriptStorage::LogVariable(lua_State* l, const char* name, int level)
 {
-	const char * type;
+	const char* type;
 	int ntype = lua_type(l, -1);
 	type = lua_typename(l, ntype);
 
-	char tabBuffer[32] = { 0 };
+	char tabBuffer[32] = {0};
 	memset(tabBuffer, '\t', level);
 
 	char value[128];
@@ -120,7 +123,7 @@ void CScriptStorage::LogVariable(lua_State * l, const char* name, int level)
 	case LUA_TTHREAD:
 		xr_strcpy(value, "[[thread]]");
 		break;
-				
+
 	case LUA_TNUMBER:
 		xr_sprintf(value, "%f", lua_tonumber(l, -1));
 		break;
@@ -147,31 +150,31 @@ void CScriptStorage::LogVariable(lua_State * l, const char* name, int level)
 		break;
 
 	case LUA_TUSERDATA:
-	{
-		auto obj = static_cast<luabind::detail::object_rep*>(lua_touserdata(l, -1));
+		{
+			auto obj = static_cast<luabind::detail::object_rep*>(lua_touserdata(l, -1));
 
-		// Skip already dumped object
-		if (m_dumpedObjList.find(obj) != m_dumpedObjList.end()) return;
-		m_dumpedObjList.insert(obj);
-		auto& r = obj->get_lua_table();
-		if (r.is_valid())
-		{
-			r.get(l);
-			Msg("%s Userdata: %s", tabBuffer, name);
-			LogTable(l, name, level + 1);
-			lua_pop(l, 1); //Remove userobject
-			return;
+			// Skip already dumped object
+			if (m_dumpedObjList.find(obj) != m_dumpedObjList.end()) return;
+			m_dumpedObjList.insert(obj);
+			auto& r = obj->get_lua_table();
+			if (r.is_valid())
+			{
+				r.get(l);
+				Msg("%s Userdata: %s", tabBuffer, name);
+				LogTable(l, name, level + 1);
+				lua_pop(l, 1); //Remove userobject
+				return;
+			}
+			else
+			{
+				// Dump class and element pointer if available
+				if (const auto objectClass = obj->crep())
+					xr_sprintf(value, "(%s): %p", objectClass->name(), obj->ptr());
+				else
+					xr_strcpy(value, "[not available]");
+			}
 		}
-		else
-		{
-			// Dump class and element pointer if available
-			if (const auto objectClass = obj->crep())
-                xr_sprintf(value, "(%s): %p", objectClass->name(), obj->ptr());
-            else
-			    xr_strcpy(value, "[not available]");
-		}
-	}
-	break;
+		break;
 
 	default:
 		xr_strcpy(value, "[not available]");
@@ -181,6 +184,7 @@ void CScriptStorage::LogVariable(lua_State * l, const char* name, int level)
 
 	Msg("%s %s %s : %s", tabBuffer, type, name, value);
 }
+
 //*********************************************************************************************
 
 static void ScriptCrashHandler(bool dump_lua_locals)
@@ -209,7 +213,7 @@ CScriptStorage::~CScriptStorage()
 	Debug.set_crashhandler(nullptr);
 }
 
-void CScriptStorage::reinit(lua_State *LSVM)
+void CScriptStorage::reinit(lua_State* LSVM)
 {
 	if (m_virtual_machine) //Как выяснилось, такое происходит при загрузке игры на этапе старта сервера 
 	{
@@ -226,7 +230,8 @@ void CScriptStorage::print_stack()
 	Log(get_lua_traceback(lua()));
 }
 
-void CScriptStorage::script_log(ScriptStorage::ELuaMessageType tLuaMessageType, const char* caFormat, ...) //Используется в очень многих местах //Очень много пишет в лог.
+void CScriptStorage::script_log(ScriptStorage::ELuaMessageType tLuaMessageType, const char* caFormat, ...)
+//Используется в очень многих местах //Очень много пишет в лог.
 {
 #ifdef DEBUG
 	va_list marker;
@@ -274,7 +279,9 @@ void CScriptStorage::script_log(ScriptStorage::ELuaMessageType tLuaMessageType, 
 #endif
 }
 
-bool CScriptStorage::load_buffer(lua_State *L, const char* caBuffer, size_t tSize, const char* caScriptName, const char* caNameSpaceName) //KRodin: эта функция форматирует содержимое скрипта используя FILE_HEADER и после этого загружает его в lua
+bool CScriptStorage::load_buffer(lua_State* L, const char* caBuffer, size_t tSize, const char* caScriptName,
+                                 const char* caNameSpaceName)
+//KRodin: эта функция форматирует содержимое скрипта используя FILE_HEADER и после этого загружает его в lua
 {
 	int l_iErrorCode = 0;
 	if (strcmp(GlobalNamespace, caNameSpaceName)) //Все скрипты кроме _G
@@ -289,7 +296,8 @@ bool CScriptStorage::load_buffer(lua_State *L, const char* caBuffer, size_t tSiz
 		std::snprintf(strBuf.get(), buf_len + 1, FILE_HEADER, caNameSpaceName, caNameSpaceName, caBuffer);
 		//Log("[CScriptStorage::load_buffer(1)] Loading buffer:");
 		//Log(strBuf.get());
-		l_iErrorCode = luaL_loadbuffer(L, strBuf.get(), buf_len /*+ 1 Нуль-терминатор на конце мешает походу*/, caScriptName);
+		l_iErrorCode = luaL_loadbuffer(L, strBuf.get(), buf_len /*+ 1 Нуль-терминатор на конце мешает походу*/,
+		                               caScriptName);
 	}
 	else //_G.script и только он.
 	{
@@ -306,15 +314,19 @@ bool CScriptStorage::load_buffer(lua_State *L, const char* caBuffer, size_t tSiz
 	return true;
 }
 
-bool CScriptStorage::do_file(const char* caScriptName, const char* caNameSpaceName) //KRodin: эта функция открывает скрипт с диска и оправляет его содержимое в функцию load_buffer, после этого походу запускает скрипт.
+bool CScriptStorage::do_file(const char* caScriptName, const char* caNameSpaceName)
+//KRodin: эта функция открывает скрипт с диска и оправляет его содержимое в функцию load_buffer, после этого походу запускает скрипт.
 {
 	string_path l_caLuaFileName;
 	auto l_tpFileReader = FS.r_open(caScriptName);
-	if (!l_tpFileReader) { //заменить на ассерт?
+	if (!l_tpFileReader)
+	{
+		//заменить на ассерт?
 		Msg("!![CScriptStorage::do_file] Cannot open file [%s]", caScriptName);
 		return false;
 	}
-	strconcat(sizeof(l_caLuaFileName), l_caLuaFileName, "@", caScriptName); //KRodin: приводит путь к виду @f:\games\s.t.a.l.k.e.r\gamedata\scripts\***.script
+	strconcat(sizeof(l_caLuaFileName), l_caLuaFileName, "@", caScriptName);
+	//KRodin: приводит путь к виду @f:\games\s.t.a.l.k.e.r\gamedata\scripts\***.script
 	//
 	//KRodin: исправлено. Теперь содержимое скрипта сразу читается нормально, без мусора на конце.
 	auto strBuf = std::make_unique<char[]>(l_tpFileReader->length() + 1);
@@ -326,7 +338,7 @@ bool CScriptStorage::do_file(const char* caScriptName, const char* caNameSpaceNa
 	if (!loaded)
 		return false;
 
-	int	l_iErrorCode = lua_pcall(lua(), 0, 0, 0); //KRodin: без этого скрипты не работают!
+	int l_iErrorCode = lua_pcall(lua(), 0, 0, 0); //KRodin: без этого скрипты не работают!
 	if (l_iErrorCode)
 	{
 		print_output(lua(), caScriptName, l_iErrorCode);
@@ -336,7 +348,8 @@ bool CScriptStorage::do_file(const char* caScriptName, const char* caNameSpaceNa
 	return true;
 }
 
-bool CScriptStorage::namespace_loaded(const char* name, bool remove_from_stack) //KRodin: видимо, функция проверяет, загружен ли скрипт.
+bool CScriptStorage::namespace_loaded(const char* name, bool remove_from_stack)
+//KRodin: видимо, функция проверяет, загружен ли скрипт.
 {
 #ifdef DEBUG
 	int start = lua_gettop(lua());
@@ -463,11 +476,14 @@ luabind::object CScriptStorage::name_space(const char* namespace_name)
 	}
 }
 
-bool CScriptStorage::print_output(lua_State *L, const char* caScriptFileName, int errorCode) //KRodin: вызывается из нескольких мест, в т.ч. из калбеков lua_error, lua_pcall_failed, lua_cast_failed, lua_panic
+bool CScriptStorage::print_output(lua_State* L, const char* caScriptFileName, int errorCode)
+//KRodin: вызывается из нескольких мест, в т.ч. из калбеков lua_error, lua_pcall_failed, lua_cast_failed, lua_panic
 {
 	auto Prefix = "";
-	if (errorCode) {
-		switch (errorCode) {
+	if (errorCode)
+	{
+		switch (errorCode)
+		{
 		case LUA_ERRRUN:
 			Prefix = "SCRIPT RUNTIME ERROR";
 			break;

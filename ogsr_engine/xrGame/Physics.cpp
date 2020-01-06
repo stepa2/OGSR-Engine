@@ -17,53 +17,54 @@
 #include "ode/src/objects.h"
 #pragma warning(default:4995)
 
-extern CPHWorld *ph_world;
+extern CPHWorld* ph_world;
 ///////////////////////////////////////////////////////////////////
 
 #include "ExtendedGeom.h"
 //union dInfBytes dInfinityValue = {{0,0,0x80,0x7f}};
-PhysicsStepTimeCallback		*physics_step_time_callback				= 0;
+PhysicsStepTimeCallback* physics_step_time_callback = 0;
 
-const dReal 		default_w_limit									= 9.8174770f;//(M_PI/16.f/(fixed_step=0.02f));
-const dReal 		default_l_limit									= 150.f;//(3.f/fixed_step=0.02f);
-const dReal 		default_l_scale									= 1.01f;
-const dReal 		default_w_scale									= 1.01f;
-const dReal			default_k_l										= 0.0002f;//square resistance !!
-const dReal			default_k_w										= 0.05f;
+const dReal default_w_limit = 9.8174770f; //(M_PI/16.f/(fixed_step=0.02f));
+const dReal default_l_limit = 150.f; //(3.f/fixed_step=0.02f);
+const dReal default_l_scale = 1.01f;
+const dReal default_w_scale = 1.01f;
+const dReal default_k_l = 0.0002f; //square resistance !!
+const dReal default_k_w = 0.05f;
 
-const dReal			mass_limit										= 10000.f;//some conventional value used as evaluative param (there is no code restriction on mass)
-extern const u16	max_joint_allowed_for_exeact_integration		= 30;
+const dReal mass_limit = 10000.f;
+//some conventional value used as evaluative param (there is no code restriction on mass)
+extern const u16 max_joint_allowed_for_exeact_integration = 30;
 
 //base	params
-const dReal base_fixed_step											=	0.02f				;
-const dReal base_erp												=	0.54545456f			;
-const dReal base_cfm												=	1.1363636e-006f		;
+const dReal base_fixed_step = 0.02f;
+const dReal base_erp = 0.54545456f;
+const dReal base_cfm = 1.1363636e-006f;
 //base params
-dReal 			fixed_step											=	0.01f;
-dReal 			world_cfm											=	CFM(SPRING_S(base_cfm,base_erp,base_fixed_step),DAMPING(base_cfm,base_erp));
-dReal 			world_erp											=	ERP(SPRING_S(base_cfm,base_erp,base_fixed_step),DAMPING(base_cfm,base_erp));
-dReal			world_spring										=	1.0f*SPRING	(world_cfm,world_erp);
-dReal			world_damping										=	1.0f*DAMPING(world_cfm,world_erp);
+dReal fixed_step = 0.01f;
+dReal world_cfm = CFM(SPRING_S(base_cfm,base_erp,base_fixed_step), DAMPING(base_cfm,base_erp));
+dReal world_erp = ERP(SPRING_S(base_cfm,base_erp,base_fixed_step), DAMPING(base_cfm,base_erp));
+dReal world_spring = 1.0f * SPRING(world_cfm, world_erp);
+dReal world_damping = 1.0f * DAMPING(world_cfm, world_erp);
 
 
-const dReal			default_world_gravity							=	2*9.81f;
+const dReal default_world_gravity = 2 * 9.81f;
 
 
 /////////////////////////////////////////////////////
 
-int			phIterations											= 18;
-float		phTimefactor											= 1.f;
-float		phBreakCommonFactor										= 0.01f;
-float		phRigidBreakWeaponFactor								= 1.f;
-Fbox		phBoundaries											= {1000.f,1000.f,-1000.f,-1000.f};
-float		ph_tri_query_ex_aabb_rate								= 1.3f;
-int			ph_tri_clear_disable_count								= 10;
-dWorldID	phWorld;
+int phIterations = 18;
+float phTimefactor = 1.f;
+float phBreakCommonFactor = 0.01f;
+float phRigidBreakWeaponFactor = 1.f;
+Fbox phBoundaries = {1000.f, 1000.f, -1000.f, -1000.f};
+float ph_tri_query_ex_aabb_rate = 1.3f;
+int ph_tri_clear_disable_count = 10;
+dWorldID phWorld;
 
 /////////////////////////////////////
-dJointGroupID	ContactGroup;
-CBlockAllocator	<dJointFeedback,128>		ContactFeedBacks;
-CBlockAllocator	<CPHContactBodyEffector,128> ContactEffectors;
+dJointGroupID ContactGroup;
+CBlockAllocator<dJointFeedback, 128> ContactFeedBacks;
+CBlockAllocator<CPHContactBodyEffector, 128> ContactEffectors;
 
 ///////////////////////////////////////////////////////////
 class SApplyBodyEffectorPred
@@ -73,11 +74,12 @@ public:
 	{
 	}
 
-	void	operator	()(CPHContactBodyEffector* pointer) const
+	void operator ()(CPHContactBodyEffector* pointer) const
 	{
 		pointer->Apply();
 	}
 };
+
 /////////////////////////////////////////////////////////////////////////////
 IC void add_contact_body_effector(dBodyID body, const dContact& c, SGameMtl* material)
 {
@@ -92,13 +94,14 @@ IC void add_contact_body_effector(dBodyID body, const dContact& c, SGameMtl* mat
 	}
 }
 
-IC static int CollideIntoGroup(dGeomID o1, dGeomID o2, dJointGroupID jointGroup, CPHIsland* world, const int &MAX_CONTACTS)
+IC static int CollideIntoGroup(dGeomID o1, dGeomID o2, dJointGroupID jointGroup, CPHIsland* world,
+                               const int& MAX_CONTACTS)
 {
 	const int RS = 800 + 10;
 	const int N = RS;
 
 	static dContact contacts[RS];
-	int	collided_contacts = 0;
+	int collided_contacts = 0;
 	// get the contacts up to a maximum of N contacts
 	int n;
 
@@ -114,9 +117,9 @@ IC static int CollideIntoGroup(dGeomID o1, dGeomID o2, dJointGroupID jointGroup,
 
 	for (i = 0; i < n; ++i)
 	{
-		dContact &c = contacts[i];
-		dContactGeom &cgeom = c.geom;
-		dSurfaceParameters &surface = c.surface;
+		dContact& c = contacts[i];
+		dContactGeom& cgeom = c.geom;
+		dSurfaceParameters& surface = c.surface;
 		dGeomID g1 = cgeom.g1;
 		dGeomID g2 = cgeom.g2;
 
@@ -128,11 +131,11 @@ IC static int CollideIntoGroup(dGeomID o1, dGeomID o2, dJointGroupID jointGroup,
 		u16 material_idx_1 = 0;
 		u16 material_idx_2 = 0;
 
-		surface.mu = 1.f;// 5000.f;
+		surface.mu = 1.f; // 5000.f;
 		surface.soft_erp = 1.f;
 		surface.soft_cfm = 1.f;
-		surface.bounce = 0.01f;//0.1f;
-		surface.bounce_vel = 1.5f;//0.005f;
+		surface.bounce = 0.01f; //0.1f;
+		surface.bounce_vel = 1.5f; //0.005f;
 		usr_data_1 = retrieveGeomUserData(g1);
 		usr_data_2 = retrieveGeomUserData(g2);
 		///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -159,15 +162,15 @@ IC static int CollideIntoGroup(dGeomID o1, dGeomID o2, dJointGroupID jointGroup,
 
 		////////////////params can be changed in callbacks//////////////////////////////////////////////////////////////////////////
 		surface.mode = dContactApprox1 | dContactSoftERP | dContactSoftCFM;
-		float spring = material_2->fPHSpring*material_1->fPHSpring*world_spring;
-		float damping = material_2->fPHDamping*material_1->fPHDamping*world_damping;
+		float spring = material_2->fPHSpring * material_1->fPHSpring * world_spring;
+		float damping = material_2->fPHDamping * material_1->fPHDamping * world_damping;
 		surface.soft_erp = ERP(spring, damping);
 		surface.soft_cfm = CFM(spring, damping);
-		surface.mu = material_2->fPHFriction*material_1->fPHFriction;
+		surface.mu = material_2->fPHFriction * material_1->fPHFriction;
 		/////////////////////////////////////////////////////////////////////////////////////////////////
 
-		Flags32	&flags_1 = material_1->Flags;
-		Flags32	&flags_2 = material_2->Flags;
+		Flags32& flags_1 = material_1->Flags;
+		Flags32& flags_2 = material_2->Flags;
 
 		if (is_tri_1)
 		{
@@ -225,12 +228,12 @@ IC static int CollideIntoGroup(dGeomID o1, dGeomID o2, dJointGroupID jointGroup,
 			surface.bounce = std::min(material_1->fPHBouncing, material_2->fPHBouncing);
 		}
 		/////////////////////////////////////////////////////////////////////////////////////////////////
-		if (usr_data_2&&usr_data_2->object_callbacks)
+		if (usr_data_2 && usr_data_2->object_callbacks)
 		{
 			usr_data_2->object_callbacks->Call(do_collide, false, c, material_1, material_2);
 		}
 
-		if (usr_data_1&&usr_data_1->object_callbacks)
+		if (usr_data_1 && usr_data_1->object_callbacks)
 
 		{
 			usr_data_1->object_callbacks->Call(do_collide, true, c, material_1, material_2);
@@ -252,7 +255,8 @@ IC static int CollideIntoGroup(dGeomID o1, dGeomID o2, dJointGroupID jointGroup,
 			}
 		}
 		///////////////////////////////////////////////////////////////////////////////////////
-		if (usr_data_1) {
+		if (usr_data_1)
+		{
 			usr_data_1->pushing_b_neg = usr_data_1->pushing_b_neg
 				&& !GMLib.GetMaterialByIdx(usr_data_1->b_neg_tri->material)->Flags.test(SGameMtl::flPassable);
 
@@ -302,23 +306,24 @@ void NearCallback(CPHObject* obj1, CPHObject* obj2, dGeomID o1, dGeomID o2)
 	}
 }
 
-void CollideStatic(dGeomID o2,CPHObject* obj2)
+void CollideStatic(dGeomID o2, CPHObject* obj2)
 {
-	
-	CPHIsland* island2=obj2->DActiveIsland();
-	CollideIntoGroup(ph_world->GetMeshGeom(),o2,ContactGroup,island2,island2->MaxJoints());
+	CPHIsland* island2 = obj2->DActiveIsland();
+	CollideIntoGroup(ph_world->GetMeshGeom(), o2, ContactGroup, island2, island2->MaxJoints());
 }
 
 //half square time
 
 //limit for angular accel
-void dBodyAngAccelFromTorqu(const dBodyID body, dReal* ang_accel, const dReal* torque) {
+void dBodyAngAccelFromTorqu(const dBodyID body, dReal* ang_accel, const dReal* torque)
+{
 	dMass m;
 	dMatrix3 invI;
 	dBodyGetMass(body, &m);
 	dInvertPDMatrix(m.I, invI, 3);
 	dMULTIPLY1_333(ang_accel, invI, torque);
 }
+
 void FixBody(dBodyID body, float ext_param, float mass_param)
 {
 	dMass m;
@@ -331,6 +336,7 @@ void FixBody(dBodyID body, float ext_param, float mass_param)
 	dBodySetForce(body, 0, 0, 0);
 	dBodySetTorque(body, 0, 0, 0);
 }
+
 void FixBody(dBodyID body)
 {
 	FixBody(body, fix_ext_param, fix_mass_param);
@@ -351,9 +357,9 @@ void BodyCutForce(dBodyID body, float l_limit, float w_limit)
 	if (force_mag > force_limit)
 	{
 		dBodySetForce(body,
-			force[0] / force_mag * force_limit,
-			force[1] / force_mag * force_limit,
-			force[2] / force_mag * force_limit
+		              force[0] / force_mag * force_limit,
+		              force[1] / force_mag * force_limit,
+		              force[2] / force_mag * force_limit
 		);
 	}
 
@@ -389,13 +395,13 @@ void BodyCutForce(dBodyID body, float l_limit, float w_limit)
 	}
 }
 
-void dMassSub(dMass *a, const dMass *b)
+void dMassSub(dMass* a, const dMass* b)
 {
 	int i;
 	VERIFY(a && b);
 	dReal denom = dRecip(a->mass - b->mass);
 	for (i = 0; i < 3; ++i)
-		a->c[i] = (a->c[i] * a->mass - b->c[i] * b->mass)*denom;
+		a->c[i] = (a->c[i] * a->mass - b->c[i] * b->mass) * denom;
 
 	a->mass -= b->mass;
 
@@ -405,22 +411,24 @@ void dMassSub(dMass *a, const dMass *b)
 
 ////Energy of non Elastic collision;
 //body - static case
-float E_NlS(dBodyID body, const dReal* norm, float norm_sign)//if body c.geom.g1 norm_sign + else -
-{													 //norm*norm_sign - to body
+float E_NlS(dBodyID body, const dReal* norm, float norm_sign) //if body c.geom.g1 norm_sign + else -
+{
+	//norm*norm_sign - to body
 	const dReal* vel = dBodyGetLinearVel(body);
-	dReal prg = -dDOT(vel, norm)*norm_sign;
+	dReal prg = -dDOT(vel, norm) * norm_sign;
 	prg = prg < 0.f ? prg = 0.f : prg;
 	dMass mass;
 	dBodyGetMass(body, &mass);
 
-	return mass.mass*prg*prg / 2;
+	return mass.mass * prg * prg / 2;
 }
 
 //body - body case
-float E_NLD(dBodyID b1, dBodyID b2, const dReal* norm)// norm - from 2 to 1
+float E_NLD(dBodyID b1, dBodyID b2, const dReal* norm) // norm - from 2 to 1
 {
 	dMass m1, m2;
-	dBodyGetMass(b1, &m1); dBodyGetMass(b2, &m2);
+	dBodyGetMass(b1, &m1);
+	dBodyGetMass(b2, &m2);
 	const dReal* vel1 = dBodyGetLinearVel(b1);
 	const dReal* vel2 = dBodyGetLinearVel(b2);
 
@@ -429,20 +437,21 @@ float E_NLD(dBodyID b1, dBodyID b2, const dReal* norm)// norm - from 2 to 1
 
 	if (vel_pr1 > vel_pr2) return 0.f; //exit if the bodies are departing
 
-	dVector3 impuls1 = { vel1[0] * m1.mass,vel1[1] * m1.mass,vel1[2] * m1.mass };
-	dVector3 impuls2 = { vel2[0] * m2.mass,vel2[1] * m2.mass,vel2[2] * m2.mass };
+	dVector3 impuls1 = {vel1[0] * m1.mass, vel1[1] * m1.mass, vel1[2] * m1.mass};
+	dVector3 impuls2 = {vel2[0] * m2.mass, vel2[1] * m2.mass, vel2[2] * m2.mass};
 
-	dVector3 c_mas_impuls = { impuls1[0] + impuls2[0],impuls1[1] + impuls2[1],impuls1[2] + impuls2[2] };
+	dVector3 c_mas_impuls = {impuls1[0] + impuls2[0], impuls1[1] + impuls2[1], impuls1[2] + impuls2[2]};
 	dReal cmass = m1.mass + m2.mass;
-	dVector3 c_mass_vel = { c_mas_impuls[0] / cmass,c_mas_impuls[1] / cmass,c_mas_impuls[2] / cmass };
+	dVector3 c_mass_vel = {c_mas_impuls[0] / cmass, c_mas_impuls[1] / cmass, c_mas_impuls[2] / cmass};
 
 	dReal c_mass_vel_prg = dDOT(c_mass_vel, norm);
 
-	dReal kin_energy_start = vel_pr1 * vel_pr1*m1.mass / 2.f + vel_pr2 * vel_pr2*m2.mass / 2.f;
-	dReal kin_energy_end = c_mass_vel_prg * c_mass_vel_prg*cmass / 2.f;
+	dReal kin_energy_start = vel_pr1 * vel_pr1 * m1.mass / 2.f + vel_pr2 * vel_pr2 * m2.mass / 2.f;
+	dReal kin_energy_end = c_mass_vel_prg * c_mass_vel_prg * cmass / 2.f;
 
 	return (kin_energy_start - kin_energy_end);
 }
+
 float E_NL(dBodyID b1, dBodyID b2, const dReal* norm)
 {
 	VERIFY(b1 || b2);
@@ -451,10 +460,11 @@ float E_NL(dBodyID b1, dBodyID b2, const dReal* norm)
 		if (b2)
 			return E_NLD(b1, b2, norm);
 		else
-			return  E_NlS(b1, norm, 1);
+			return E_NlS(b1, norm, 1);
 	else
 		return E_NlS(b2, norm, -1);
 }
+
 void ApplyGravityAccel(dBodyID body, const dReal* accel)
 {
 	dMass m;

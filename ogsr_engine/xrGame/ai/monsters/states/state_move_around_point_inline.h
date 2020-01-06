@@ -36,8 +36,8 @@ void CStateMonsterMoveAroundPointAbstract::execute()
 
 TEMPLATE_SPECIALIZATION
 bool CStateMonsterMoveAroundPointAbstract::check_completion()
-{	
-//	if (data.time_out)
+{
+	//	if (data.time_out)
 
 	return false;
 }

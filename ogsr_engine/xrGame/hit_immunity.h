@@ -14,10 +14,10 @@ public:
 	CHitImmunity();
 	virtual ~CHitImmunity();
 
-	virtual void LoadImmunities (LPCSTR section,CInifile* ini);
+	virtual void LoadImmunities(LPCSTR section, CInifile* ini);
 
-	float		GetHitImmunity	(ALife::EHitType hit_type) const				{return m_HitTypeK[hit_type];}
-	virtual float AffectHit		(float power, ALife::EHitType hit_type);
+	float GetHitImmunity(ALife::EHitType hit_type) const { return m_HitTypeK[hit_type]; }
+	virtual float AffectHit(float power, ALife::EHitType hit_type);
 
 protected:
 	//коэффициенты на которые домножается хит
@@ -25,8 +25,8 @@ protected:
 	//(для защитных костюмов и специфичных животных)
 	HitImmunity::HitTypeSVec m_HitTypeK;
 public:
-	HitImmunity::HitTypeSVec &immunities() { return m_HitTypeK; }
-	static void	script_register (lua_State *L);
+	HitImmunity::HitTypeSVec& immunities() { return m_HitTypeK; }
+	static void script_register(lua_State* L);
 
-	virtual	CHitImmunity*	cast_hit_immunities() { return this; }
+	virtual CHitImmunity* cast_hit_immunities() { return this; }
 };

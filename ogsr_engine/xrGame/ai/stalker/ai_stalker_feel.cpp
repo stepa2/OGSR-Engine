@@ -23,20 +23,20 @@
 BOOL CAI_Stalker::feel_vision_isRelevant(CObject* O)
 {
 	if (!g_Alive())
-		return		FALSE;
-	CEntityAlive*	E = smart_cast<CEntityAlive*>		(O);
-	CInventoryItem*	I = smart_cast<CInventoryItem*>	(O);
-	if (!E && !I)	return	(FALSE);
-//	if (E && (E->g_Team() == g_Team()))			return FALSE;
-	return(TRUE);
+		return FALSE;
+	CEntityAlive* E = smart_cast<CEntityAlive*>(O);
+	CInventoryItem* I = smart_cast<CInventoryItem*>(O);
+	if (!E && !I) return (FALSE);
+	//	if (E && (E->g_Team() == g_Team()))			return FALSE;
+	return (TRUE);
 }
 
-void CAI_Stalker::renderable_Render	()
+void CAI_Stalker::renderable_Render()
 {
-	inherited::renderable_Render		();
+	inherited::renderable_Render();
 
 	if (!already_dead())
-		CInventoryOwner::renderable_Render	();
+		CInventoryOwner::renderable_Render();
 
 #ifdef DEBUG
 	if (g_Alive()) {
@@ -46,35 +46,35 @@ void CAI_Stalker::renderable_Render	()
 #endif // DEBUG
 }
 
-void CAI_Stalker::Exec_Look			(float dt)
+void CAI_Stalker::Exec_Look(float dt)
 {
 	if (animation_movement_controlled())
 		return;
 
-	sight().Exec_Look				(dt);
+	sight().Exec_Look(dt);
 }
 
 bool CAI_Stalker::bfCheckForNodeVisibility(u32 dwNodeID, bool bIfRayPick)
 {
-	return							(memory().visual().visible(dwNodeID,movement().m_head.current.yaw,ffGetFov()));
+	return (memory().visual().visible(dwNodeID, movement().m_head.current.yaw, ffGetFov()));
 }
 
-BOOL CAI_Stalker::feel_touch_contact	(CObject *O)
+BOOL CAI_Stalker::feel_touch_contact(CObject* O)
 {
 	if (!inherited::feel_touch_contact(O))
-		return						(FALSE);
+		return (FALSE);
 
-	CGameObject						*game_object = smart_cast<CGameObject*>(O);
+	CGameObject* game_object = smart_cast<CGameObject*>(O);
 	if (!game_object)
-		return						(FALSE);
+		return (FALSE);
 
-	return							(game_object->feel_touch_on_contact(this));
+	return (game_object->feel_touch_on_contact(this));
 }
 
-BOOL CAI_Stalker::feel_touch_on_contact	(CObject *O)
+BOOL CAI_Stalker::feel_touch_on_contact(CObject* O)
 {
 	if ((O->spatial.type | STYPE_VISIBLEFORAI) != O->spatial.type)
-		return	(FALSE);
+		return (FALSE);
 
-	return		(inherited::feel_touch_on_contact(O));
+	return (inherited::feel_touch_on_contact(O));
 }

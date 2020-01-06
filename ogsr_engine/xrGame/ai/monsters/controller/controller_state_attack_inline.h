@@ -18,26 +18,29 @@
 #define CStateControllerAttackAbstract CStateControllerAttack<_Object>
 
 TEMPLATE_SPECIALIZATION
-CStateControllerAttackAbstract::CStateControllerAttack(_Object *obj) : inherited(obj)
+CStateControllerAttackAbstract::CStateControllerAttack(_Object* obj) : inherited(obj)
 {
-	add_state(eStateAttack_MoveToHomePoint,	xr_new<CStateMonsterAttackMoveToHomePoint<CController> >(obj));	
- 	add_state(eStateAttack_Run,				xr_new<CStateMonsterAttackRun<CController> >			(obj));
- 	add_state(eStateAttack_Melee,			xr_new<CStateMonsterAttackMelee<CController> >			(obj));
+	add_state(eStateAttack_MoveToHomePoint, xr_new<CStateMonsterAttackMoveToHomePoint<CController>>(obj));
+	add_state(eStateAttack_Run, xr_new<CStateMonsterAttackRun<CController>>(obj));
+	add_state(eStateAttack_Melee, xr_new<CStateMonsterAttackMelee<CController>>(obj));
 }
 
 TEMPLATE_SPECIALIZATION
 void CStateControllerAttackAbstract::initialize()
-{	
-	inherited::initialize				();
+{
+	inherited::initialize();
 }
 
 TEMPLATE_SPECIALIZATION
 bool CStateControllerAttackAbstract::check_home_point()
 {
-	if (prev_substate != eStateAttack_MoveToHomePoint) {
-		if (get_state(eStateAttack_MoveToHomePoint)->check_start_conditions())	return true;
-	} else {
-		if (!get_state(eStateAttack_MoveToHomePoint)->check_completion())		return true;
+	if (prev_substate != eStateAttack_MoveToHomePoint)
+	{
+		if (get_state(eStateAttack_MoveToHomePoint)->check_start_conditions()) return true;
+	}
+	else
+	{
+		if (!get_state(eStateAttack_MoveToHomePoint)->check_completion()) return true;
 	}
 
 	return false;
@@ -46,61 +49,60 @@ bool CStateControllerAttackAbstract::check_home_point()
 TEMPLATE_SPECIALIZATION
 void CStateControllerAttackAbstract::execute()
 {
-	object->anim().clear_override_animation	();
+	object->anim().clear_override_animation();
 
-	if	( check_home_point() )
+	if (check_home_point())
 	{
-		select_state					(eStateAttack_MoveToHomePoint);
-		get_state_current()->execute	();
-		prev_substate				=	current_substate;
+		select_state(eStateAttack_MoveToHomePoint);
+		get_state_current()->execute();
+		prev_substate = current_substate;
 		return;
 	}
 
-	EMonsterState		state_id	=	eStateUnknown;
-	const CEntityAlive* enemy		=	object->EnemyMan.get_enemy();
+	EMonsterState state_id = eStateUnknown;
+	const CEntityAlive* enemy = object->EnemyMan.get_enemy();
 
-	if ( current_substate == eStateAttack_Melee )
+	if (current_substate == eStateAttack_Melee)
 	{
-		if ( get_state(eStateAttack_Melee)->check_completion() )
-			state_id				=	eStateAttack_Run;
+		if (get_state(eStateAttack_Melee)->check_completion())
+			state_id = eStateAttack_Run;
 		else
-			state_id				=	eStateAttack_Melee;
+			state_id = eStateAttack_Melee;
 	}
 	else
 	{
-		if ( get_state(eStateAttack_Melee)->check_start_conditions() )
-			state_id				=	eStateAttack_Melee;
+		if (get_state(eStateAttack_Melee)->check_start_conditions())
+			state_id = eStateAttack_Melee;
 		else
-			state_id				=	eStateAttack_Run;
+			state_id = eStateAttack_Run;
 	}
 
-	if ( !object->enemy_accessible() && state_id == eStateAttack_Run )
+	if (!object->enemy_accessible() && state_id == eStateAttack_Run)
 	{
-		current_substate			=	(u32)eStateUnknown;
-		prev_substate				=	current_substate;
+		current_substate = (u32)eStateUnknown;
+		prev_substate = current_substate;
 
-		Fvector dir_xz				=	object->Direction();
-		dir_xz.y					=	0;
-		Fvector self_to_enemy_xz	=	enemy->Position() - object->Position();
-		self_to_enemy_xz.y			=	0;
+		Fvector dir_xz = object->Direction();
+		dir_xz.y = 0;
+		Fvector self_to_enemy_xz = enemy->Position() - object->Position();
+		self_to_enemy_xz.y = 0;
 
-		float const angle			=	angle_between_vectors(dir_xz, self_to_enemy_xz);
-		
-		if ( _abs(angle) > deg2rad(30.f) )
+		float const angle = angle_between_vectors(dir_xz, self_to_enemy_xz);
+
+		if (_abs(angle) > deg2rad(30.f))
 		{
-			bool const rotate_right		=	object->control().direction().is_from_right(enemy->Position());
-			object->anim().set_override_animation	(rotate_right ? 
-													 eAnimStandTurnRight: eAnimStandTurnLeft, 0);
-			object->dir().face_target		(enemy);
+			bool const rotate_right = object->control().direction().is_from_right(enemy->Position());
+			object->anim().set_override_animation(rotate_right ? eAnimStandTurnRight : eAnimStandTurnLeft, 0);
+			object->dir().face_target(enemy);
 		}
 
-		object->set_action				(ACT_STAND_IDLE);
+		object->set_action(ACT_STAND_IDLE);
 		return;
 	}
 
-	select_state						(state_id);
-	get_state_current()->execute		();
-	prev_substate					=	current_substate;
+	select_state(state_id);
+	get_state_current()->execute();
+	prev_substate = current_substate;
 }
 
 TEMPLATE_SPECIALIZATION
@@ -109,7 +111,7 @@ void CStateControllerAttackAbstract::setup_substates()
 }
 
 TEMPLATE_SPECIALIZATION
-void CStateControllerAttackAbstract::check_force_state() 
+void CStateControllerAttackAbstract::check_force_state()
 {
 }
 

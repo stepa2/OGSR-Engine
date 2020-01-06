@@ -11,260 +11,265 @@
 #include "Inventory.h"
 #include "ai/stalker/ai_stalker.h"
 #include "ai/monsters/BaseMonster/base_monster.h"
-extern	class CPHWorld	*ph_world;
+extern class CPHWorld* ph_world;
+
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////
-CPHCapture::CPHCapture( CPHCharacter* a_character, CPhysicsShellHolder* a_taget_object, LPCSTR capture_bone, bool hard_mode )
+CPHCapture::CPHCapture(CPHCharacter* a_character, CPhysicsShellHolder* a_taget_object, LPCSTR capture_bone,
+                       bool hard_mode)
 {
 	CPHUpdateObject::Activate();
 
-	m_joint					=NULL;	
-	m_ajoint				=NULL;
-	m_body					=NULL;
-	m_taget_object			=NULL;
-	m_character				=NULL;
-	b_failed				=false;
-	b_disabled				=false;	
-	b_character_feedback	=false;
-	e_state					=cstPulling;
+	m_joint = NULL;
+	m_ajoint = NULL;
+	m_body = NULL;
+	m_taget_object = NULL;
+	m_character = NULL;
+	b_failed = false;
+	b_disabled = false;
+	b_character_feedback = false;
+	e_state = cstPulling;
 	m_hard_mode = hard_mode;
-	
-	if(!a_taget_object							||
-	   !a_taget_object->m_pPhysicsShell			||
-	   !a_taget_object->m_pPhysicsShell->isActive()||
-	   smart_cast<CInventoryItem*>(a_taget_object)
-	   ) 
+
+	if (!a_taget_object ||
+		!a_taget_object->m_pPhysicsShell ||
+		!a_taget_object->m_pPhysicsShell->isActive() ||
+		smart_cast<CInventoryItem*>(a_taget_object)
+	)
 	{
-		m_taget_object=NULL;
-		b_failed=true;
+		m_taget_object = NULL;
+		b_failed = true;
 		return;
 	}
 
-	if(!a_character||!a_character->b_exist)
+	if (!a_character || !a_character->b_exist)
 	{
-		m_taget_object=NULL;
-		b_failed=true;
+		m_taget_object = NULL;
+		b_failed = true;
 		return;
 	}
-	m_taget_object			=a_taget_object;
-	m_character				=a_character;
+	m_taget_object = a_taget_object;
+	m_character = a_character;
 
-	CObject* capturer_object=smart_cast<CObject*>(m_character->PhysicsRefObject());
+	CObject* capturer_object = smart_cast<CObject*>(m_character->PhysicsRefObject());
 
-	if(!capturer_object)
+	if (!capturer_object)
 	{
-		m_taget_object=NULL;
-		b_failed=true;
+		m_taget_object = NULL;
+		b_failed = true;
 		return;
 	}
 
-	IKinematics* p_kinematics=smart_cast<IKinematics*>(capturer_object->Visual());
+	IKinematics* p_kinematics = smart_cast<IKinematics*>(capturer_object->Visual());
 
-	if(!p_kinematics)
+	if (!p_kinematics)
 	{
-		m_taget_object=NULL;
-		b_failed=true;
+		m_taget_object = NULL;
+		b_failed = true;
 		return;
 	}
 
 	CInifile* ini = nullptr;
-	if (smart_cast<CActor*>(m_character->PhysicsRefObject()) && pSettings->section_exist("actor_capture")) {
+	if (smart_cast<CActor*>(m_character->PhysicsRefObject()) && pSettings->section_exist("actor_capture"))
+	{
 		ini = pSettings;
 		m_capture_section = "actor_capture";
 	}
-	else if (smart_cast<CAI_Stalker*>(m_character->PhysicsRefObject()) && pSettings->section_exist("stalker_capture")) {
+	else if (smart_cast<CAI_Stalker*>(m_character->PhysicsRefObject()) && pSettings->section_exist("stalker_capture"))
+	{
 		ini = pSettings;
 		m_capture_section = "stalker_capture";
 	}
-	else {
+	else
+	{
 		ini = p_kinematics->LL_UserData();
 		m_capture_section = "capture";
 	}
 
-	if(!ini)
+	if (!ini)
 	{
-		m_taget_object=NULL;
-		b_failed=true;
+		m_taget_object = NULL;
+		b_failed = true;
 		return;
 	}
 
-	if( !ini->section_exist( m_capture_section ) )
+	if (!ini->section_exist(m_capture_section))
 	{
-		m_taget_object=NULL;
-		b_failed=true;
+		m_taget_object = NULL;
+		b_failed = true;
 		return;
 	}
 
-	u16 capture_bone_id = p_kinematics->LL_BoneID( capture_bone ? capture_bone : ini->r_string( m_capture_section, "bone" ) );
-	R_ASSERT2(capture_bone_id!=BI_NONE,"wrong capture bone");
-	m_capture_bone=&p_kinematics->LL_GetBoneInstance(capture_bone_id);
-		
+	u16 capture_bone_id = p_kinematics->LL_BoneID(
+		capture_bone ? capture_bone : ini->r_string(m_capture_section, "bone"));
+	R_ASSERT2(capture_bone_id!=BI_NONE, "wrong capture bone");
+	m_capture_bone = &p_kinematics->LL_GetBoneInstance(capture_bone_id);
 
 
-	m_taget_element = m_taget_object->m_pPhysicsShell->NearestToPoint( GetCapturePosition() );
+	m_taget_element = m_taget_object->m_pPhysicsShell->NearestToPoint(GetCapturePosition());
 
 	Init(ini);
-
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
-CPHCapture::CPHCapture( CPHCharacter* a_character, CPhysicsShellHolder* a_taget_object, u16 a_taget_element, LPCSTR capture_bone, bool hard_mode )
+CPHCapture::CPHCapture(CPHCharacter* a_character, CPhysicsShellHolder* a_taget_object, u16 a_taget_element,
+                       LPCSTR capture_bone, bool hard_mode)
 {
-
 	CPHUpdateObject::Activate();
-	m_joint					=NULL;	
-	m_ajoint				=NULL;
-	m_body					=NULL;
-	b_failed				=false;
-	b_disabled				=false;
-	e_state					=cstPulling;
-	b_character_feedback	=false;
-	m_taget_object			=NULL;
-	m_character				=NULL;
+	m_joint = NULL;
+	m_ajoint = NULL;
+	m_body = NULL;
+	b_failed = false;
+	b_disabled = false;
+	e_state = cstPulling;
+	b_character_feedback = false;
+	m_taget_object = NULL;
+	m_character = NULL;
 	m_hard_mode = hard_mode;
-	if(!a_taget_object								||
-	   !a_taget_object->m_pPhysicsShell				||
-	   !a_taget_object->m_pPhysicsShell->isActive()	||
-	   smart_cast<CInventoryItem*>(a_taget_object)
-	   ) 
+	if (!a_taget_object ||
+		!a_taget_object->m_pPhysicsShell ||
+		!a_taget_object->m_pPhysicsShell->isActive() ||
+		smart_cast<CInventoryItem*>(a_taget_object)
+	)
 	{
-		m_taget_object=NULL;
-		b_failed=true;
+		m_taget_object = NULL;
+		b_failed = true;
 		return;
 	}
 
-	if(!a_character||!a_character->b_exist)
+	if (!a_character || !a_character->b_exist)
 	{
-		m_taget_object=NULL;
-		b_failed=true;
+		m_taget_object = NULL;
+		b_failed = true;
 		return;
 	}
-	m_taget_object			=a_taget_object;
-	m_character				=a_character;
+	m_taget_object = a_taget_object;
+	m_character = a_character;
 
-	CObject* capturer_object=smart_cast<CObject*>(m_character->PhysicsRefObject());
+	CObject* capturer_object = smart_cast<CObject*>(m_character->PhysicsRefObject());
 
-	if(!capturer_object)
+	if (!capturer_object)
 	{
-		m_taget_object=NULL;
-		b_failed=true;
+		m_taget_object = NULL;
+		b_failed = true;
 		return;
 	}
 
-	IKinematics* p_kinematics=smart_cast<IKinematics*>(capturer_object->Visual());
+	IKinematics* p_kinematics = smart_cast<IKinematics*>(capturer_object->Visual());
 
-	if(!p_kinematics)
+	if (!p_kinematics)
 	{
-		m_taget_object=NULL;
-		b_failed=true;
+		m_taget_object = NULL;
+		b_failed = true;
 		return;
 	}
 
 	CInifile* ini = nullptr;
-	if (smart_cast<CActor*>(m_character->PhysicsRefObject()) && pSettings->section_exist("actor_capture")) {
+	if (smart_cast<CActor*>(m_character->PhysicsRefObject()) && pSettings->section_exist("actor_capture"))
+	{
 		ini = pSettings;
 		m_capture_section = "actor_capture";
 	}
-	else if (smart_cast<CAI_Stalker*>(m_character->PhysicsRefObject()) && pSettings->section_exist("stalker_capture")) {
+	else if (smart_cast<CAI_Stalker*>(m_character->PhysicsRefObject()) && pSettings->section_exist("stalker_capture"))
+	{
 		ini = pSettings;
 		m_capture_section = "stalker_capture";
 	}
-	else {
+	else
+	{
 		ini = p_kinematics->LL_UserData();
 		m_capture_section = "capture";
 	}
 
-	if(!ini)
+	if (!ini)
 	{
-		m_taget_object=NULL;
-		b_failed=true;
+		m_taget_object = NULL;
+		b_failed = true;
 		return;
 	}
 
-	if(a_taget_element==BI_NONE)
+	if (a_taget_element == BI_NONE)
 	{
-		m_taget_object=NULL;
-		b_failed=true;
+		m_taget_object = NULL;
+		b_failed = true;
 		return;
 	}
 
-	if( !ini->section_exist( m_capture_section ) )
+	if (!ini->section_exist(m_capture_section))
 	{
-		m_taget_object=NULL;
-		b_failed=true;
-		return;
-	}
-	
-	u16 capture_bone_id = p_kinematics->LL_BoneID( capture_bone ? capture_bone : ini->r_string( m_capture_section, "bone" ) );
-	R_ASSERT2(capture_bone_id!=BI_NONE,"wrong capture bone");
-	m_capture_bone=&p_kinematics->LL_GetBoneInstance(capture_bone_id);
-		
-
-
-	IRenderVisual* V=m_taget_object->Visual();
-
-	if(!V)
-	{
-		m_taget_object=NULL;
-		b_failed=true;
+		m_taget_object = NULL;
+		b_failed = true;
 		return;
 	}
 
-	IKinematics* K=	smart_cast<IKinematics*>(V);
+	u16 capture_bone_id = p_kinematics->LL_BoneID(
+		capture_bone ? capture_bone : ini->r_string(m_capture_section, "bone"));
+	R_ASSERT2(capture_bone_id!=BI_NONE, "wrong capture bone");
+	m_capture_bone = &p_kinematics->LL_GetBoneInstance(capture_bone_id);
 
-	if(!K)
+
+	IRenderVisual* V = m_taget_object->Visual();
+
+	if (!V)
 	{
-		m_taget_object=NULL;
-		b_failed=true;
+		m_taget_object = NULL;
+		b_failed = true;
 		return;
 	}
 
-	CBoneInstance& tag_bone=K->LL_GetBoneInstance(a_taget_element);
+	IKinematics* K = smart_cast<IKinematics*>(V);
 
-	if(!tag_bone.callback_param())
+	if (!K)
 	{
-		m_taget_object=NULL;
-		b_failed=true;
+		m_taget_object = NULL;
+		b_failed = true;
 		return;
 	}
 
-	m_taget_element					=(CPhysicsElement*)tag_bone.callback_param();
+	CBoneInstance& tag_bone = K->LL_GetBoneInstance(a_taget_element);
 
-	if(!m_taget_element)
+	if (!tag_bone.callback_param())
 	{
-		m_taget_object=NULL;
-		b_failed=true;
+		m_taget_object = NULL;
+		b_failed = true;
+		return;
+	}
+
+	m_taget_element = (CPhysicsElement*)tag_bone.callback_param();
+
+	if (!m_taget_element)
+	{
+		m_taget_object = NULL;
+		b_failed = true;
 		return;
 	}
 
 	Init(ini);
-
 }
-
 
 
 void CPHCapture::Init(CInifile* ini)
 {
 	Fvector dir;
 	Fvector capture_bone_position = GetCapturePosition();
-	b_character_feedback=true;
+	b_character_feedback = true;
 
 
 	m_taget_element->GetGlobalPositionDynamic(&dir);
-	dir.sub(capture_bone_position,dir);
+	dir.sub(capture_bone_position, dir);
 
 
-	m_pull_distance = ini->r_float( m_capture_section, "pull_distance" );
-	if(!m_hard_mode && dir.magnitude()>m_pull_distance)
+	m_pull_distance = ini->r_float(m_capture_section, "pull_distance");
+	if (!m_hard_mode && dir.magnitude() > m_pull_distance)
 	{
-		m_taget_object=NULL;
-		b_failed=true;
+		m_taget_object = NULL;
+		b_failed = true;
 		return;
 	}
 
-	m_capture_distance = ini->r_float( m_capture_section, "distance" );
-	m_capture_force    = ini->r_float( m_capture_section, "capture_force" );
-	m_capture_time     = ini->r_u32( m_capture_section, "time_limit" ) * 1000;
+	m_capture_distance = ini->r_float(m_capture_section, "distance");
+	m_capture_force = ini->r_float(m_capture_section, "capture_force");
+	m_capture_time = ini->r_u32(m_capture_section, "time_limit") * 1000;
 
 	float pull_force_factor = READ_IF_EXISTS(ini, r_float, m_capture_section, "pull_force_factor", 4.f);
 	auto ps = m_taget_object->PPhysicsShell();
@@ -272,61 +277,61 @@ void CPHCapture::Init(CInifile* ini)
 
 	m_time_start = Device.dwTimeGlobal;
 
-	float pulling_vel_scale = ini->r_float( m_capture_section, "velocity_scale" );
-	m_taget_element->set_DynamicLimits(default_l_limit*pulling_vel_scale,default_w_limit*pulling_vel_scale);
+	float pulling_vel_scale = ini->r_float(m_capture_section, "velocity_scale");
+	m_taget_element->set_DynamicLimits(default_l_limit * pulling_vel_scale, default_w_limit * pulling_vel_scale);
 	//m_taget_element->PhysicsShell()->set_ObjectContactCallback(object_contactCallbackFun);
 	m_character->SetObjectContactCallback(object_contactCallbackFun);
 	m_island.Init();
-	CActor* A=smart_cast<CActor*>(m_character->PhysicsRefObject());
-	if(A)
+	CActor* A = smart_cast<CActor*>(m_character->PhysicsRefObject());
+	if (A)
 	{
-		A->SetWeaponHideState(INV_STATE_BLOCK_ALL,true);
+		A->SetWeaponHideState(INV_STATE_BLOCK_ALL, true);
 		m_hard_mode = true;
 	}
-	else if ( !m_hard_mode )
+	else if (!m_hard_mode)
 		m_hard_mode = false;
 
-	ps->applyForce( 0, m_pull_force, 0 );
+	ps->applyForce(0, m_pull_force, 0);
 }
 
 void CPHCapture::Release()
 {
-	if(b_failed) return;
-	if(e_state==cstReleased) return;
-	if(m_joint) 
+	if (b_failed) return;
+	if (e_state == cstReleased) return;
+	if (m_joint)
 	{
 		m_island.RemoveJoint(m_joint);
 
 		dJointDestroy(m_joint);
-
 	}
-	m_joint=NULL;
-	if(m_ajoint)
+	m_joint = NULL;
+	if (m_ajoint)
 	{
 		m_island.RemoveJoint(m_ajoint);
 		dJointDestroy(m_ajoint);
 	}
-	m_ajoint=NULL;
-	if(m_body) 
+	m_ajoint = NULL;
+	if (m_body)
 	{
 		m_island.RemoveBody(m_body);
 		dBodyDestroy(m_body);
 	}
-	m_body=NULL;
+	m_body = NULL;
 
-	if(e_state==cstPulling&&m_taget_element&&!m_taget_object->getDestroy()&&m_taget_object->PPhysicsShell()&&m_taget_object->PPhysicsShell()->isActive())
+	if (e_state == cstPulling && m_taget_element && !m_taget_object->getDestroy() && m_taget_object->PPhysicsShell() &&
+		m_taget_object->PPhysicsShell()->isActive())
 	{
 		m_taget_element->set_DynamicLimits();
 	}
 
 	b_failed = false;
-	e_state=cstReleased;
-	b_collide=true;
-	CActor* A=smart_cast<CActor*>(m_character->PhysicsRefObject());
-	if(A)
+	e_state = cstReleased;
+	b_collide = true;
+	CActor* A = smart_cast<CActor*>(m_character->PhysicsRefObject());
+	if (A)
 	{
-		A->SetWeaponHideState(INV_STATE_BLOCK_ALL,false);
-//.		A->inventory().setSlotsBlocked(false);
+		A->SetWeaponHideState(INV_STATE_BLOCK_ALL, false);
+		//.		A->inventory().setSlotsBlocked(false);
 	}
 }
 
@@ -338,9 +343,9 @@ void CPHCapture::Deactivate()
 	//	m_taget_element->set_ObjectContactCallback(0);
 
 	//}
-	if(m_character)m_character->SetObjectContactCallback(0);
+	if (m_character)m_character->SetObjectContactCallback(0);
 	CPHUpdateObject::Deactivate();
-	m_character		=NULL;
-	m_taget_object	=NULL;
-	m_taget_element	=NULL;
+	m_character = NULL;
+	m_taget_object = NULL;
+	m_taget_element = NULL;
 }

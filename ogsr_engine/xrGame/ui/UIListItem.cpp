@@ -31,10 +31,11 @@ void CUIListItem::Init(float x, float y, float width, float height)
 {
 	inherited::Init(x, y, width, height);
 	SetPressMode(CUIButton::DOWN_PRESS);
-	SetPushOffset( Fvector2().set(0.0f,0.0f));
+	SetPushOffset(Fvector2().set(0.0f, 0.0f));
 }
 
-void CUIListItem::InitTexture(LPCSTR tex_name){
+void CUIListItem::InitTexture(LPCSTR tex_name)
+{
 	CUIButton::InitTexture(tex_name);
 	SetTextX(m_UIStaticItem.GetRect().width());
 }
@@ -42,8 +43,8 @@ void CUIListItem::InitTexture(LPCSTR tex_name){
 
 void CUIListItem::Init(const char* str, float x, float y, float width, float height)
 {
-	Init(x,y,width, height);
-	SetTextST(str);	
+	Init(x, y, width, height);
+	SetTextST(str);
 }
 
 

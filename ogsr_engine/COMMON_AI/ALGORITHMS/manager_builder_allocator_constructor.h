@@ -11,22 +11,23 @@
 #include "builder_allocator_constructor.h"
 
 template <
-	typename _manager, 
+	typename _manager,
 	typename _builder,
 	typename _allocator,
 	template <
 		typename _builder,
 		typename _allocator
 	>
-	class	 _builder_allocator_constructor = CBuilderAllocatorConstructor
+	class _builder_allocator_constructor = CBuilderAllocatorConstructor
 >
-struct CManagerBuilderAllocatorConstructor {
+struct CManagerBuilderAllocatorConstructor
+{
 	template <
 		template <typename T> class _vertex = CEmptyClassTemplate,
 		template <typename T1, typename T2> class _index_vertex = CEmptyClassTemplate2
 	>
-	class CDataStorage : 
-		public _manager:: template CDataStorage<
+	class CDataStorage :
+		public _manager::template CDataStorage<
 			_vertex,
 			_index_vertex,
 			_builder_allocator_constructor<
@@ -40,19 +41,19 @@ struct CManagerBuilderAllocatorConstructor {
 			_vertex,
 			_index_vertex,
 			_builder_allocator_constructor<
-			_builder,
-			_allocator
+				_builder,
+				_allocator
 			>
 		> inherited;
-		typedef typename inherited::inherited		inherited_allocator;
-		typedef typename inherited::CGraphVertex	CGraphVertex;
-		typedef typename CGraphVertex::_index_type	_index_type;
+		typedef typename inherited::inherited inherited_allocator;
+		typedef typename inherited::CGraphVertex CGraphVertex;
+		typedef typename CGraphVertex::_index_type _index_type;
 
 	public:
-		IC							CDataStorage	(const u32 vertex_count);
-		virtual						~CDataStorage	();
-		IC		void				init			();
-		IC		CGraphVertex		&create_vertex	(const _index_type &vertex_id);
+		IC CDataStorage(const u32 vertex_count);
+		virtual ~CDataStorage();
+		IC void init();
+		IC CGraphVertex& create_vertex(const _index_type& vertex_id);
 	};
 };
 

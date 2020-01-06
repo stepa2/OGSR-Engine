@@ -49,11 +49,11 @@
 #	include "debug_renderer.h"
 #endif
 
-int			g_cl_InterpolationType		= 0;
-u32			g_cl_InterpolationMaxPoints = 0;
-int			g_dwInputUpdateDelta		= 20;
-BOOL		net_cl_inputguaranteed		= FALSE;
-CActor*		g_actor						= NULL;
+int g_cl_InterpolationType = 0;
+u32 g_cl_InterpolationMaxPoints = 0;
+int g_dwInputUpdateDelta = 20;
+BOOL net_cl_inputguaranteed = FALSE;
+CActor* g_actor = NULL;
 
 CActor* Actor()
 {
@@ -61,90 +61,90 @@ CActor* Actor()
 	// и вполне может быть вызвана, когда актора ещё нет.
 	// Т.ч. вылетать не будем в этом случае.
 	//VERIFY		(g_actor); 
-	return g_actor; 
+	return g_actor;
 };
 
 //--------------------------------------------------------------------
-void	CActor::ConvState(u32 mstate_rl, string128 *buf)
+void CActor::ConvState(u32 mstate_rl, string128* buf)
 {
-	strcpy(*buf,"");
-	if (isActorAccelerated(mstate_rl, IsZoomAimingMode()))		strcat(*buf,"Accel ");
-	if (mstate_rl&mcCrouch)		strcat(*buf,"Crouch ");
-	if (mstate_rl&mcFwd)		strcat(*buf,"Fwd ");
-	if (mstate_rl&mcBack)		strcat(*buf,"Back ");
-	if (mstate_rl&mcLStrafe)	strcat(*buf,"LStrafe ");
-	if (mstate_rl&mcRStrafe)	strcat(*buf,"RStrafe ");
-	if (mstate_rl&mcJump)		strcat(*buf,"Jump ");
-	if (mstate_rl&mcFall)		strcat(*buf,"Fall ");
-	if (mstate_rl&mcTurn)		strcat(*buf,"Turn ");
-	if (mstate_rl&mcLanding)	strcat(*buf,"Landing ");
-	if (mstate_rl&mcLLookout)	strcat(*buf,"LLookout ");
-	if (mstate_rl&mcRLookout)	strcat(*buf,"RLookout ");
-	if (m_bJumpKeyPressed)		strcat(*buf,"+Jumping ");
+	strcpy(*buf, "");
+	if (isActorAccelerated(mstate_rl, IsZoomAimingMode())) strcat(*buf, "Accel ");
+	if (mstate_rl & mcCrouch) strcat(*buf, "Crouch ");
+	if (mstate_rl & mcFwd) strcat(*buf, "Fwd ");
+	if (mstate_rl & mcBack) strcat(*buf, "Back ");
+	if (mstate_rl & mcLStrafe) strcat(*buf, "LStrafe ");
+	if (mstate_rl & mcRStrafe) strcat(*buf, "RStrafe ");
+	if (mstate_rl & mcJump) strcat(*buf, "Jump ");
+	if (mstate_rl & mcFall) strcat(*buf, "Fall ");
+	if (mstate_rl & mcTurn) strcat(*buf, "Turn ");
+	if (mstate_rl & mcLanding) strcat(*buf, "Landing ");
+	if (mstate_rl & mcLLookout) strcat(*buf, "LLookout ");
+	if (mstate_rl & mcRLookout) strcat(*buf, "RLookout ");
+	if (m_bJumpKeyPressed) strcat(*buf, "+Jumping ");
 };
 //--------------------------------------------------------------------
-void CActor::net_Export	(NET_Packet& P)					// export to server
+void CActor::net_Export(NET_Packet& P) // export to server
 {
 	//CSE_ALifeCreatureAbstract
-	u8					flags = 0;
-	P.w_float			(GetfHealth());
-	P.w_u32				(Level().timeServer());
-	P.w_u8				(flags);
-	Fvector				p = Position();
-	P.w_vec3			(p);//Position());
+	u8 flags = 0;
+	P.w_float(GetfHealth());
+	P.w_u32(Level().timeServer());
+	P.w_u8(flags);
+	Fvector p = Position();
+	P.w_vec3(p); //Position());
 
-	P.w_float /*w_angle8*/			(angle_normalize(r_model_yaw)); //Device.vCameraDirection.getH());//
-	P.w_float /*w_angle8*/			(angle_normalize(unaffected_r_torso.yaw));//(r_torso.yaw);
-	P.w_float /*w_angle8*/			(angle_normalize(unaffected_r_torso.pitch));//(r_torso.pitch);
-	P.w_float /*w_angle8*/			(angle_normalize(unaffected_r_torso.roll));//(r_torso.roll);
-	P.w_u8				(u8(g_Team()));
-	P.w_u8				(u8(g_Squad()));
-	P.w_u8				(u8(g_Group()));
+	P.w_float /*w_angle8*/(angle_normalize(r_model_yaw)); //Device.vCameraDirection.getH());//
+	P.w_float /*w_angle8*/(angle_normalize(unaffected_r_torso.yaw)); //(r_torso.yaw);
+	P.w_float /*w_angle8*/(angle_normalize(unaffected_r_torso.pitch)); //(r_torso.pitch);
+	P.w_float /*w_angle8*/(angle_normalize(unaffected_r_torso.roll)); //(r_torso.roll);
+	P.w_u8(u8(g_Team()));
+	P.w_u8(u8(g_Squad()));
+	P.w_u8(u8(g_Group()));
 
 
 	//CSE_ALifeCreatureTrader
-//	P.w_float			(inventory().TotalWeight());
-//	P.w_u32				(m_dwMoney);
+	//	P.w_float			(inventory().TotalWeight());
+	//	P.w_u32				(m_dwMoney);
 
 	//CSE_ALifeCreatureActor
-	
-	u16 ms	= (u16)(mstate_real & 0x0000ffff);
-	P.w_u16				(u16(ms));
-	P.w_sdir			(NET_SavedAccel);
-	Fvector				v = character_physics_support()->movement()->GetVelocity();
-	P.w_sdir			(v);//m_PhysicMovementControl.GetVelocity());
-//	P.w_float_q16		(fArmor,-500,1000);
-	P.w_float			(g_Radiation());
 
-	P.w_u8				(u8(inventory().GetActiveSlot()));
+	u16 ms = (u16)(mstate_real & 0x0000ffff);
+	P.w_u16(u16(ms));
+	P.w_sdir(NET_SavedAccel);
+	Fvector v = character_physics_support()->movement()->GetVelocity();
+	P.w_sdir(v); //m_PhysicMovementControl.GetVelocity());
+	//	P.w_float_q16		(fArmor,-500,1000);
+	P.w_float(g_Radiation());
+
+	P.w_u8(u8(inventory().GetActiveSlot()));
 	/////////////////////////////////////////////////
-	u16 NumItems		= 0;
-		
-	P.w_u16				(NumItems);
-	if (!NumItems)		return;
+	u16 NumItems = 0;
+
+	P.w_u16(NumItems);
+	if (!NumItems) return;
 
 	if (g_Alive())
 	{
-		SPHNetState	State;
+		SPHNetState State;
 
 		CPHSynchronize* pSyncObj = NULL;
 		pSyncObj = PHGetSyncItem(0);
 		pSyncObj->get_State(State);
 
-		P.w_u8					( State.enabled );
+		P.w_u8(State.enabled);
 
-		P.w_vec3				( State.angular_vel);
-		P.w_vec3				( State.linear_vel);
+		P.w_vec3(State.angular_vel);
+		P.w_vec3(State.linear_vel);
 
-		P.w_vec3				( State.force);
-		P.w_vec3				( State.torque);
+		P.w_vec3(State.force);
+		P.w_vec3(State.torque);
 
-		P.w_vec3				( State.position);
+		P.w_vec3(State.position);
 
-		P.w_float				( State.quaternion.x );
-		P.w_float				( State.quaternion.y );
-		P.w_float				( State.quaternion.z );
-		P.w_float				( State.quaternion.w );
+		P.w_float(State.quaternion.x);
+		P.w_float(State.quaternion.y);
+		P.w_float(State.quaternion.z);
+		P.w_float(State.quaternion.w);
 	}
 	else
 	{
@@ -152,23 +152,25 @@ void CActor::net_Export	(NET_Packet& P)					// export to server
 	};
 };
 
-static void w_vec_q8(NET_Packet& P,const Fvector& vec,const Fvector& min,const Fvector& max)
+static void w_vec_q8(NET_Packet& P, const Fvector& vec, const Fvector& min, const Fvector& max)
 {
-	P.w_float_q8(vec.x,min.x,max.x);
-	P.w_float_q8(vec.y,min.y,max.y);
-	P.w_float_q8(vec.z,min.z,max.z);
+	P.w_float_q8(vec.x, min.x, max.x);
+	P.w_float_q8(vec.y, min.y, max.y);
+	P.w_float_q8(vec.z, min.z, max.z);
 }
-static void r_vec_q8(NET_Packet& P,Fvector& vec,const Fvector& min,const Fvector& max)
-{
-	P.r_float_q8(vec.x,min.x,max.x);
-	P.r_float_q8(vec.y,min.y,max.y);
-	P.r_float_q8(vec.z,min.z,max.z);
 
-	clamp(vec.x,min.x,max.x);
-	clamp(vec.y,min.y,max.y);
-	clamp(vec.z,min.z,max.z);
+static void r_vec_q8(NET_Packet& P, Fvector& vec, const Fvector& min, const Fvector& max)
+{
+	P.r_float_q8(vec.x, min.x, max.x);
+	P.r_float_q8(vec.y, min.y, max.y);
+	P.r_float_q8(vec.z, min.z, max.z);
+
+	clamp(vec.x, min.x, max.x);
+	clamp(vec.y, min.y, max.y);
+	clamp(vec.z, min.z, max.z);
 }
-static void w_qt_q8(NET_Packet& P,const Fquaternion& q)
+
+static void w_qt_q8(NET_Packet& P, const Fquaternion& q)
 {
 	//Fvector Q;
 	//Q.set(q.x,q.y,q.z);
@@ -177,10 +179,10 @@ static void w_qt_q8(NET_Packet& P,const Fquaternion& q)
 	//P.w_float_q8(Q.y,-1.f,1.f);
 	//P.w_float_q8(Q.z,-1.f,1.f);
 	///////////////////////////////////////////////////
-	P.w_float_q8(q.x,-1.f,1.f);
-	P.w_float_q8(q.y,-1.f,1.f);
-	P.w_float_q8(q.z,-1.f,1.f);
-	P.w_float_q8(q.w,-1.f,1.f);
+	P.w_float_q8(q.x, -1.f, 1.f);
+	P.w_float_q8(q.y, -1.f, 1.f);
+	P.w_float_q8(q.z, -1.f, 1.f);
+	P.w_float_q8(q.w, -1.f, 1.f);
 
 	///////////////////////////////////////////
 
@@ -190,7 +192,8 @@ static void w_qt_q8(NET_Packet& P,const Fquaternion& q)
 	//P.w_float_q8(q.z,-1.f,1.f);
 	//P.w(sign())
 }
-static void r_qt_q8(NET_Packet& P,Fquaternion& q)
+
+static void r_qt_q8(NET_Packet& P, Fquaternion& q)
 {
 	//// x^2 + y^2 + z^2 + w^2 = 1
 	//P.r_float_q8(q.x,-1.f,1.f);
@@ -201,32 +204,32 @@ static void r_qt_q8(NET_Packet& P,Fquaternion& q)
 	//q.w=_sqrt(w2);
 	/////////////////////////////////////////////////////
 	///////////////////////////////////////////////////
-	P.r_float_q8(q.x,-1.f,1.f);
-	P.r_float_q8(q.y,-1.f,1.f);
-	P.r_float_q8(q.z,-1.f,1.f);
-	P.r_float_q8(q.w,-1.f,1.f);
+	P.r_float_q8(q.x, -1.f, 1.f);
+	P.r_float_q8(q.y, -1.f, 1.f);
+	P.r_float_q8(q.z, -1.f, 1.f);
+	P.r_float_q8(q.w, -1.f, 1.f);
 
-	clamp(q.x,-1.f,1.f);
-	clamp(q.y,-1.f,1.f);
-	clamp(q.z,-1.f,1.f);
-	clamp(q.w,-1.f,1.f);
+	clamp(q.x, -1.f, 1.f);
+	clamp(q.y, -1.f, 1.f);
+	clamp(q.z, -1.f, 1.f);
+	clamp(q.w, -1.f, 1.f);
 }
 
 #define F_MAX         3.402823466e+38F
 
-static void	UpdateLimits (Fvector &p, Fvector& min, Fvector& max)
+static void UpdateLimits(Fvector& p, Fvector& min, Fvector& max)
 {
-	if(p.x<min.x)min.x=p.x;
-	if(p.y<min.y)min.y=p.y;
-	if(p.z<min.z)min.z=p.z;
+	if (p.x < min.x)min.x = p.x;
+	if (p.y < min.y)min.y = p.y;
+	if (p.z < min.z)min.z = p.z;
 
-	if(p.x>max.x)max.x=p.x;
-	if(p.y>max.y)max.y=p.y;
-	if(p.z>max.z)max.z=p.z;
+	if (p.x > max.x)max.x = p.x;
+	if (p.y > max.y)max.y = p.y;
+	if (p.z > max.z)max.z = p.z;
 
-	for (int k=0; k<3; k++)
+	for (int k = 0; k < 3; k++)
 	{
-		if (p[k]<min[k] || p[k]>max[k])
+		if (p[k] < min[k] || p[k] > max[k])
 		{
 			R_ASSERT2(0, "Fuck");
 			UpdateLimits(p, min, max);
@@ -234,50 +237,50 @@ static void	UpdateLimits (Fvector &p, Fvector& min, Fvector& max)
 	}
 };
 
-void		CActor::net_ExportDeadBody		(NET_Packet &P)
+void CActor::net_ExportDeadBody(NET_Packet& P)
 {
 	/////////////////////////////
-	Fvector min,max;
+	Fvector min, max;
 
 	min.set(F_MAX,F_MAX,F_MAX);
-	max.set(-F_MAX,-F_MAX,-F_MAX);
+	max.set(-F_MAX, -F_MAX, -F_MAX);
 	/////////////////////////////////////
-	u16 bones_number		= PHGetSyncItemsNumber();
-	for(u16 i=0;i<bones_number;i++)
+	u16 bones_number = PHGetSyncItemsNumber();
+	for (u16 i = 0; i < bones_number; i++)
 	{
 		SPHNetState state;
 		PHGetSyncItem(i)->get_State(state);
 
-		Fvector& p=state.position;
-		UpdateLimits (p, min, max);
+		Fvector& p = state.position;
+		UpdateLimits(p, min, max);
 
-		Fvector px =state.linear_vel;
+		Fvector px = state.linear_vel;
 		px.div(10.0f);
 		px.add(state.position);
-		UpdateLimits (px, min, max);
+		UpdateLimits(px, min, max);
 	};
 
 	P.w_u8(10);
 	P.w_vec3(min);
 	P.w_vec3(max);
 
-	for(u16 i=0;i<bones_number;i++)
+	for (u16 i = 0; i < bones_number; i++)
 	{
 		SPHNetState state;
 		PHGetSyncItem(i)->get_State(state);
-//		state.net_Save(P,min,max);
-		w_vec_q8(P,state.position,min,max);
-		w_qt_q8(P,state.quaternion);
+		//		state.net_Save(P,min,max);
+		w_vec_q8(P, state.position, min, max);
+		w_qt_q8(P, state.quaternion);
 
 		//---------------------------------
-		Fvector px =state.linear_vel;
+		Fvector px = state.linear_vel;
 		px.div(10.0f);
 		px.add(state.position);
-		w_vec_q8(P,px,min,max);
-	};	
+		w_vec_q8(P, px, min, max);
+	};
 };
 
-void CActor::net_Import		(NET_Packet& P)					// import from server
+void CActor::net_Import(NET_Packet& P) // import from server
 {
 	//-----------------------------------------------
 	net_Import_Base(P);
@@ -290,78 +293,80 @@ void CActor::net_Import		(NET_Packet& P)					// import from server
 	//-----------------------------------------------
 };
 
-void		CActor::net_Import_Base				( NET_Packet& P)
+void CActor::net_Import_Base(NET_Packet& P)
 {
-	net_update			N;
+	net_update N;
 
-	u8					flags;
-	u16					tmp;
+	u8 flags;
+	u16 tmp;
 
 	//CSE_ALifeCreatureAbstract
 	float health;
-	P.r_float			(health);
+	P.r_float(health);
 	//----------- for E3 -----------------------------
 	if (OnClient())SetfHealth(health);
 	//------------------------------------------------
-	P.r_u32				(N.dwTimeStamp	);
-	//---------------------------------------------
-	
+	P.r_u32(N.dwTimeStamp);
 	//---------------------------------------------
 
-	P.r_u8				(flags			);
-	P.r_vec3			(N.p_pos		);
-	P.r_float /*r_angle8*/			(N.o_model		);
-	P.r_float /*r_angle8*/			(N.o_torso.yaw	); 
-	P.r_float /*r_angle8*/			(N.o_torso.pitch);
-	P.r_float /*r_angle8*/			(N.o_torso.roll	); if (N.o_torso.roll > PI) N.o_torso.roll -= PI_MUL_2;
-	id_Team				= P.r_u8();
-	id_Squad			= P.r_u8();
-	id_Group			= P.r_u8();
-	
-	
+	//---------------------------------------------
+
+	P.r_u8(flags);
+	P.r_vec3(N.p_pos);
+	P.r_float /*r_angle8*/(N.o_model);
+	P.r_float /*r_angle8*/(N.o_torso.yaw);
+	P.r_float /*r_angle8*/(N.o_torso.pitch);
+	P.r_float /*r_angle8*/(N.o_torso.roll);
+	if (N.o_torso.roll > PI) N.o_torso.roll -= PI_MUL_2;
+	id_Team = P.r_u8();
+	id_Squad = P.r_u8();
+	id_Group = P.r_u8();
+
+
 	//----------- for E3 -----------------------------
-//	if (OnClient())
+	//	if (OnClient())
 	//------------------------------------------------
 	{
-//		if (OnServer() || Remote())
+		//		if (OnServer() || Remote())
 		if (Level().IsDemoPlay())
 		{
-			unaffected_r_torso.yaw		= N.o_torso.yaw;
-			unaffected_r_torso.pitch	= N.o_torso.pitch;
-			unaffected_r_torso.roll		= N.o_torso.roll;
+			unaffected_r_torso.yaw = N.o_torso.yaw;
+			unaffected_r_torso.pitch = N.o_torso.pitch;
+			unaffected_r_torso.roll = N.o_torso.roll;
 
-			cam_Active()->yaw	= -N.o_torso.yaw;
+			cam_Active()->yaw = -N.o_torso.yaw;
 			cam_Active()->pitch = N.o_torso.pitch;
 		};
 	};
 
 	//CSE_ALifeCreatureTrader
-//	P.r_float			(fDummy);
-//	m_dwMoney =			P.r_u32();
+	//	P.r_float			(fDummy);
+	//	m_dwMoney =			P.r_u32();
 
 	//CSE_ALifeCreatureActor
-	P.r_u16				(tmp			); N.mstate = u32(tmp);
-	P.r_sdir			(N.p_accel		);
-	P.r_sdir			(N.p_velocity	);
-	float				fRRadiation;
-	P.r_float			(fRRadiation);
+	P.r_u16(tmp);
+	N.mstate = u32(tmp);
+	P.r_sdir(N.p_accel);
+	P.r_sdir(N.p_velocity);
+	float fRRadiation;
+	P.r_float(fRRadiation);
 	//----------- for E3 -----------------------------
-	if (OnClient())		
+	if (OnClient())
 	{
-//		fArmor = fRArmor;
+		//		fArmor = fRArmor;
 		SetfRadiation(fRRadiation);
 	};
 	//------------------------------------------------
 
-	u8					ActiveSlot;
-	P.r_u8				(ActiveSlot);
-	
+	u8 ActiveSlot;
+	P.r_u8(ActiveSlot);
+
 	//----------- for E3 -----------------------------
 	if (OnClient())
-	//------------------------------------------------
+		//------------------------------------------------
 	{
 		if (ActiveSlot == NO_ACTIVE_SLOT) inventory().SetActiveSlot(NO_ACTIVE_SLOT);
-		else 
+		else
 		{
 			if (inventory().GetActiveSlot() != u32(ActiveSlot))
 				inventory().Activate(u32(ActiveSlot));
@@ -379,29 +384,29 @@ void		CActor::net_Import_Base				( NET_Packet& P)
 	}
 	else
 	{
-		NET.push_back			(N);
-		if (NET.size()>5) NET.pop_front();
-	}	
+		NET.push_back(N);
+		if (NET.size() > 5) NET.pop_front();
+	}
 	//-----------------------------------------------
-	net_Import_Base_proceed	();
+	net_Import_Base_proceed();
 	//-----------------------------------------------
 };
 
-void	CActor::net_Import_Base_proceed		( )
+void CActor::net_Import_Base_proceed()
 {
 	if (g_Alive())
 	{
-		setVisible				((BOOL)!HUDview	());
-		setEnabled				(TRUE);
+		setVisible((BOOL)!HUDview());
+		setEnabled(TRUE);
 	};
 	//---------------------------------------------
-		
+
 	if (Remote()) return;
 
-	net_update N		= NET.back();
+	net_update N = NET.back();
 };
 
-void		CActor::net_Import_Physic			( NET_Packet& P)
+void CActor::net_Import_Physic(NET_Packet& P)
 {
 	m_States.clear();
 	if (m_u16NumBones != 1)
@@ -411,12 +416,12 @@ void		CActor::net_Import_Physic			( NET_Packet& P)
 		P.r_u8();
 		P.r_vec3(min);
 		P.r_vec3(max);
-		
-		for (u16 i=0; i<m_u16NumBones; i++)
+
+		for (u16 i = 0; i < m_u16NumBones; i++)
 		{
 			SPHNetState state, stateL;
 			PHGetSyncItem(i)->get_State(state);
-//			stateL.net_Load(P, min, max);
+			//			stateL.net_Load(P, min, max);
 			r_vec_q8(P, stateL.position, min, max);
 			r_qt_q8(P, stateL.quaternion);
 			//---------------------------------------
@@ -424,44 +429,44 @@ void		CActor::net_Import_Physic			( NET_Packet& P)
 			stateL.linear_vel.sub(stateL.position);
 			stateL.linear_vel.mul(10.0f);
 			//---------------------------------------
-			state.position				= stateL.position;
-			state.previous_position		= stateL.position;
-			state.quaternion			= stateL.quaternion;
-			state.previous_quaternion	= stateL.quaternion;
-			state.linear_vel			= stateL.linear_vel;
+			state.position = stateL.position;
+			state.previous_position = stateL.position;
+			state.quaternion = stateL.quaternion;
+			state.previous_quaternion = stateL.quaternion;
+			state.linear_vel = stateL.linear_vel;
 			//---------------------------------------
 			m_States.push_back(state);
 		};
 	}
 	else
 	{
-		net_update_A			N_A;
+		net_update_A N_A;
 
-		P.r_u8					( *((u8*)&(N_A.State.enabled)) );
+		P.r_u8(*((u8*)&(N_A.State.enabled)));
 
-		P.r_vec3				( N_A.State.angular_vel);
-		P.r_vec3				( N_A.State.linear_vel);
+		P.r_vec3(N_A.State.angular_vel);
+		P.r_vec3(N_A.State.linear_vel);
 
-		P.r_vec3				( N_A.State.force);
-		P.r_vec3				( N_A.State.torque);
+		P.r_vec3(N_A.State.force);
+		P.r_vec3(N_A.State.torque);
 
-		P.r_vec3				( N_A.State.position);
+		P.r_vec3(N_A.State.position);
 
-		P.r_float				( N_A.State.quaternion.x );
-		P.r_float				( N_A.State.quaternion.y );
-		P.r_float				( N_A.State.quaternion.z );
-		P.r_float				( N_A.State.quaternion.w );
+		P.r_float(N_A.State.quaternion.x);
+		P.r_float(N_A.State.quaternion.y);
+		P.r_float(N_A.State.quaternion.z);
+		P.r_float(N_A.State.quaternion.w);
 
 		if (!NET.empty())
-			N_A.dwTimeStamp			= NET.back().dwTimeStamp;
+			N_A.dwTimeStamp = NET.back().dwTimeStamp;
 		else
-			N_A.dwTimeStamp			= Level().timeServer();
+			N_A.dwTimeStamp = Level().timeServer();
 
-		N_A.State.previous_position	= N_A.State.position;
+		N_A.State.previous_position = N_A.State.position;
 		N_A.State.previous_quaternion = N_A.State.quaternion;
 		//----------- for E3 -----------------------------
 		if (Local() && OnClient() || !g_Alive()) return;
-//		if (g_Alive() && (Remote() || OnServer()))
+		//		if (g_Alive() && (Remote() || OnServer()))
 		{
 			//-----------------------------------------------
 			if (!NET_A.empty() && N_A.dwTimeStamp < NET_A.back().dwTimeStamp) return;
@@ -471,8 +476,8 @@ void		CActor::net_Import_Physic			( NET_Packet& P)
 			}
 			else
 			{
-				NET_A.push_back			(N_A);
-				if (NET_A.size()>5) NET_A.pop_front();
+				NET_A.push_back(N_A);
+				if (NET_A.size() > 5) NET_A.pop_front();
 			};
 
 			if (!NET_A.empty()) m_bInterpolate = true;
@@ -483,119 +488,119 @@ void		CActor::net_Import_Physic			( NET_Packet& P)
 	//-----------------------------------------------
 };
 
-void	CActor::net_Import_Physic_proceed	( )
+void CActor::net_Import_Physic_proceed()
 {
 	Level().AddObject_To_Objects4CrPr(this);
 	CrPr_SetActivated(false);
 	CrPr_SetActivationStep(0);
 };
 
-BOOL CActor::net_Spawn		(CSE_Abstract* DC)
+BOOL CActor::net_Spawn(CSE_Abstract* DC)
 {
-	m_holder_id				= ALife::_OBJECT_ID(-1);
+	m_holder_id = ALife::_OBJECT_ID(-1);
 	m_feel_touch_characters = 0;
-	m_snd_noise			= 0.0f;
-	m_sndShockEffector	= NULL;
-/*	m_followers			= NULL;*/
+	m_snd_noise = 0.0f;
+	m_sndShockEffector = NULL;
+	/*	m_followers			= NULL;*/
 	if (m_pPhysicsShell)
 	{
 		m_pPhysicsShell->Deactivate();
 		xr_delete(m_pPhysicsShell);
 	};
 	//force actor to be local on server client
-	CSE_Abstract			*e	= (CSE_Abstract*)(DC);
-	CSE_ALifeCreatureActor	*E	= smart_cast<CSE_ALifeCreatureActor*>(e);	
+	CSE_Abstract* e = (CSE_Abstract*)(DC);
+	CSE_ALifeCreatureActor* E = smart_cast<CSE_ALifeCreatureActor*>(e);
 	if (OnServer())
 	{
 		E->s_flags.set(M_SPAWN_OBJECT_LOCAL, TRUE);
 	}
-	
-	if(	TRUE == E->s_flags.test(M_SPAWN_OBJECT_LOCAL) && TRUE == E->s_flags.is(M_SPAWN_OBJECT_ASPLAYER))
+
+	if (TRUE == E->s_flags.test(M_SPAWN_OBJECT_LOCAL) && TRUE == E->s_flags.is(M_SPAWN_OBJECT_ASPLAYER))
 		g_actor = this;
 
 	VERIFY(m_pActorEffector == NULL);
 	m_pActorEffector = xr_new<CCameraManager>(false);
 
 	// motions
-	m_bAnimTorsoPlayed			= false;
-	m_current_legs_blend		= 0;
-	m_current_jump_blend		= 0;
-	m_current_legs.invalidate	();
-	m_current_torso.invalidate	();
-	m_current_head.invalidate	();
+	m_bAnimTorsoPlayed = false;
+	m_current_legs_blend = 0;
+	m_current_jump_blend = 0;
+	m_current_legs.invalidate();
+	m_current_torso.invalidate();
+	m_current_head.invalidate();
 	//-------------------------------------
 	// инициализация реестров, используемых актером
 	encyclopedia_registry->registry().init(ID());
 	game_news_registry->registry().init(ID());
 
 	{
-	  auto news = game_news_registry->registry().objects();
-	  if ( news.size() > NEWS_TO_SHOW )
-	    news.erase(
-	      news.begin(),
-	      news.begin() + ( news.size() - NEWS_TO_SHOW )
-            );
+		auto news = game_news_registry->registry().objects();
+		if (news.size() > NEWS_TO_SHOW)
+			news.erase(
+				news.begin(),
+				news.begin() + (news.size() - NEWS_TO_SHOW)
+			);
 	}
 
 	if (!CInventoryOwner::net_Spawn(DC)) return FALSE;
-	if (!inherited::net_Spawn(DC))	return FALSE;
+	if (!inherited::net_Spawn(DC)) return FALSE;
 
-	CSE_ALifeTraderAbstract	 *pTA	= smart_cast<CSE_ALifeTraderAbstract*>(e);
-	set_money				(pTA->m_dwMoney, false);		
+	CSE_ALifeTraderAbstract* pTA = smart_cast<CSE_ALifeTraderAbstract*>(e);
+	set_money(pTA->m_dwMoney, false);
 
-	ROS()->force_mode	(IRender_ObjectSpecific::TRACE_ALL);
+	ROS()->force_mode(IRender_ObjectSpecific::TRACE_ALL);
 
-	m_pPhysics_support->in_NetSpawn	(e);
-	character_physics_support()->movement()->ActivateBox( m_loaded_ph_box_id );
-	if(E->m_holderID!=u16(-1))
-	{ 
+	m_pPhysics_support->in_NetSpawn(e);
+	character_physics_support()->movement()->ActivateBox(m_loaded_ph_box_id);
+	if (E->m_holderID != u16(-1))
+	{
 		character_physics_support()->movement()->DestroyCharacter();
 	}
-	if(m_bOutBorder)character_physics_support()->movement()->setOutBorder();
-	r_torso_tgt_roll		= 0;
+	if (m_bOutBorder)character_physics_support()->movement()->setOutBorder();
+	r_torso_tgt_roll = 0;
 
-	r_model_yaw				= E->o_torso.yaw;
-	r_torso.yaw				= E->o_torso.yaw;
-	r_torso.pitch			= E->o_torso.pitch;
-	r_torso.roll			= 0.0f;//E->o_Angle.z;
+	r_model_yaw = E->o_torso.yaw;
+	r_torso.yaw = E->o_torso.yaw;
+	r_torso.pitch = E->o_torso.pitch;
+	r_torso.roll = 0.0f; //E->o_Angle.z;
 
-	unaffected_r_torso.yaw	= r_torso.yaw;
-	unaffected_r_torso.pitch= r_torso.pitch;
-	unaffected_r_torso.roll	= r_torso.roll;
+	unaffected_r_torso.yaw = r_torso.yaw;
+	unaffected_r_torso.pitch = r_torso.pitch;
+	unaffected_r_torso.roll = r_torso.roll;
 
 	// KRodin: это, мне кажется, лишнее.
 	//if( psActorFlags.test(AF_PSP) )
 	//	cam_Set(eacLookAt);
 	//else
-		cam_Set(eacFirstEye);
+	cam_Set(eacFirstEye);
 
-	cam_Active()->Set		(-E->o_torso.yaw,E->o_torso.pitch,0);//E->o_Angle.z);
+	cam_Active()->Set(-E->o_torso.yaw, E->o_torso.pitch, 0); //E->o_Angle.z);
 
 	// *** movement state - respawn
-	mstate_wishful			= 0;
-	if ( m_loaded_ph_box_id == 1 || m_loaded_ph_box_id == 3 )
-	  mstate_real = mcCrouch;
-	else if ( m_loaded_ph_box_id == 2 || m_loaded_ph_box_id == 4 )
-	  mstate_real = mcCrouch|mcAccel;
+	mstate_wishful = 0;
+	if (m_loaded_ph_box_id == 1 || m_loaded_ph_box_id == 3)
+		mstate_real = mcCrouch;
+	else if (m_loaded_ph_box_id == 2 || m_loaded_ph_box_id == 4)
+		mstate_real = mcCrouch | mcAccel;
 	else
-	  mstate_real = 0;
+		mstate_real = 0;
 	mstate_old = mstate_real;
-	m_bJumpKeyPressed		= FALSE;
+	m_bJumpKeyPressed = FALSE;
 
-	NET_SavedAccel.set		(0,0,0);
-	NET_WasInterpolating	= TRUE;
+	NET_SavedAccel.set(0, 0, 0);
+	NET_WasInterpolating = TRUE;
 
-	setEnabled				(E->s_flags.is(M_SPAWN_OBJECT_LOCAL));
+	setEnabled(E->s_flags.is(M_SPAWN_OBJECT_LOCAL));
 
-	Engine.Sheduler.Register	(this,TRUE);
+	Engine.Sheduler.Register(this,TRUE);
 
-	hit_slowmo				= 0.f;
+	hit_slowmo = 0.f;
 
 	OnChangeVisual();
 	//----------------------------------
 	m_bAllowDeathRemove = false;
 
-//	m_bHasUpdate = false;
+	//	m_bHasUpdate = false;
 	m_bInInterpolation = false;
 	m_bInterpolate = false;
 
@@ -606,27 +611,27 @@ BOOL CActor::net_Spawn		(CSE_Abstract* DC)
 	LastPosH.clear();
 	LastPosL.clear();
 #endif
-//*
-	
-//	if (OnServer())// && E->s_flags.is(M_SPAWN_OBJECT_LOCAL))
-/*	
-	if (OnClient())
-	{
-		if (!pStatGraph)
+	//*
+
+	//	if (OnServer())// && E->s_flags.is(M_SPAWN_OBJECT_LOCAL))
+	/*	
+		if (OnClient())
 		{
-			static g_Y = 0;
-			pStatGraph = xr_new<CStatGraph>();
-			pStatGraph->SetRect(0, g_Y, Device.dwWidth, 100, 0xff000000, 0xff000000);
-			g_Y += 110;
-			if (g_Y > 700) g_Y = 100;
-			pStatGraph->SetGrid(0, 0.0f, 10, 1.0f, 0xff808080, 0xffffffff);
-			pStatGraph->SetMinMax(0, 10, 300);
-			pStatGraph->SetStyle(CStatGraph::stBar);
-			pStatGraph->AppendSubGraph(CStatGraph::stCurve);
-			pStatGraph->AppendSubGraph(CStatGraph::stCurve);
+			if (!pStatGraph)
+			{
+				static g_Y = 0;
+				pStatGraph = xr_new<CStatGraph>();
+				pStatGraph->SetRect(0, g_Y, Device.dwWidth, 100, 0xff000000, 0xff000000);
+				g_Y += 110;
+				if (g_Y > 700) g_Y = 100;
+				pStatGraph->SetGrid(0, 0.0f, 10, 1.0f, 0xff808080, 0xffffffff);
+				pStatGraph->SetMinMax(0, 10, 300);
+				pStatGraph->SetStyle(CStatGraph::stBar);
+				pStatGraph->AppendSubGraph(CStatGraph::stCurve);
+				pStatGraph->AppendSubGraph(CStatGraph::stCurve);
+			}
 		}
-	}
-*/	
+	*/
 	SetDefaultVisualOutfit(cNameVisual());
 
 	smart_cast<IKinematics*>(Visual())->CalculateBones();
@@ -640,122 +645,124 @@ BOOL CActor::net_Spawn		(CSE_Abstract* DC)
 	//-------------------------------------
 	if (!g_Alive())
 	{
-		mstate_wishful	&=		~mcAnyMove;
-		mstate_real		&=		~mcAnyMove;
-		IKinematicsAnimated* K= smart_cast<IKinematicsAnimated*>(Visual());
+		mstate_wishful &= ~mcAnyMove;
+		mstate_real &= ~mcAnyMove;
+		IKinematicsAnimated* K = smart_cast<IKinematicsAnimated*>(Visual());
 		K->PlayCycle("death_init");
 
-		
+
 		//остановить звук тяжелого дыхания
 		m_HeavyBreathSnd.stop();
 	}
-	
-	typedef CClientSpawnManager::CALLBACK_TYPE	CALLBACK_TYPE;
-	CALLBACK_TYPE	callback;
-	callback.bind	(this,&CActor::on_requested_spawn);
-	m_holder_id				= E->m_holderID;
+
+	typedef CClientSpawnManager::CALLBACK_TYPE CALLBACK_TYPE;
+	CALLBACK_TYPE callback;
+	callback.bind(this, &CActor::on_requested_spawn);
+	m_holder_id = E->m_holderID;
 	if (E->m_holderID != ALife::_OBJECT_ID(-1))
-		Level().client_spawn_manager().add(E->m_holderID,ID(),callback);
+		Level().client_spawn_manager().add(E->m_holderID, ID(), callback);
 	//F
 	//-------------------------------------------------------------
 	m_iLastHitterID = u16(-1);
 	m_iLastHittingWeaponID = u16(-1);
 	m_s16LastHittedElement = -1;
 	m_bWasHitted = false;
-	m_dwILastUpdateTime		= 0;
+	m_dwILastUpdateTime = 0;
 
-		Level().MapManager().AddMapLocation("actor_location",ID());
-		Level().MapManager().AddMapLocation("actor_location_p",ID());
+	Level().MapManager().AddMapLocation("actor_location", ID());
+	Level().MapManager().AddMapLocation("actor_location_p", ID());
 
-		m_game_task_manager	= xr_new<CGameTaskManager>();
-		GameTaskManager().initialize(ID());
+	m_game_task_manager = xr_new<CGameTaskManager>();
+	GameTaskManager().initialize(ID());
 
-		m_statistic_manager = xr_new<CActorStatisticMgr>();
+	m_statistic_manager = xr_new<CActorStatisticMgr>();
 
 
-	spatial.type |=STYPE_REACTTOSOUND;
+	spatial.type |= STYPE_REACTTOSOUND;
 	psHUD_Flags.set(HUD_WEAPON_RT,TRUE);
-	
+
 	if (Level().IsDemoPlay() && OnClient())
 	{
 		setLocal(FALSE);
 	};
-	return					TRUE;
+	return TRUE;
 }
 
-void CActor::net_Destroy	()
+void CActor::net_Destroy()
 {
-	inherited::net_Destroy	();
+	inherited::net_Destroy();
 
 	if (m_holder_id != ALife::_OBJECT_ID(-1))
-		Level().client_spawn_manager().remove	(m_holder_id,ID());
+		Level().client_spawn_manager().remove(m_holder_id, ID());
 
-	delete_data				(m_game_task_manager);
-	delete_data				(m_statistic_manager);
-	
-	Level().MapManager		().RemoveMapLocationByObjectID(ID());
+	delete_data(m_game_task_manager);
+	delete_data(m_statistic_manager);
+
+	Level().MapManager().RemoveMapLocationByObjectID(ID());
 
 #pragma todo("Dima to MadMax : do not comment inventory owner net_Destroy!!!")
 	CInventoryOwner::net_Destroy();
-	cam_UnsetLadder();	
+	cam_UnsetLadder();
 	character_physics_support()->movement()->DestroyCharacter();
-	if(m_pPhysicsShell)			{
+	if (m_pPhysicsShell)
+	{
 		m_pPhysicsShell->Deactivate();
 		xr_delete<CPhysicsShell>(m_pPhysicsShell);
 	};
-	m_pPhysics_support->in_NetDestroy	();
+	m_pPhysics_support->in_NetDestroy();
 
-	xr_delete		(m_sndShockEffector);
-	xr_delete		(pStatGraph);
-	xr_delete		(m_pActorEffector);
-	pCamBobbing		= NULL;
-	
-#ifdef DEBUG	
+	xr_delete(m_sndShockEffector);
+	xr_delete(pStatGraph);
+	xr_delete(m_pActorEffector);
+	pCamBobbing = NULL;
+
+#ifdef DEBUG
 	LastPosS.clear();
 	LastPosH.clear();
 	LastPosL.clear();
 #endif
 
 	processing_deactivate();
-	m_holder=NULL;
-	m_holderID=u16(-1);
-	
+	m_holder = NULL;
+	m_holderID = u16(-1);
+
 	SetDefaultVisualOutfit(NULL);
 
-	if(g_actor == this) g_actor= NULL;
+	if (g_actor == this) g_actor = NULL;
 
-	Engine.Sheduler.Unregister	(this);
+	Engine.Sheduler.Unregister(this);
 }
 
-void CActor::net_Relcase	(CObject* O)
+void CActor::net_Relcase(CObject* O)
 {
-	
- 	VERIFY(O);
+	VERIFY(O);
 	CGameObject* GO = smart_cast<CGameObject*>(O);
-	if(GO&&m_pObjectWeLookingAt==GO){
-		m_pObjectWeLookingAt=NULL;
+	if (GO && m_pObjectWeLookingAt == GO)
+	{
+		m_pObjectWeLookingAt = NULL;
 	}
-	CHolderCustom* HC=smart_cast<CHolderCustom*>(GO);
-	if(HC&&HC==m_pVehicleWeLookingAt){
-		m_pVehicleWeLookingAt=NULL;
+	CHolderCustom* HC = smart_cast<CHolderCustom*>(GO);
+	if (HC && HC == m_pVehicleWeLookingAt)
+	{
+		m_pVehicleWeLookingAt = NULL;
 	}
-	if(HC&&HC==m_holder)
+	if (HC && HC == m_holder)
 	{
 		m_holder->detach_Actor();
-		m_holder=NULL;
+		m_holder = NULL;
 	}
-	inherited::net_Relcase	(O);
+	inherited::net_Relcase(O);
 
 	memory().remove_links(O);
 	m_pPhysics_support->in_NetRelcase(O);
-	conditions().net_Relcase( O );
+	conditions().net_Relcase(O);
 }
 
-BOOL	CActor::net_Relevant		()				// relevant for export to server
-{ 
+BOOL CActor::net_Relevant() // relevant for export to server
+{
 	if (OnServer())
 	{
-		return getSVU() | getLocal(); 
+		return getSVU() | getLocal();
 	}
 	else
 	{
@@ -763,138 +770,140 @@ BOOL	CActor::net_Relevant		()				// relevant for export to server
 	};
 };
 
-void	CActor::SetCallbacks()
+void CActor::SetCallbacks()
 {
-	IKinematics* V		= smart_cast<IKinematics*>(Visual());
-	VERIFY				(V);
-	u16 spine0_bone		= V->LL_BoneID("bip01_spine");
-	u16 spine1_bone		= V->LL_BoneID("bip01_spine1");
-	u16 shoulder_bone	= V->LL_BoneID("bip01_spine2");
-	u16 head_bone		= V->LL_BoneID("bip01_head");
-	V->LL_GetBoneInstance(u16(spine0_bone)).set_callback	(bctCustom,Spin0Callback,this);
-	V->LL_GetBoneInstance(u16(spine1_bone)).set_callback	(bctCustom,Spin1Callback,this);
-	V->LL_GetBoneInstance(u16(shoulder_bone)).set_callback	(bctCustom,ShoulderCallback,this);
-	V->LL_GetBoneInstance(u16(head_bone)).set_callback		(bctCustom,HeadCallback,this);
-}
-void	CActor::ResetCallbacks()
-{
-	IKinematics* V		= smart_cast<IKinematics*>(Visual());
-	VERIFY				(V);
-	u16 spine0_bone		= V->LL_BoneID("bip01_spine");
-	u16 spine1_bone		= V->LL_BoneID("bip01_spine1");
-	u16 shoulder_bone	= V->LL_BoneID("bip01_spine2");
-	u16 head_bone		= V->LL_BoneID("bip01_head");
-	V->LL_GetBoneInstance(u16(spine0_bone)).reset_callback	();
-	V->LL_GetBoneInstance(u16(spine1_bone)).reset_callback	();
-	V->LL_GetBoneInstance(u16(shoulder_bone)).reset_callback();
-	V->LL_GetBoneInstance(u16(head_bone)).reset_callback	();
+	IKinematics* V = smart_cast<IKinematics*>(Visual());
+	VERIFY(V);
+	u16 spine0_bone = V->LL_BoneID("bip01_spine");
+	u16 spine1_bone = V->LL_BoneID("bip01_spine1");
+	u16 shoulder_bone = V->LL_BoneID("bip01_spine2");
+	u16 head_bone = V->LL_BoneID("bip01_head");
+	V->LL_GetBoneInstance(u16(spine0_bone)).set_callback(bctCustom, Spin0Callback, this);
+	V->LL_GetBoneInstance(u16(spine1_bone)).set_callback(bctCustom, Spin1Callback, this);
+	V->LL_GetBoneInstance(u16(shoulder_bone)).set_callback(bctCustom, ShoulderCallback, this);
+	V->LL_GetBoneInstance(u16(head_bone)).set_callback(bctCustom, HeadCallback, this);
 }
 
-void	CActor::OnChangeVisual()
+void CActor::ResetCallbacks()
 {
-///	inherited::OnChangeVisual();
+	IKinematics* V = smart_cast<IKinematics*>(Visual());
+	VERIFY(V);
+	u16 spine0_bone = V->LL_BoneID("bip01_spine");
+	u16 spine1_bone = V->LL_BoneID("bip01_spine1");
+	u16 shoulder_bone = V->LL_BoneID("bip01_spine2");
+	u16 head_bone = V->LL_BoneID("bip01_head");
+	V->LL_GetBoneInstance(u16(spine0_bone)).reset_callback();
+	V->LL_GetBoneInstance(u16(spine1_bone)).reset_callback();
+	V->LL_GetBoneInstance(u16(shoulder_bone)).reset_callback();
+	V->LL_GetBoneInstance(u16(head_bone)).reset_callback();
+}
+
+void CActor::OnChangeVisual()
+{
+	///	inherited::OnChangeVisual();
 	{
-		CPhysicsShell* tmp_shell=PPhysicsShell();
-		PPhysicsShell()=NULL;
+		CPhysicsShell* tmp_shell = PPhysicsShell();
+		PPhysicsShell() = NULL;
 		inherited::OnChangeVisual();
-		PPhysicsShell()=tmp_shell;
-		tmp_shell=NULL;
+		PPhysicsShell() = tmp_shell;
+		tmp_shell = NULL;
 	}
 
-	IKinematicsAnimated* V	= smart_cast<IKinematicsAnimated*>(Visual());
-	if (V){
-		SetCallbacks		();
-		m_anims->Create		(V);
-		m_vehicle_anims->Create			(V);
-		CDamageManager::reload(*cNameSect(),"damage",pSettings);
+	IKinematicsAnimated* V = smart_cast<IKinematicsAnimated*>(Visual());
+	if (V)
+	{
+		SetCallbacks();
+		m_anims->Create(V);
+		m_vehicle_anims->Create(V);
+		CDamageManager::reload(*cNameSect(), "damage", pSettings);
 		//-------------------------------------------------------------------------------
-		m_head				= smart_cast<IKinematics*>(Visual())->LL_BoneID("bip01_head");
-		m_r_hand			= smart_cast<IKinematics*>(Visual())->LL_BoneID(pSettings->r_string(*cNameSect(),"weapon_bone0"));
-		m_l_finger1			= smart_cast<IKinematics*>(Visual())->LL_BoneID(pSettings->r_string(*cNameSect(),"weapon_bone1"));
-		m_r_finger2			= smart_cast<IKinematics*>(Visual())->LL_BoneID(pSettings->r_string(*cNameSect(),"weapon_bone2"));
+		m_head = smart_cast<IKinematics*>(Visual())->LL_BoneID("bip01_head");
+		m_r_hand = smart_cast<IKinematics*>(Visual())->LL_BoneID(pSettings->r_string(*cNameSect(), "weapon_bone0"));
+		m_l_finger1 = smart_cast<IKinematics*>(Visual())->LL_BoneID(pSettings->r_string(*cNameSect(), "weapon_bone1"));
+		m_r_finger2 = smart_cast<IKinematics*>(Visual())->LL_BoneID(pSettings->r_string(*cNameSect(), "weapon_bone2"));
 		//-------------------------------------------------------------------------------
-		m_neck				= smart_cast<IKinematics*>(Visual())->LL_BoneID("bip01_neck");
-		m_l_clavicle		= smart_cast<IKinematics*>(Visual())->LL_BoneID("bip01_l_clavicle");
-		m_r_clavicle		= smart_cast<IKinematics*>(Visual())->LL_BoneID("bip01_r_clavicle");
-		m_spine2			= smart_cast<IKinematics*>(Visual())->LL_BoneID("bip01_spine2");
-		m_spine1			= smart_cast<IKinematics*>(Visual())->LL_BoneID("bip01_spine1");
-		m_spine				= smart_cast<IKinematics*>(Visual())->LL_BoneID("bip01_spine");
+		m_neck = smart_cast<IKinematics*>(Visual())->LL_BoneID("bip01_neck");
+		m_l_clavicle = smart_cast<IKinematics*>(Visual())->LL_BoneID("bip01_l_clavicle");
+		m_r_clavicle = smart_cast<IKinematics*>(Visual())->LL_BoneID("bip01_r_clavicle");
+		m_spine2 = smart_cast<IKinematics*>(Visual())->LL_BoneID("bip01_spine2");
+		m_spine1 = smart_cast<IKinematics*>(Visual())->LL_BoneID("bip01_spine1");
+		m_spine = smart_cast<IKinematics*>(Visual())->LL_BoneID("bip01_spine");
 		//-------------------------------------------------------------------------------
 		reattach_items();
 		//-------------------------------------------------------------------------------
 		m_pPhysics_support->in_ChangeVisual();
 		//-------------------------------------------------------------------------------
-		SetCallbacks		();
+		SetCallbacks();
 		//-------------------------------------------------------------------------------
-		m_current_head.invalidate	();
-		m_current_legs.invalidate	();
-		m_current_torso.invalidate	();
-		m_current_legs_blend		= NULL;
-		m_current_torso_blend		= NULL;
-		m_current_jump_blend		= NULL;
+		m_current_head.invalidate();
+		m_current_legs.invalidate();
+		m_current_torso.invalidate();
+		m_current_legs_blend = NULL;
+		m_current_torso_blend = NULL;
+		m_current_jump_blend = NULL;
 
 		CStepManager::reload(*cNameSect());
 	}
 };
 
-void	CActor::ChangeVisual			( shared_str NewVisual )
+void CActor::ChangeVisual(shared_str NewVisual)
 {
 	if (!NewVisual.size()) return;
-	if (cNameVisual().size() )
+	if (cNameVisual().size())
 	{
 		if (cNameVisual() == NewVisual) return;
 	}
 
 	cNameVisual_set(NewVisual);
 
-	g_SetAnimation			(mstate_real);
+	g_SetAnimation(mstate_real);
 	Visual()->dcast_PKinematics()->CalculateBones_Invalidate();
 	Visual()->dcast_PKinematics()->CalculateBones();
 };
 
 void ACTOR_DEFS::net_update::lerp(ACTOR_DEFS::net_update& A, ACTOR_DEFS::net_update& B, float f)
 {
-//	float invf		= 1.f-f;
-//	// 
-//	o_model			= angle_lerp	(A.o_model,B.o_model,		f);
-//	o_torso.yaw		= angle_lerp	(A.o_torso.yaw,B.o_torso.yaw,f);
-//	o_torso.pitch	= angle_lerp	(A.o_torso.pitch,B.o_torso.pitch,f);
-//	o_torso.roll	= angle_lerp	(A.o_torso.roll,B.o_torso.roll,f);
-//	p_pos.lerp		(A.p_pos,B.p_pos,f);
-//	p_accel			= (f<0.5f)?A.p_accel:B.p_accel;
-//	p_velocity.lerp	(A.p_velocity,B.p_velocity,f);
-//	mstate			= (f<0.5f)?A.mstate:B.mstate;
-//	weapon			= (f<0.5f)?A.weapon:B.weapon;
-//	fHealth			= invf*A.fHealth+f*B.fHealth;
-//	fArmor			= invf*A.fArmor+f*B.fArmor;
-//	weapon			= (f<0.5f)?A.weapon:B.weapon;
+	//	float invf		= 1.f-f;
+	//	// 
+	//	o_model			= angle_lerp	(A.o_model,B.o_model,		f);
+	//	o_torso.yaw		= angle_lerp	(A.o_torso.yaw,B.o_torso.yaw,f);
+	//	o_torso.pitch	= angle_lerp	(A.o_torso.pitch,B.o_torso.pitch,f);
+	//	o_torso.roll	= angle_lerp	(A.o_torso.roll,B.o_torso.roll,f);
+	//	p_pos.lerp		(A.p_pos,B.p_pos,f);
+	//	p_accel			= (f<0.5f)?A.p_accel:B.p_accel;
+	//	p_velocity.lerp	(A.p_velocity,B.p_velocity,f);
+	//	mstate			= (f<0.5f)?A.mstate:B.mstate;
+	//	weapon			= (f<0.5f)?A.weapon:B.weapon;
+	//	fHealth			= invf*A.fHealth+f*B.fHealth;
+	//	fArmor			= invf*A.fArmor+f*B.fArmor;
+	//	weapon			= (f<0.5f)?A.weapon:B.weapon;
 }
 
-InterpData				IStartT;
-InterpData				IRecT;
-InterpData				IEndT;
+InterpData IStartT;
+InterpData IRecT;
+InterpData IEndT;
 
-void CActor::PH_B_CrPr		()	// actions & operations before physic correction-prediction steps
+void CActor::PH_B_CrPr() // actions & operations before physic correction-prediction steps
 {
 	//just set last update data for now
-//	if (!m_bHasUpdate) return;	
+	//	if (!m_bHasUpdate) return;	
 	if (CrPr_IsActivated()) return;
 	if (CrPr_GetActivationStep() > ph_world->m_steps_num) return;
 
 	if (g_Alive())
 	{
 		CrPr_SetActivated(true);
-		{		
+		{
 			///////////////////////////////////////////////
-			InterpData* pIStart = &IStart;			
-			pIStart->Pos				= Position();
-			pIStart->Vel				= character_physics_support()->movement()->GetVelocity();
-			pIStart->o_model			= angle_normalize(r_model_yaw);
-			pIStart->o_torso.yaw		= angle_normalize(unaffected_r_torso.yaw);
-			pIStart->o_torso.pitch		= angle_normalize(unaffected_r_torso.pitch);
-			pIStart->o_torso.roll		= angle_normalize(unaffected_r_torso.roll);
+			InterpData* pIStart = &IStart;
+			pIStart->Pos = Position();
+			pIStart->Vel = character_physics_support()->movement()->GetVelocity();
+			pIStart->o_model = angle_normalize(r_model_yaw);
+			pIStart->o_torso.yaw = angle_normalize(unaffected_r_torso.yaw);
+			pIStart->o_torso.pitch = angle_normalize(unaffected_r_torso.pitch);
+			pIStart->o_torso.roll = angle_normalize(unaffected_r_torso.roll);
 			if (pIStart->o_torso.roll > PI)
-					pIStart->o_torso.roll	-= PI_MUL_2;
+				pIStart->o_torso.roll -= PI_MUL_2;
 		}
 		///////////////////////////////////////////////
 		CPHSynchronize* pSyncObj = NULL;
@@ -909,7 +918,7 @@ void CActor::PH_B_CrPr		()	// actions & operations before physic correction-pred
 		{
 			PHUnFreeze();
 
-			pSyncObj->set_State(NET_A.back().State);			
+			pSyncObj->set_State(NET_A.back().State);
 		}
 		else
 		{
@@ -918,18 +927,19 @@ void CActor::PH_B_CrPr		()	// actions & operations before physic correction-pred
 
 			NET_Last = N;
 			///////////////////////////////////////////////
-			cam_Active()->Set		(-unaffected_r_torso.yaw,unaffected_r_torso.pitch, 0);//, unaffected_r_torso.roll);		// set's camera orientation
-			if (!N_A.State.enabled) 
+			cam_Active()->Set(-unaffected_r_torso.yaw, unaffected_r_torso.pitch, 0);
+			//, unaffected_r_torso.roll);		// set's camera orientation
+			if (!N_A.State.enabled)
 			{
 				pSyncObj->set_State(N_A.State);
 			}
 			else
 			{
 				PHUnFreeze();
-				
+
 				pSyncObj->set_State(N_A.State);
-				
-				g_Physics(N.p_accel, 0.0f, 0.0f);				
+
+				g_Physics(N.p_accel, 0.0f, 0.0f);
 				Position().set(IStart.Pos);
 			};
 		};
@@ -941,29 +951,29 @@ void CActor::PH_B_CrPr		()	// actions & operations before physic correction-pred
 
 		PHUnFreeze();
 
-		for (u16 i=0; i<m_u16NumBones; i++)
+		for (u16 i = 0; i < m_u16NumBones; i++)
 		{
 			SPHNetState state, stateL;
 			PHGetSyncItem(i)->get_State(state);
 			stateL = m_States[i];
 			//---------------------------------------
-			state.position				= stateL.position;
-			state.previous_position		= stateL.previous_position;
-			state.quaternion			= stateL.quaternion;
-			state.previous_quaternion	= stateL.previous_quaternion;
-			state.linear_vel			= stateL.linear_vel;
-			state.enabled				= true;
+			state.position = stateL.position;
+			state.previous_position = stateL.previous_position;
+			state.quaternion = stateL.quaternion;
+			state.previous_quaternion = stateL.previous_quaternion;
+			state.linear_vel = stateL.linear_vel;
+			state.enabled = true;
 			//---------------------------------------
 			PHGetSyncItem(i)->set_State(state);
 		};
 	};
-};	
+};
 
 
-void CActor::PH_I_CrPr		()		// actions & operations between two phisic prediction steps
+void CActor::PH_I_CrPr() // actions & operations between two phisic prediction steps
 {
 	//store recalculated data, then we able to restore it after small future prediction
-//	if (!m_bHasUpdate) return;
+	//	if (!m_bHasUpdate) return;
 	if (!CrPr_IsActivated()) return;
 	if (g_Alive())
 	{
@@ -974,14 +984,14 @@ void CActor::PH_I_CrPr		()		// actions & operations between two phisic predictio
 		////////////////////////////////////
 		pSyncObj->get_State(RecalculatedState);
 		////////////////////////////////////		
-	}; 
+	};
 };
 
-void CActor::PH_A_CrPr		()
+void CActor::PH_A_CrPr()
 {
 	//restore recalculated data and get data for interpolation	
-//	if (!m_bHasUpdate) return;
-//	m_bHasUpdate = false;
+	//	if (!m_bHasUpdate) return;
+	//	m_bHasUpdate = false;
 	if (!CrPr_IsActivated()) return;
 	if (!g_Alive()) return;
 	////////////////////////////////////
@@ -989,7 +999,7 @@ void CActor::PH_A_CrPr		()
 	pSyncObj = PHGetSyncItem(0);
 	if (!pSyncObj) return;
 	////////////////////////////////////
-	pSyncObj->get_State(PredictedState);	
+	pSyncObj->get_State(PredictedState);
 	////////////////////////////////////
 	pSyncObj->set_State(RecalculatedState);
 	////////////////////////////////////
@@ -998,10 +1008,10 @@ void CActor::PH_A_CrPr		()
 	mstate_wishful = mstate_real = NET_Last.mstate;
 	CalculateInterpolationParams();
 };
-extern	float		g_cl_lvInterp;
+extern float g_cl_lvInterp;
 
-void	CActor::CalculateInterpolationParams()
-{	
+void CActor::CalculateInterpolationParams()
+{
 	//	Fmatrix xformX0, xformX1;
 	CPHSynchronize* pSyncObj = NULL;
 	pSyncObj = PHGetSyncItem(0);
@@ -1020,19 +1030,19 @@ void	CActor::CalculateInterpolationParams()
 	pIStart->o_torso.roll		= unaffected_r_torso.roll;
 	*/
 	/////////////////////////////////////////////////////////////////////
-	pIRec->Pos				= RecalculatedState.position;
-	pIRec->Vel				= RecalculatedState.linear_vel;
-	pIRec->o_model			= NET_Last.o_model;
-	pIRec->o_torso			= NET_Last.o_torso;
+	pIRec->Pos = RecalculatedState.position;
+	pIRec->Vel = RecalculatedState.linear_vel;
+	pIRec->o_model = NET_Last.o_model;
+	pIRec->o_torso = NET_Last.o_torso;
 	/////////////////////////////////////////////////////////////////////
-	pIEnd->Pos				= PredictedState.position;
-	pIEnd->Vel				= PredictedState.linear_vel;
-	pIEnd->o_model			= pIRec->o_model		;
-	pIEnd->o_torso.yaw		= pIRec->o_torso.yaw	;
-	pIEnd->o_torso.pitch	= pIRec->o_torso.pitch	;	
-	pIEnd->o_torso.roll		= pIRec->o_torso.roll	;	
+	pIEnd->Pos = PredictedState.position;
+	pIEnd->Vel = PredictedState.linear_vel;
+	pIEnd->o_model = pIRec->o_model;
+	pIEnd->o_torso.yaw = pIRec->o_torso.yaw;
+	pIEnd->o_torso.pitch = pIRec->o_torso.pitch;
+	pIEnd->o_torso.roll = pIRec->o_torso.roll;
 	/////////////////////////////////////////////////////////////////////
-//	Msg("from %f, to %f", IStart.o_torso.yaw/PI*180.0f, IEnd.o_torso.yaw/PI*180.0f);
+	//	Msg("from %f, to %f", IStart.o_torso.yaw/PI*180.0f, IEnd.o_torso.yaw/PI*180.0f);
 	/////////////////////////////////////////////////////////////////////
 	Fvector SP0, SP1, SP2, SP3;
 	Fvector HP0, HP1, HP2, HP3;
@@ -1043,21 +1053,23 @@ void	CActor::CalculateInterpolationParams()
 	if (m_bInInterpolation)
 	{
 		u32 CurTime = Level().timeServer();
-		float factor	= float(CurTime - m_dwIStartTime)/(m_dwIEndTime - m_dwIStartTime);
+		float factor = float(CurTime - m_dwIStartTime) / (m_dwIEndTime - m_dwIStartTime);
 		if (factor > 1.0f) factor = 1.0f;
 
 		float c = factor;
-		for (u32 k=0; k<3; k++)
+		for (u32 k = 0; k < 3; k++)
 		{
-			SP0[k] = c*(c*(c*SCoeff[k][0]+SCoeff[k][1])+SCoeff[k][2])+SCoeff[k][3];
-			SP1[k] = (c*c*SCoeff[k][0]*3+c*SCoeff[k][1]*2+SCoeff[k][2])/3; // сокрость из формулы в 3 раза превышает скорость при расчете коэффициентов !!!!
+			SP0[k] = c * (c * (c * SCoeff[k][0] + SCoeff[k][1]) + SCoeff[k][2]) + SCoeff[k][3];
+			SP1[k] = (c * c * SCoeff[k][0] * 3 + c * SCoeff[k][1] * 2 + SCoeff[k][2]) / 3;
+			// сокрость из формулы в 3 раза превышает скорость при расчете коэффициентов !!!!
 
-			HP0[k] = c*(c*(c*HCoeff[k][0]+HCoeff[k][1])+HCoeff[k][2])+HCoeff[k][3];
-			HP1[k] = (c*c*HCoeff[k][0]*3+c*HCoeff[k][1]*2+HCoeff[k][2]); // сокрость из формулы в 3 раза превышает скорость при расчете коэффициентов !!!!
+			HP0[k] = c * (c * (c * HCoeff[k][0] + HCoeff[k][1]) + HCoeff[k][2]) + HCoeff[k][3];
+			HP1[k] = (c * c * HCoeff[k][0] * 3 + c * HCoeff[k][1] * 2 + HCoeff[k][2]);
+			// сокрость из формулы в 3 раза превышает скорость при расчете коэффициентов !!!!
 		};
 
 		SP1.add(SP0);
-	}	
+	}
 	else
 	{
 		if (LastState.linear_vel.x == 0 && LastState.linear_vel.y == 0 && LastState.linear_vel.z == 0)
@@ -1068,11 +1080,11 @@ void	CActor::CalculateInterpolationParams()
 		{
 			HP1.sub(LastState.position, LastState.previous_position);
 		};
-		HP1.mul(1.0f/fixed_step);
+		HP1.mul(1.0f / fixed_step);
 		SP1.add(HP1, SP0);
 	}
 	HP2.sub(PredictedState.position, PredictedState.previous_position);
-	HP2.mul(1.0f/fixed_step);
+	HP2.mul(1.0f / fixed_step);
 	SP2.sub(PredictedState.position, HP2);
 
 	SP3.set(PredictedState.position);
@@ -1096,23 +1108,24 @@ void	CActor::CalculateInterpolationParams()
 	TotalPath.sub(SP3, SP0);
 	float TotalLen = TotalPath.magnitude();
 
-	SPHNetState	State0 = (NET_A.back()).State;
-	SPHNetState	State1 = PredictedState;
+	SPHNetState State0 = (NET_A.back()).State;
+	SPHNetState State1 = PredictedState;
 
 	float lV0 = State0.linear_vel.magnitude();
 	float lV1 = State1.linear_vel.magnitude();
 
-	u32		ConstTime = u32((fixed_step - ph_world->m_frame_time)*1000)+ Level().GetInterpolationSteps()*u32(fixed_step*1000);
+	u32 ConstTime = u32((fixed_step - ph_world->m_frame_time) * 1000) + Level().GetInterpolationSteps() * u32(
+		fixed_step * 1000);
 
 	m_dwIStartTime = m_dwILastUpdateTime;
-	
-//	if (( lV0 + lV1) > 0.000001 && g_cl_lvInterp == 0)
+
+	//	if (( lV0 + lV1) > 0.000001 && g_cl_lvInterp == 0)
 	{
-//		u32		CulcTime = iCeil(TotalLen*2000/( lV0 + lV1));
-//		m_dwIEndTime = m_dwIStartTime + min(CulcTime, ConstTime);
+		//		u32		CulcTime = iCeil(TotalLen*2000/( lV0 + lV1));
+		//		m_dwIEndTime = m_dwIStartTime + min(CulcTime, ConstTime);
 	}
-//	else
-		m_dwIEndTime = m_dwIStartTime + ConstTime;
+	//	else
+	m_dwIEndTime = m_dwIStartTime + ConstTime;
 	/////////////////////////////////////////////////////////////////////////////
 	Fvector V0, V1;
 	//	V0.sub(SP1, SP0);
@@ -1126,39 +1139,39 @@ void	CActor::CalculateInterpolationParams()
 	{
 		if (V0.x != 0 || V0.y != 0 || V0.z != 0)
 		{
-			if (lV0 > TotalLen/3)
+			if (lV0 > TotalLen / 3)
 			{
 				HP1.normalize();
 				//				V0.normalize();
 				//				V0.mul(TotalLen/3);
 				HP1.normalize();
-				HP1.mul(TotalLen/3);
+				HP1.mul(TotalLen / 3);
 				SP1.add(HP1, SP0);
 			}
 		}
 
 		if (V1.x != 0 || V1.y != 0 || V1.z != 0)
 		{
-			if (lV1 > TotalLen/3)
+			if (lV1 > TotalLen / 3)
 			{
 				//				V1.normalize();
 				//				V1.mul(TotalLen/3);
 				HP2.normalize();
-				HP2.mul(TotalLen/3);
+				HP2.mul(TotalLen / 3);
 				SP2.sub(SP3, HP2);
 			};
 		}
 	};
 	/////////////////////////////////////////////////////////////////////////////
-	for( u32 i =0; i<3; i++)
+	for (u32 i = 0; i < 3; i++)
 	{
-		SCoeff[i][0] = SP3[i]	- 3*SP2[i] + 3*SP1[i] - SP0[i];
-		SCoeff[i][1] = 3*SP2[i]	- 6*SP1[i] + 3*SP0[i];
-		SCoeff[i][2] = 3*SP1[i]	- 3*SP0[i];
+		SCoeff[i][0] = SP3[i] - 3 * SP2[i] + 3 * SP1[i] - SP0[i];
+		SCoeff[i][1] = 3 * SP2[i] - 6 * SP1[i] + 3 * SP0[i];
+		SCoeff[i][2] = 3 * SP1[i] - 3 * SP0[i];
 		SCoeff[i][3] = SP0[i];
 
-		HCoeff[i][0] = 2*HP0[i] - 2*HP3[i] + HP1[i] + HP2[i];
-		HCoeff[i][1] = -3*HP0[i]	+ 3*HP3[i] - 2*HP1[i] - HP2[i];
+		HCoeff[i][0] = 2 * HP0[i] - 2 * HP3[i] + HP1[i] + HP2[i];
+		HCoeff[i][1] = -3 * HP0[i] + 3 * HP3[i] - 2 * HP1[i] - HP2[i];
 		HCoeff[i][2] = HP1[i];
 		HCoeff[i][3] = HP0[i];
 	};
@@ -1168,82 +1181,88 @@ void	CActor::CalculateInterpolationParams()
 	if (m_pPhysicsShell) m_pPhysicsShell->NetInterpolationModeON();
 }
 
-int		actInterpType = 0;
-void CActor::make_Interpolation	()
+int actInterpType = 0;
+
+void CActor::make_Interpolation()
 {
 	m_dwILastUpdateTime = Level().timeServer();
-			
-	if(g_Alive() && m_bInInterpolation) 
+
+	if (g_Alive() && m_bInInterpolation)
 	{
 		u32 CurTime = m_dwILastUpdateTime;
 
 		if (CurTime >= m_dwIEndTime)
 		{
-			m_bInInterpolation = false;			
+			m_bInInterpolation = false;
 			mstate_real = mstate_wishful = NET_Last.mstate;
 			NET_SavedAccel = NET_Last.p_accel;
 
 			CPHSynchronize* pSyncObj = NULL;
 			pSyncObj = PHGetSyncItem(0);
 			if (!pSyncObj) return;
-			pSyncObj->set_State(PredictedState);//, PredictedState.enabled);
-			VERIFY2								(_valid(renderable.xform),*cName());			
+			pSyncObj->set_State(PredictedState); //, PredictedState.enabled);
+			VERIFY2(_valid(renderable.xform), *cName());
 		}
 		else
-		{			
+		{
 			float factor = 0.0f;
 
 			if (m_dwIEndTime != m_dwIStartTime)
-				factor = float(CurTime - m_dwIStartTime)/(m_dwIEndTime - m_dwIStartTime);
-			
+				factor = float(CurTime - m_dwIStartTime) / (m_dwIEndTime - m_dwIStartTime);
+
 			Fvector NewPos;
 			NewPos.lerp(IStart.Pos, IEnd.Pos, factor);
-			
-			VERIFY2								(_valid(renderable.xform),*cName());
 
-//			r_model_yaw		= angle_lerp	(IStart.o_model,IEnd.o_model,		factor);			
-			unaffected_r_torso.yaw		= angle_lerp	(IStart.o_torso.yaw,IEnd.o_torso.yaw,factor);
-			unaffected_r_torso.pitch	= angle_lerp	(IStart.o_torso.pitch,IEnd.o_torso.pitch,factor);
-			unaffected_r_torso.roll		= angle_lerp	(IStart.o_torso.roll,IEnd.o_torso.roll,factor);
+			VERIFY2(_valid(renderable.xform), *cName());
 
-			for (u32 k=0; k<3; k++)
+			//			r_model_yaw		= angle_lerp	(IStart.o_model,IEnd.o_model,		factor);			
+			unaffected_r_torso.yaw = angle_lerp(IStart.o_torso.yaw, IEnd.o_torso.yaw, factor);
+			unaffected_r_torso.pitch = angle_lerp(IStart.o_torso.pitch, IEnd.o_torso.pitch, factor);
+			unaffected_r_torso.roll = angle_lerp(IStart.o_torso.roll, IEnd.o_torso.roll, factor);
+
+			for (u32 k = 0; k < 3; k++)
 			{
 				IPosL[k] = NewPos[k];
-				IPosS[k] = factor*(factor*(factor*SCoeff[k][0]+SCoeff[k][1])+SCoeff[k][2])+SCoeff[k][3];
-				IPosH[k] = factor*(factor*(factor*HCoeff[k][0]+HCoeff[k][1])+HCoeff[k][2])+HCoeff[k][3];
+				IPosS[k] = factor * (factor * (factor * SCoeff[k][0] + SCoeff[k][1]) + SCoeff[k][2]) + SCoeff[k][3];
+				IPosH[k] = factor * (factor * (factor * HCoeff[k][0] + HCoeff[k][1]) + HCoeff[k][2]) + HCoeff[k][3];
 			};
-			
+
 			Fvector SpeedVector, ResPosition;
 			switch (g_cl_InterpolationType)
 			{
-			case 0:	
+			case 0:
 				{
 					ResPosition.set(IPosL);
 					SpeedVector.sub(IEnd.Pos, IStart.Pos);
-					SpeedVector.div(float(m_dwIEndTime - m_dwIStartTime)/1000.0f);
-				}break;
-			case 1: 
+					SpeedVector.div(float(m_dwIEndTime - m_dwIStartTime) / 1000.0f);
+				}
+				break;
+			case 1:
 				{
-					for (int k=0; k<3; k++)
-						SpeedVector[k] = (factor*factor*SCoeff[k][0]*3+factor*SCoeff[k][1]*2+SCoeff[k][2])/3; // сокрость из формулы в 3 раза превышает скорость при расчете коэффициентов !!!!
-					
-					ResPosition.set(IPosS); 
-				}break;
-			case 2: 
-				{
-					for (int k=0; k<3; k++)
-						SpeedVector[k] = (factor*factor*HCoeff[k][0]*3+factor*HCoeff[k][1]*2+HCoeff[k][2]); 
+					for (int k = 0; k < 3; k++)
+						SpeedVector[k] = (factor * factor * SCoeff[k][0] * 3 + factor * SCoeff[k][1] * 2 + SCoeff[k][2])
+							/ 3; // сокрость из формулы в 3 раза превышает скорость при расчете коэффициентов !!!!
 
-					ResPosition.set(IPosH); 
-				}break;
+					ResPosition.set(IPosS);
+				}
+				break;
+			case 2:
+				{
+					for (int k = 0; k < 3; k++)
+						SpeedVector[k] = (factor * factor * HCoeff[k][0] * 3 + factor * HCoeff[k][1] * 2 + HCoeff[k][2]
+						);
+
+					ResPosition.set(IPosH);
+				}
+				break;
 			default:
 				{
 					R_ASSERT2(0, "Unknown interpolation curve type!");
 				}
 			}
-			character_physics_support()->movement()->SetPosition	(ResPosition);
-			character_physics_support()->movement()->SetVelocity	(SpeedVector);
-			cam_Active()->Set		(-unaffected_r_torso.yaw,unaffected_r_torso.pitch, 0);//, unaffected_r_torso.roll);
+			character_physics_support()->movement()->SetPosition(ResPosition);
+			character_physics_support()->movement()->SetVelocity(SpeedVector);
+			cam_Active()->Set(-unaffected_r_torso.yaw, unaffected_r_torso.pitch, 0); //, unaffected_r_torso.roll);
 		};
 	}
 	else
@@ -1260,6 +1279,7 @@ void CActor::make_Interpolation	()
 	};
 #endif
 };
+
 /*
 void		CActor::UpdatePosStack	( u32 Time0, u32 Time1 )
 {
@@ -1305,21 +1325,21 @@ ACTOR_DEFS::SMemoryPos*				CActor::FindMemoryPos (u32 Time)
 };
 */
 
-void CActor::save(NET_Packet &output_packet)
+void CActor::save(NET_Packet& output_packet)
 {
 	inherited::save(output_packet);
 	CInventoryOwner::save(output_packet);
 	output_packet.w_u8(u8(m_bOutBorder));
-	output_packet.w_u8( u8( character_physics_support()->movement()->BoxID() ) );
+	output_packet.w_u8(u8(character_physics_support()->movement()->BoxID()));
 }
 
-void CActor::load(IReader &input_packet)
+void CActor::load(IReader& input_packet)
 {
 	inherited::load(input_packet);
 	CInventoryOwner::load(input_packet);
-	m_bOutBorder=!!(input_packet.r_u8());
-	if ( ai().get_alife()->header().version() > 5 )
-	  m_loaded_ph_box_id = input_packet.r_u8();
+	m_bOutBorder = !!(input_packet.r_u8());
+	if (ai().get_alife()->header().version() > 5)
+		m_loaded_ph_box_id = input_packet.r_u8();
 }
 
 #ifdef DEBUG
@@ -1698,7 +1718,7 @@ void CActor::net_Save(NET_Packet& P)
 	P.w_u16(m_holderID);
 	Msg					("m_pPhysics_support->in_NetSave() : %d",P.w_tell() - pos);
 #else
-	inherited::net_Save	(P);
+	inherited::net_Save(P);
 	m_pPhysics_support->in_NetSave(P);
 	P.w_u16(m_holderID);
 #endif
@@ -1709,9 +1729,9 @@ BOOL CActor::net_SaveRelevant()
 	return TRUE;
 }
 
-void				CActor::SetHitInfo				(CObject* who, CObject* weapon, s16 element, Fvector Pos, Fvector Dir)
+void CActor::SetHitInfo(CObject* who, CObject* weapon, s16 element, Fvector Pos, Fvector Dir)
 {
-	m_iLastHitterID = (who!= NULL) ? who->ID() : u16(-1);
+	m_iLastHitterID = (who != NULL) ? who->ID() : u16(-1);
 	m_iLastHittingWeaponID = (weapon != NULL) ? weapon->ID() : u16(-1);
 	m_s16LastHittedElement = element;
 	m_fLastHealth = GetfHealth();
@@ -1722,29 +1742,31 @@ void				CActor::SetHitInfo				(CObject* who, CObject* weapon, s16 element, Fvect
 
 void CActor::OnPlayHeadShotParticle(NET_Packet P)
 {
-	Fvector	HitDir, HitPos;
-	s16	element = P.r_s16();	
-	P.r_dir(HitDir);	HitDir.invert();
+	Fvector HitDir, HitPos;
+	s16 element = P.r_s16();
+	P.r_dir(HitDir);
+	HitDir.invert();
 	P.r_vec3(HitPos);
 	//-----------------------------------
 	if (!m_sHeadShotParticle.size()) return;
-	Fmatrix pos; 	
-	CParticlesPlayer::MakeXFORM(this,element,HitDir,HitPos,pos);
+	Fmatrix pos;
+	CParticlesPlayer::MakeXFORM(this, element, HitDir, HitPos, pos);
 	// установить particles
 	CParticlesObject* ps = NULL;
-	
+
 	ps = CParticlesObject::Create(m_sHeadShotParticle.c_str(),TRUE);
 
-	ps->UpdateParent(pos,Fvector().set(0.f,0.f,0.f));
+	ps->UpdateParent(pos, Fvector().set(0.f, 0.f, 0.f));
 	GamePersistent().ps_needtoplay.push_back(ps);
 };
 
 bool CActor::Check_for_BackStab_Bone(u16 e)
 {
-	return e == m_head || e == m_neck || e == m_spine2 || e == m_l_clavicle || e == m_r_clavicle || e == m_spine1 || e == m_spine;
+	return e == m_head || e == m_neck || e == m_spine2 || e == m_l_clavicle || e == m_r_clavicle || e == m_spine1 || e
+		== m_spine;
 }
 
-bool				CActor::InventoryAllowSprint			()
+bool CActor::InventoryAllowSprint()
 {
 	PIItem pActiveItem = inventory().ActiveItem();
 	if (pActiveItem && !pActiveItem->IsSprintAllowed())
@@ -1759,12 +1781,12 @@ bool				CActor::InventoryAllowSprint			()
 	return true;
 };
 
-BOOL				CActor::BonePassBullet					(int boneID)
+BOOL CActor::BonePassBullet(int boneID)
 {
 	return inherited::BonePassBullet(boneID);
 }
 
-void			CActor::On_B_NotCurrentEntity		()
+void CActor::On_B_NotCurrentEntity()
 {
 	inventory().Items_SetCurrentEntityHud(false);
 };

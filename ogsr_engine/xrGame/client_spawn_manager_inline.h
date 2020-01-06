@@ -8,7 +8,7 @@
 
 #pragma once
 
-IC	CClientSpawnManager::CClientSpawnManager	()
+IC CClientSpawnManager::CClientSpawnManager()
 {
 }
 

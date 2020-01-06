@@ -360,7 +360,7 @@ void print_free_functions(lua_State *L, const luabind::object &object, LPCSTR he
 			}
 			// #pragma todo("Dima to Dima : Remove this hack if find out why")			
 
-			// */			
+// */			
 			// lua_pop	(L, 1);	// remove value from stack
 			lua_pop(L, 1);
 			if (lua_gettop(L) > save_top)
@@ -401,7 +401,7 @@ void print_help(lua_State *L)
 		luabind::detail::class_registry::get_registry(L)->iterate_classes(L, &print_class);
 		FastMsg("End of list of the classes exported to LUA\n");
 		FastMsg("\nList of the namespaces exported to LUA\n");
-#if !defined(_CPPUNWIND)				
+#if !defined(_CPPUNWIND)
 		__try
 #else
 		try
@@ -438,7 +438,7 @@ void print_help(lua_State *L)
 #endif
 }
 #else
-void print_help(lua_State *L)
+void print_help(lua_State* L)
 {
 	Msg("! For a dump lua_help, uncomment #define ENABLE_DUMP_LUA_HELP in config.hpp");
 }

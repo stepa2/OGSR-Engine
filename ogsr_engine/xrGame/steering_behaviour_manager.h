@@ -9,7 +9,8 @@
 #include "smart_cover_detail.h"
 
 class CAI_Rat;
-private debug::make_final<manager>
+private
+debug::make_final<manager>
 {
 public:
 					manager			(CAI_Rat const *object);

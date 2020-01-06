@@ -1,7 +1,9 @@
 #pragma once
 
-namespace GameObject {
-	enum ECallbackType {
+namespace GameObject
+{
+	enum ECallbackType
+	{
 		eTradeStart = u32(0),
 		eTradeStop,
 		eTradeSellBuyItem,
@@ -15,7 +17,7 @@ namespace GameObject {
 
 		ePatrolPathInPoint,
 
-//		eInventoryPda,
+		//		eInventoryPda,
 		eInventoryInfo,
 		eArticleInfo,
 		eTaskStateChange,
@@ -34,7 +36,7 @@ namespace GameObject {
 		eActionTypeParticle,
 		eActionTypeObject,
 
-//		eActorSleep,
+		//		eActorSleep,
 
 		eHelicopterOnPoint,
 		eHelicopterOnHit,
@@ -43,7 +45,7 @@ namespace GameObject {
 		eOnItemDrop,
 
 		eScriptAnimation,
-		
+
 		eTraderGlobalAnimationRequest,
 		eTraderHeadAnimationRequest,
 		eTraderSoundEnd,
@@ -62,7 +64,7 @@ namespace GameObject {
 		eOnBeforeUseItem,
 		entity_alive_before_hit,
 
-//		eOnHudAnimationEnd,
+		//		eOnHudAnimationEnd,
 
 		eOnUpdateAddonsVisibiility,
 		eOnUpdateHUDAddonsVisibiility,
@@ -114,7 +116,7 @@ namespace GameObject {
 		eOnInvBoxItemTake,
 		eOnInvBoxItemDrop,
 		eOnInvBoxOpen,
-		
+
 		eSelectPdaContact,
 
 		eDummy = u32(-1),

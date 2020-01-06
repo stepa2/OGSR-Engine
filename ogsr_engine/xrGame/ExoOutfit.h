@@ -8,10 +8,10 @@
 
 #include "customoutfit.h"
 
-class CExoOutfit: public CCustomOutfit
+class CExoOutfit : public CCustomOutfit
 {
 private:
-    typedef	CCustomOutfit inherited;
+	typedef CCustomOutfit inherited;
 public:
 	CExoOutfit(void);
 	virtual ~CExoOutfit(void);

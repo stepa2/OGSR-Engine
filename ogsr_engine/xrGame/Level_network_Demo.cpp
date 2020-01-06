@@ -4,65 +4,75 @@
 #include "xrServer.h"
 
 #define DEMO_DATA_SIZE	65536
-u32	g_dwDemoDeltaFrame = 1;
+u32 g_dwDemoDeltaFrame = 1;
 
-void						CLevel::Demo_StoreServerData	(void* data, u32 size)
+void CLevel::Demo_StoreServerData(void* data, u32 size)
 {
 	return;
-/* warning 4702 - unreachable code
-	DemoCS.Enter();
-	Demo_StoreData(data, size, DATA_SERVER_PACKET);
-	DemoCS.Leave();
-*/
+	/* warning 4702 - unreachable code
+		DemoCS.Enter();
+		Demo_StoreData(data, size, DATA_SERVER_PACKET);
+		DemoCS.Leave();
+	*/
 }
 
-void						CLevel::Demo_StoreData			(void* data, u32 size, DEMO_CHUNK DataType)
+void CLevel::Demo_StoreData(void* data, u32 size, DEMO_CHUNK DataType)
 {
- 	if (!IsDemoSave()) return;
+	if (!IsDemoSave()) return;
 
-//	DemoCS.Enter();
-	
+	//	DemoCS.Enter();
+
 	u32 CurTime = timeServer_Async();
-	u32 TotalSize = 4 + 4 + 4;//	
-	switch(DataType)
+	u32 TotalSize = 4 + 4 + 4; //	
+	switch (DataType)
 	{
 	case DATA_FRAME:
 		{
 			TotalSize += size;
-		}break;
+		}
+		break;
 	case DATA_SERVER_PACKET:
 	case DATA_CLIENT_PACKET:
 		{
 			TotalSize += size + 4;
-		}break;
+		}
+		break;
 	}
 
 	R_ASSERT2(size <= DEMO_DATA_SIZE, "Data is too BIG!");
 	if ((TotalSize + m_dwStoredDemoDataSize) >= DEMO_DATA_SIZE)
 	{
-		Demo_DumpData();		
+		Demo_DumpData();
 	};
 
-	DEMO_CHUNK	Chunk = DataType;
-	CopyMemory(m_pStoredDemoData + m_dwStoredDemoDataSize, &Chunk, 4);				m_dwStoredDemoDataSize += 4;					
-	CopyMemory(m_pStoredDemoData + m_dwStoredDemoDataSize, &m_dwCurDemoFrame, 4);	m_dwStoredDemoDataSize += 4;		
-	CopyMemory(m_pStoredDemoData + m_dwStoredDemoDataSize, &CurTime, 4);			m_dwStoredDemoDataSize += 4;				
+	DEMO_CHUNK Chunk = DataType;
+	CopyMemory(m_pStoredDemoData + m_dwStoredDemoDataSize, &Chunk, 4);
+	m_dwStoredDemoDataSize += 4;
+	CopyMemory(m_pStoredDemoData + m_dwStoredDemoDataSize, &m_dwCurDemoFrame, 4);
+	m_dwStoredDemoDataSize += 4;
+	CopyMemory(m_pStoredDemoData + m_dwStoredDemoDataSize, &CurTime, 4);
+	m_dwStoredDemoDataSize += 4;
 	switch (DataType)
 	{
 	case DATA_FRAME:
 		{
-			CopyMemory(m_pStoredDemoData + m_dwStoredDemoDataSize, data, size);		m_dwStoredDemoDataSize += size;		
-		}break;
+			CopyMemory(m_pStoredDemoData + m_dwStoredDemoDataSize, data, size);
+			m_dwStoredDemoDataSize += size;
+		}
+		break;
 	case DATA_SERVER_PACKET:
 	case DATA_CLIENT_PACKET:
 		{
-			CopyMemory(m_pStoredDemoData + m_dwStoredDemoDataSize, &size, 4);		m_dwStoredDemoDataSize += 4;
-			CopyMemory(m_pStoredDemoData + m_dwStoredDemoDataSize, data, size);		m_dwStoredDemoDataSize += size;		
-		}break;
+			CopyMemory(m_pStoredDemoData + m_dwStoredDemoDataSize, &size, 4);
+			m_dwStoredDemoDataSize += 4;
+			CopyMemory(m_pStoredDemoData + m_dwStoredDemoDataSize, data, size);
+			m_dwStoredDemoDataSize += size;
+		}
+		break;
 	}
-	
-	
-//	DemoCS.Leave();
+
+
+	//	DemoCS.Leave();
 
 	/*
 	FILE* fTDemo = fopen(m_sDemoName, "ab");
@@ -79,7 +89,7 @@ void						CLevel::Demo_StoreData			(void* data, u32 size, DEMO_CHUNK DataType)
 	*/
 }
 
-void						CLevel::Demo_DumpData()
+void CLevel::Demo_DumpData()
 {
 	if (!m_sDemoName[0]) return;
 	FILE* fTDemo = fopen(m_sDemoName, "ab");
@@ -94,9 +104,9 @@ void						CLevel::Demo_DumpData()
 
 //#define STORE_TDEMO
 
-void						CLevel::Demo_PrepareToStore			()
+void CLevel::Demo_PrepareToStore()
 {
-	m_bDemoSaveMode = !!strstr(Core.Params,"-techdemo");
+	m_bDemoSaveMode = !!strstr(Core.Params, "-techdemo");
 
 	if (!m_bDemoSaveMode) return;
 
@@ -106,36 +116,37 @@ void						CLevel::Demo_PrepareToStore			()
 	GetComputerName(CName, (DWORD*)&CNameSize);
 	SYSTEMTIME Time;
 	GetLocalTime(&Time);
-	sprintf_s(m_sDemoName, "xray_%s_%02d-%02d-%02d_%02d-%02d-%02d.tdemo", CName, Time.wMonth, Time.wDay, Time.wYear, Time.wHour, Time.wMinute, Time.wSecond);
+	sprintf_s(m_sDemoName, "xray_%s_%02d-%02d-%02d_%02d-%02d-%02d.tdemo", CName, Time.wMonth, Time.wDay, Time.wYear,
+	          Time.wHour, Time.wMinute, Time.wSecond);
 	Msg("Tech Demo would be stored in - %s", m_sDemoName);
-	
-	FS.update_path      (m_sDemoName,"$logs$",m_sDemoName);
+
+	FS.update_path(m_sDemoName, "$logs$", m_sDemoName);
 	//---------------------------------------------------------------
 	m_dwStoredDemoDataSize = 0;
-	m_pStoredDemoData = xr_alloc<u8>(DEMO_DATA_SIZE/sizeof(u8));
+	m_pStoredDemoData = xr_alloc<u8>(DEMO_DATA_SIZE / sizeof(u8));
 	//---------------------------------------------------------------
 	m_dwCurDemoFrame = 0;
-//	ZeroMemory(&m_sDemoHeader, sizeof(m_sDemoHeader));
+	//	ZeroMemory(&m_sDemoHeader, sizeof(m_sDemoHeader));
 	m_sDemoHeader.Head[0] = 0;
 	m_sDemoHeader.ServerOptions = "";
 };
 
-void						CLevel::WriteStoredDemo			()
-{	
+void CLevel::WriteStoredDemo()
+{
 	if (!DemoCS.TryEnter()) return;
-	
+
 	Demo_DumpData();
 	DemoCS.Leave();
 };
 
-BOOL	g_bLeaveTDemo = FALSE;
+BOOL g_bLeaveTDemo = FALSE;
 
-void						CLevel::Demo_Clear				()
+void CLevel::Demo_Clear()
 {
 	WriteStoredDemo();
 	m_bDemoSaveMode = FALSE;
 	xr_free(m_pStoredDemoData);
-	m_dwStoredDemoDataSize = 0;	 
+	m_dwStoredDemoDataSize = 0;
 
 	if (!g_bLeaveTDemo)
 	{
@@ -143,151 +154,153 @@ void						CLevel::Demo_Clear				()
 	};
 };
 
-void						CLevel::Demo_Load				(LPCSTR DemoName)
-{	
-/*
-	string_path			DemoFileName;
-	FS.update_path      (DemoFileName,"$logs$",DemoName);
-	//-----------------------------------------------------
-	HANDLE hDemoFile = CreateFile(DemoFileName, FILE_ALL_ACCESS, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (hDemoFile == NULL) return;
-
-	u32	FileSize = GetFileSize(hDemoFile, NULL);
-	u8* pDemoData = xr_alloc<u8>(FileSize/sizeof(u8));
-	ReadFile(hDemoFile, pDemoData, FileSize, (LPDWORD)&FileSize, NULL);
-	CloseHandle(hDemoFile);
-	u8* pTDemoData = pDemoData;
-	//-----------------------------------------------------
-
-//	FILE* fTDemo = fopen(DemoFileName, "rb");
-//	if (fTDemo)
-	{
-//		NET_Packet NewPacket;
-		DemoDataStruct NewData;
-		Msg("\n------- Loading Demo... ---------\n");
-
-//		while (!feof(fTDemo))
-		while (u32(pTDemoData - pDemoData) < FileSize)
+void CLevel::Demo_Load(LPCSTR DemoName)
+{
+	/*
+		string_path			DemoFileName;
+		FS.update_path      (DemoFileName,"$logs$",DemoName);
+		//-----------------------------------------------------
+		HANDLE hDemoFile = CreateFile(DemoFileName, FILE_ALL_ACCESS, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+		if (hDemoFile == NULL) return;
+	
+		u32	FileSize = GetFileSize(hDemoFile, NULL);
+		u8* pDemoData = xr_alloc<u8>(FileSize/sizeof(u8));
+		ReadFile(hDemoFile, pDemoData, FileSize, (LPDWORD)&FileSize, NULL);
+		CloseHandle(hDemoFile);
+		u8* pTDemoData = pDemoData;
+		//-----------------------------------------------------
+	
+	//	FILE* fTDemo = fopen(DemoFileName, "rb");
+	//	if (fTDemo)
 		{
-			CopyMemory(&(NewData.m_dwDataType), pTDemoData, sizeof(NewData.m_dwDataType));				pTDemoData += sizeof(NewData.m_dwDataType);
-			CopyMemory(&(NewData.m_dwFrame), pTDemoData, sizeof(NewData.m_dwFrame));					pTDemoData += sizeof(NewData.m_dwFrame);
-			CopyMemory(&(NewData.m_dwTimeReceive), pTDemoData, sizeof(NewData.m_dwTimeReceive));		pTDemoData += sizeof(NewData.m_dwTimeReceive);
+	//		NET_Packet NewPacket;
+			DemoDataStruct NewData;
+			Msg("\n------- Loading Demo... ---------\n");
+	
+	//		while (!feof(fTDemo))
+			while (u32(pTDemoData - pDemoData) < FileSize)
+			{
+				CopyMemory(&(NewData.m_dwDataType), pTDemoData, sizeof(NewData.m_dwDataType));				pTDemoData += sizeof(NewData.m_dwDataType);
+				CopyMemory(&(NewData.m_dwFrame), pTDemoData, sizeof(NewData.m_dwFrame));					pTDemoData += sizeof(NewData.m_dwFrame);
+				CopyMemory(&(NewData.m_dwTimeReceive), pTDemoData, sizeof(NewData.m_dwTimeReceive));		pTDemoData += sizeof(NewData.m_dwTimeReceive);
+	
+	//			fread(&(NewData.m_dwDataType), sizeof(NewData.m_dwDataType), 1, fTDemo);
+	//			fread(&(NewData.m_dwFrame), sizeof(NewData.m_dwFrame), 1, fTDemo);
+	//			fread(&(NewData.m_dwTimeReceive), sizeof(NewData.m_dwTimeReceive), 1, fTDemo);
+				switch (NewData.m_dwDataType)
+				{
+				case DATA_FRAME:
+					{
+						CopyMemory(&(NewData.FrameTime), pTDemoData, sizeof(NewData.FrameTime));			pTDemoData += sizeof(NewData.FrameTime);
+	//					fread(&(NewData.FrameTime), sizeof(NewData.FrameTime), 1, fTDemo);
+						m_dwLastDemoFrame = NewData.m_dwFrame;
+					}break;
+				case DATA_CLIENT_PACKET:
+				case DATA_SERVER_PACKET:
+					{
+						CopyMemory(&(NewData.Packet.B.count), pTDemoData, sizeof(NewData.Packet.B.count));	pTDemoData += sizeof(NewData.Packet.B.count);
+						CopyMemory((NewData.Packet.B.data), pTDemoData, NewData.Packet.B.count);			pTDemoData += NewData.Packet.B.count;
+	
+	//					fread(&(NewData.Packet.B.count), sizeof(NewData.Packet.B.count), 1, fTDemo);
+	//					fread((NewData.Packet.B.data), 1, NewData.Packet.B.count, fTDemo);
+					}break;
+				};			
+	
+				m_aDemoData.push_back(NewData);
+			}
+	//		fclose(fTDemo);
+			if (!m_aDemoData.empty()) 
+			{
+				m_bDemoPlayMode = TRUE;
+				m_bDemoSaveMode = FALSE;
+			};
+			m_dwCurDemoFrame = 0;
+		}
+		xr_free(pDemoData);
+		//-----------------------------------------------
+		g_dwDemoDeltaFrame = 1;
+	*/
+}
 
-//			fread(&(NewData.m_dwDataType), sizeof(NewData.m_dwDataType), 1, fTDemo);
-//			fread(&(NewData.m_dwFrame), sizeof(NewData.m_dwFrame), 1, fTDemo);
-//			fread(&(NewData.m_dwTimeReceive), sizeof(NewData.m_dwTimeReceive), 1, fTDemo);
+static long lFileSize = 0;
+
+void CLevel::Demo_Load_toFrame(LPCSTR FileName, DWORD toFrame, long& ofs)
+{
+	/*
+		if (ofs == 1) g_dwDemoDeltaFrame = 1;
+	
+		m_sDemoFileName = FileName;
+		string_path	DemoFileName;
+		FS.update_path      (DemoFileName,"$logs$",FileName);
+		//-----------------------------------------------------
+		FILE* fTDemo = fopen(DemoFileName, "rb");
+		if (!fTDemo) return;
+		if (ofs == 0)
+		{
+			//-------------- get file size ------------------------
+			fseek(fTDemo, 0, SEEK_END);
+			lFileSize = ftell(fTDemo);
+			fseek(fTDemo, 0, SEEK_SET);
+	
+			//-------------- load file header ---------------------		
+			fread(&m_sDemoHeader.bServerClient, 32, 1, fTDemo); //-V512
+			DWORD OptSize = 0;
+			fread(&OptSize, 4, 1, fTDemo);
+			string4096 ServerOptions = "";
+			fread(&ServerOptions, OptSize, 1, fTDemo);
+			m_sDemoHeader.ServerOptions = ServerOptions;
+			ofs = ftell(fTDemo);
+			//------------- replace server and client options -----
+			m_caServerOptions = m_sDemoHeader.ServerOptions;
+			m_caClientOptions = "localhost";
+			//-----------------------------------------------------
+		}
+		if (fseek(fTDemo, ofs, SEEK_SET))
+		{
+			R_ASSERT(0);
+		};
+		DemoDataStruct NewData;	
+		while (!feof(fTDemo) && (ofs < lFileSize))
+		{
+			fread(&(NewData.m_dwDataType), sizeof(NewData.m_dwDataType), 1, fTDemo);
+			fread(&(NewData.m_dwFrame), sizeof(NewData.m_dwFrame), 1, fTDemo);
+			fread(&(NewData.m_dwTimeReceive), sizeof(NewData.m_dwTimeReceive), 1, fTDemo);
 			switch (NewData.m_dwDataType)
 			{
 			case DATA_FRAME:
-				{
-					CopyMemory(&(NewData.FrameTime), pTDemoData, sizeof(NewData.FrameTime));			pTDemoData += sizeof(NewData.FrameTime);
-//					fread(&(NewData.FrameTime), sizeof(NewData.FrameTime), 1, fTDemo);
+				{				
+					fread(&(NewData.FrameTime), sizeof(NewData.FrameTime), 1, fTDemo);
 					m_dwLastDemoFrame = NewData.m_dwFrame;
 				}break;
 			case DATA_CLIENT_PACKET:
 			case DATA_SERVER_PACKET:
 				{
-					CopyMemory(&(NewData.Packet.B.count), pTDemoData, sizeof(NewData.Packet.B.count));	pTDemoData += sizeof(NewData.Packet.B.count);
-					CopyMemory((NewData.Packet.B.data), pTDemoData, NewData.Packet.B.count);			pTDemoData += NewData.Packet.B.count;
-
-//					fread(&(NewData.Packet.B.count), sizeof(NewData.Packet.B.count), 1, fTDemo);
-//					fread((NewData.Packet.B.data), 1, NewData.Packet.B.count, fTDemo);
+					fread(&(NewData.Packet.B.count), sizeof(NewData.Packet.B.count), 1, fTDemo);
+					fread((NewData.Packet.B.data), 1, NewData.Packet.B.count, fTDemo);
 				}break;
 			};			
-
+	
+			ofs = ftell(fTDemo);
 			m_aDemoData.push_back(NewData);
-		}
-//		fclose(fTDemo);
+			if (NewData.m_dwFrame > toFrame) break;
+		};
+		
+		fclose(fTDemo);
+	
 		if (!m_aDemoData.empty()) 
 		{
 			m_bDemoPlayMode = TRUE;
 			m_bDemoSaveMode = FALSE;
 		};
-		m_dwCurDemoFrame = 0;
-	}
-	xr_free(pDemoData);
-	//-----------------------------------------------
-	g_dwDemoDeltaFrame = 1;
-*/
-}
-
-static long lFileSize = 0;
-void						CLevel::Demo_Load_toFrame	(LPCSTR FileName, DWORD toFrame, long &ofs)
-{
-/*
-	if (ofs == 1) g_dwDemoDeltaFrame = 1;
-
-	m_sDemoFileName = FileName;
-	string_path	DemoFileName;
-	FS.update_path      (DemoFileName,"$logs$",FileName);
-	//-----------------------------------------------------
-	FILE* fTDemo = fopen(DemoFileName, "rb");
-	if (!fTDemo) return;
-	if (ofs == 0)
-	{
-		//-------------- get file size ------------------------
-		fseek(fTDemo, 0, SEEK_END);
-		lFileSize = ftell(fTDemo);
-		fseek(fTDemo, 0, SEEK_SET);
-
-		//-------------- load file header ---------------------		
-		fread(&m_sDemoHeader.bServerClient, 32, 1, fTDemo); //-V512
-		DWORD OptSize = 0;
-		fread(&OptSize, 4, 1, fTDemo);
-		string4096 ServerOptions = "";
-		fread(&ServerOptions, OptSize, 1, fTDemo);
-		m_sDemoHeader.ServerOptions = ServerOptions;
-		ofs = ftell(fTDemo);
-		//------------- replace server and client options -----
-		m_caServerOptions = m_sDemoHeader.ServerOptions;
-		m_caClientOptions = "localhost";
-		//-----------------------------------------------------
-	}
-	if (fseek(fTDemo, ofs, SEEK_SET))
-	{
-		R_ASSERT(0);
-	};
-	DemoDataStruct NewData;	
-	while (!feof(fTDemo) && (ofs < lFileSize))
-	{
-		fread(&(NewData.m_dwDataType), sizeof(NewData.m_dwDataType), 1, fTDemo);
-		fread(&(NewData.m_dwFrame), sizeof(NewData.m_dwFrame), 1, fTDemo);
-		fread(&(NewData.m_dwTimeReceive), sizeof(NewData.m_dwTimeReceive), 1, fTDemo);
-		switch (NewData.m_dwDataType)
-		{
-		case DATA_FRAME:
-			{				
-				fread(&(NewData.FrameTime), sizeof(NewData.FrameTime), 1, fTDemo);
-				m_dwLastDemoFrame = NewData.m_dwFrame;
-			}break;
-		case DATA_CLIENT_PACKET:
-		case DATA_SERVER_PACKET:
-			{
-				fread(&(NewData.Packet.B.count), sizeof(NewData.Packet.B.count), 1, fTDemo);
-				fread((NewData.Packet.B.data), 1, NewData.Packet.B.count, fTDemo);
-			}break;
-		};			
-
-		ofs = ftell(fTDemo);
-		m_aDemoData.push_back(NewData);
-		if (NewData.m_dwFrame > toFrame) break;
-	};
-	
-	fclose(fTDemo);
-
-	if (!m_aDemoData.empty()) 
-	{
-		m_bDemoPlayMode = TRUE;
-		m_bDemoSaveMode = FALSE;
-	};
-*/
+	*/
 };
 
 static DWORD dFrame = 1;
-void						CLevel::Demo_Update				()
+
+void CLevel::Demo_Update()
 {
 	if (!IsDemoPlay() || m_aDemoData.empty() || !m_bDemoStarted) return;
-	if (float(m_lDemoOfs)/lFileSize>0.95f)
+	if (float(m_lDemoOfs) / lFileSize > 0.95f)
 	{
 		g_dwDemoDeltaFrame = 1;
 		dFrame = 1;
@@ -295,9 +308,9 @@ void						CLevel::Demo_Update				()
 	static u32 Pos = 0;
 
 	if (m_bDemoPlayByFrame)
-		Demo_Load_toFrame(m_sDemoFileName.c_str(), m_dwCurDemoFrame+dFrame, m_lDemoOfs);
+		Demo_Load_toFrame(m_sDemoFileName.c_str(), m_dwCurDemoFrame + dFrame, m_lDemoOfs);
 
-	if (Pos >= m_aDemoData.size()) return;	
+	if (Pos >= m_aDemoData.size()) return;
 
 	if (!m_bDemoPlayByFrame)
 	{
@@ -312,29 +325,30 @@ void						CLevel::Demo_Update				()
 					break;
 				case DATA_CLIENT_PACKET:
 					{
-						if (P->m_dwTimeReceive <= CurTime) 
+						if (P->m_dwTimeReceive <= CurTime)
 						{
-							Msg("tReceive [%d] - CurTime [%d]",P->m_dwTimeReceive, CurTime);
+							Msg("tReceive [%d] - CurTime [%d]", P->m_dwTimeReceive, CurTime);
 							IPureClient::OnMessage(P->Packet.B.data, P->Packet.B.count);
 						}
-						else 
-						{			
+						else
+						{
 							break;
 						};
-					}break;
+					}
+					break;
 				case DATA_FRAME:
-					if (P->m_dwTimeReceive <= CurTime) 
+					if (P->m_dwTimeReceive <= CurTime)
 					{
-						Msg("tsReceive [%d] - CurTime [%d]",P->m_dwTimeReceive, CurTime);
+						Msg("tsReceive [%d] - CurTime [%d]", P->m_dwTimeReceive, CurTime);
 						Server->OnMessage(P->Packet, ClientID());
 					}
-					else 
-					{			
+					else
+					{
 						break;
 					};
 					break;
-				}				
-			}		
+				}
+			}
 		};
 	}
 	else
@@ -343,7 +357,7 @@ void						CLevel::Demo_Update				()
 		{
 			DemoDataStruct* P;
 			P = &(m_aDemoData.front());
-			if (P->m_dwFrame > m_dwCurDemoFrame) 
+			if (P->m_dwFrame > m_dwCurDemoFrame)
 			{
 				break;
 			};
@@ -351,40 +365,42 @@ void						CLevel::Demo_Update				()
 			{
 			case DATA_FRAME:
 				{
-					Device.dwTimeDelta		= P->FrameTime.dwTimeDelta;
-					Device.dwTimeGlobal		= P->FrameTime.dwTimeGlobal;
-					Device.fTimeDelta		= P->FrameTime.fTimeDelta;
-					Device.fTimeGlobal		= P->FrameTime.fTimeGlobal;
-
-				}break;
+					Device.dwTimeDelta = P->FrameTime.dwTimeDelta;
+					Device.dwTimeGlobal = P->FrameTime.dwTimeGlobal;
+					Device.fTimeDelta = P->FrameTime.fTimeDelta;
+					Device.fTimeGlobal = P->FrameTime.fTimeGlobal;
+				}
+				break;
 			case DATA_CLIENT_PACKET:
 				{
-					u16			m_type;					
-					P->Packet.r_begin	(m_type);
+					u16 m_type;
+					P->Packet.r_begin(m_type);
 					IPureClient::OnMessage(P->Packet.B.data, P->Packet.B.count);
-				}break;
+				}
+				break;
 			case DATA_SERVER_PACKET:
 				{
-					u16			m_type;					
-					P->Packet.r_begin	(m_type);
+					u16 m_type;
+					P->Packet.r_begin(m_type);
 					Server->OnMessage(P->Packet, ClientID());
-				}break;
+				}
+				break;
 			}
 			m_aDemoData.pop_front();
 		};
-	};	
+	};
 
 	Msg("!!KRodin: Called Demo_update!");
 
-//	m_dwCurDemoFrame++;
+	//	m_dwCurDemoFrame++;
 
-	if (Pos >= m_aDemoData.size() || m_lDemoOfs>lFileSize)
+	if (Pos >= m_aDemoData.size() || m_lDemoOfs > lFileSize)
 	{
 		Msg("! ------------- Demo Ended ------------");
-	};	
+	};
 };
 
-void						CLevel::Demo_StartFrame			()
+void CLevel::Demo_StartFrame()
 {
 	if (!IsDemoSave() || !net_IsSyncronised()) return;
 
@@ -396,20 +412,19 @@ void						CLevel::Demo_StartFrame			()
 	CurFrameTime.dwTimeServer = Level().timeServer();
 	CurFrameTime.dwTimeServer_Delta = 0;
 	CurFrameTime.fTimeDelta = Device.fTimeDelta;
-	CurFrameTime.fTimeGlobal= Device.fTimeGlobal;
+	CurFrameTime.fTimeGlobal = Device.fTimeGlobal;
 
 	Demo_StoreData(&CurFrameTime, sizeof(CurFrameTime), DATA_FRAME);
 
 	DemoCS.Leave();
 };
 
-void						CLevel::Demo_EndFrame			()
+void CLevel::Demo_EndFrame()
 {
 	if (IsDemoPlay() && m_bDemoPlayByFrame)
-		m_dwCurDemoFrame+=dFrame;		
+		m_dwCurDemoFrame += dFrame;
 	else
-		m_dwCurDemoFrame++;	
+		m_dwCurDemoFrame++;
 
 	dFrame = g_dwDemoDeltaFrame;
 };
-

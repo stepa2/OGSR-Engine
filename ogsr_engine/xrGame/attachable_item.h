@@ -11,39 +11,40 @@
 class CPhysicsShellHolder;
 class CInventoryItem;
 
-class CAttachableItem {
+class CAttachableItem
+{
 private:
-	CInventoryItem				*m_item;
-	shared_str					m_bone_name;
-	Fmatrix						m_offset;
-	u16							m_bone_id;
-	bool						m_enabled;
-//	bool						m_auto_attach;
+	CInventoryItem* m_item;
+	shared_str m_bone_name;
+	Fmatrix m_offset;
+	u16 m_bone_id;
+	bool m_enabled;
+	//	bool						m_auto_attach;
 #ifdef DEBUG
 	bool						m_valid;
 #endif
 
 
 public:
-	IC							CAttachableItem			();
-	virtual						~CAttachableItem		();
-	virtual	DLL_Pure			*_construct				();
-	virtual CAttachableItem		*cast_attachable_item	()	{return this;}
-	virtual	void				reload					(LPCSTR section);
-	virtual void				OnH_A_Chield			();
-	virtual void				OnH_A_Independent		();
-	virtual void				renderable_Render		();
-	virtual bool				can_be_attached			() const;
-	virtual	void				afterAttach				();
-	virtual	void				afterDetach				();
-	IC		CInventoryItem		&item					() const;
-	IC		CPhysicsShellHolder	&object					() const;
-	IC		shared_str			bone_name				() const;
-	IC		u16					bone_id					() const;
-	IC		void				set_bone_id				(u16 bone_id);
-	IC		const Fmatrix		&offset					() const;
-	IC		bool				enabled					() const;
-			void				enable					(bool value);
+	IC CAttachableItem();
+	virtual ~CAttachableItem();
+	virtual DLL_Pure* _construct();
+	virtual CAttachableItem* cast_attachable_item() { return this; }
+	virtual void reload(LPCSTR section);
+	virtual void OnH_A_Chield();
+	virtual void OnH_A_Independent();
+	virtual void renderable_Render();
+	virtual bool can_be_attached() const;
+	virtual void afterAttach();
+	virtual void afterDetach();
+	IC CInventoryItem& item() const;
+	IC CPhysicsShellHolder& object() const;
+	IC shared_str bone_name() const;
+	IC u16 bone_id() const;
+	IC void set_bone_id(u16 bone_id);
+	IC const Fmatrix& offset() const;
+	IC bool enabled() const;
+	void enable(bool value);
 
 public:
 #ifdef DEBUG

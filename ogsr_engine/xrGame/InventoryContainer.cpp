@@ -11,7 +11,7 @@
 #include "Artifact.h"
 
 CInventoryContainer::CInventoryContainer():
-		CCustomInventoryBox<CInventoryItemObject>()
+	CCustomInventoryBox<CInventoryItemObject>()
 {
 	open();
 }
@@ -28,7 +28,9 @@ float CInventoryContainer::RadiationRestoreSpeed() const
 	SItemsInfo info;
 	CalcItems(info);
 
-	return Core.Features.test(xrCore::Feature::objects_radioactive) ? ( m_fRadiationRestoreSpeed + info.info[0] ) : info.info[0];
+	return Core.Features.test(xrCore::Feature::objects_radioactive)
+		       ? (m_fRadiationRestoreSpeed + info.info[0])
+		       : info.info[0];
 }
 
 float CInventoryContainer::Weight() const
@@ -39,10 +41,10 @@ float CInventoryContainer::Weight() const
 }
 
 
-u32	CInventoryContainer::CalcItems	(SItemsInfo &info) const
+u32 CInventoryContainer::CalcItems(SItemsInfo& info) const
 {
-	CObjectList &objs = Level().Objects;
-	u32  result = 0;
+	CObjectList& objs = Level().Objects;
+	u32 result = 0;
 	Memory.mem_fill(&info, 0, sizeof(info));
 
 	for (auto it = m_items.begin(); it != m_items.end(); it++)
@@ -53,7 +55,7 @@ u32	CInventoryContainer::CalcItems	(SItemsInfo &info) const
 		{
 			result++;
 			info.weight += itm->Weight();
-			info.cost	+= itm->Cost();
+			info.cost += itm->Cost();
 			float rsp = itm->RadiationRestoreSpeed();
 			info.info[0] += rsp > 0 ? rsp : 0; // нейтрализаторы радиации из рюкзака не работают (артефакты в т.ч.)
 		}
@@ -63,7 +65,7 @@ u32	CInventoryContainer::CalcItems	(SItemsInfo &info) const
 }
 
 bool CInventoryContainer::CanTrade() const
-{	
+{
 	if (!IsEmpty()) // продавать можно только пустым
 		return false;
 	return inherited::CanTrade();
@@ -85,6 +87,7 @@ BOOL CInventoryContainer::net_Spawn(CSE_Abstract* DC)
 	}
 	return res;
 }
+
 void CInventoryContainer::OnEvent(NET_Packet& P, u16 type)
 {
 	inherited::OnEvent(P, type);
@@ -92,7 +95,6 @@ void CInventoryContainer::OnEvent(NET_Packet& P, u16 type)
 	//	Msg("CInventoryContainer %s received object", Name());
 	//if (GE_OWNERSHIP_REJECT == type)
 	//	Msg("CInventoryContainer %s lost object", Name());
-
 }
 
 
@@ -106,5 +108,5 @@ void CInventoryContainer::close()
 void CInventoryContainer::open()
 {
 	m_opened = true;
-	inherited::set_tip_text	 ("container_use");
+	inherited::set_tip_text("container_use");
 }

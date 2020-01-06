@@ -1,7 +1,7 @@
 #ifndef CYCLE_CONST_STORAGE_H
 #define CYCLE_CONST_STORAGE_H
 
-template<class T,int size> 
+template <class T, int size>
 class CCycleConstStorage
 {
 	T array[size];
@@ -9,20 +9,23 @@ class CCycleConstStorage
 public:
 	IC CCycleConstStorage()
 	{
-		first=0;
+		first = 0;
 	}
+
 	IC void fill_in(const T& val)
 	{
-		std::fill(array,array+size,val);
+		std::fill(array, array + size, val);
 	}
+
 	IC void push_back(T& val)
 	{
-		array[first]=val;
-		first=(++first)%size; //-V567
+		array[first] = val;
+		first = (++first) % size; //-V567
 	}
-	IC T& operator [] (int i)
+
+	IC T& operator [](int i)
 	{
-		return array[(first+i)%size];
+		return array[(first + i) % size];
 	}
 };
 #endif

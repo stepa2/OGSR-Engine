@@ -6,8 +6,8 @@
 
 class CUIProgressBar : public CUIWindow
 {
-	friend class		CUIXmlInit;
-	typedef CUIWindow	inherited;
+	friend class CUIXmlInit;
+	typedef CUIWindow inherited;
 protected:
 	//	bool				m_bIsHorizontal;
 	enum EOrientMode
@@ -56,6 +56,7 @@ public:
 		m_MaxPos = _Max;
 		UpdateProgressBar();
 	}
+
 	float GetRange_min() { return m_MinPos; }
 	float GetRange_max() { return m_MaxPos; }
 	void SetProgressPos(float _Pos);
@@ -65,7 +66,7 @@ public:
 	virtual void Draw();
 	virtual void Update();
 
-	DECLARE_SCRIPT_REGISTER_FUNCTION
+DECLARE_SCRIPT_REGISTER_FUNCTION
 };
 
 add_to_type_list(CUIProgressBar)

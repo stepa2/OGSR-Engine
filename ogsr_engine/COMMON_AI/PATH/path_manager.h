@@ -17,15 +17,16 @@ template <
 	typename _dist_type,
 	typename _index_type,
 	typename _iteration_type
->	class CPathManager : 
-		public CPathManagerGeneric <
-			_Graph,
-			_DataStorage,
-			_Parameters,
-			_dist_type,
-			_index_type,
-			_iteration_type
-		>
+>
+class CPathManager :
+	public CPathManagerGeneric<
+		_Graph,
+		_DataStorage,
+		_Parameters,
+		_dist_type,
+		_index_type,
+		_iteration_type
+	>
 {
 };
 

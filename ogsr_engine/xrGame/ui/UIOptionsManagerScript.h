@@ -1,8 +1,8 @@
-
 #pragma once
 #include "../script_export_space.h"
 
-class CUIOptionsManagerScript {
+class CUIOptionsManagerScript
+{
 public:
 	void SaveBackupValues(const char* group);
 	void SetCurrentValues(const char* group);
@@ -12,7 +12,7 @@ public:
 	void OptionsPostAccept();
 	void SendMessage2Group(const char* group, const char* message);
 
-	DECLARE_SCRIPT_REGISTER_FUNCTION
+DECLARE_SCRIPT_REGISTER_FUNCTION
 };
 
 add_to_type_list(CUIOptionsManagerScript)

@@ -15,7 +15,8 @@ template <
 	typename _dist_type,
 	typename _index_type,
 	typename _iteration_type
->	class CPathManager <
+>
+class CPathManager<
 		CLevelGraph,
 		_DataStorage,
 		SStraightLineParams<
@@ -26,18 +27,18 @@ template <
 		_dist_type,
 		_index_type,
 		_iteration_type
-	> : public CPathManager <
-			CLevelGraph,
-			_DataStorage,
-			SBaseParameters<
-				_dist_type,
-				_index_type,
-				_iteration_type
-			>,
+	> : public CPathManager<
+		CLevelGraph,
+		_DataStorage,
+		SBaseParameters<
 			_dist_type,
 			_index_type,
 			_iteration_type
-		>
+		>,
+		_dist_type,
+		_index_type,
+		_iteration_type
+	>
 {
 protected:
 	typedef CLevelGraph _Graph;
@@ -46,7 +47,7 @@ protected:
 		_index_type,
 		_iteration_type
 	> _Parameters;
-	typedef typename CPathManager <
+	typedef typename CPathManager<
 		_Graph,
 		_DataStorage,
 		SBaseParameters<
@@ -60,13 +61,14 @@ protected:
 	> inherited;
 
 protected:
-	_Parameters			*m_parameters;
+	_Parameters* m_parameters;
 
 public:
-	virtual				~CPathManager	();
-	IC		void		setup			(const _Graph *graph, _DataStorage *_data_storage, xr_vector<_index_type> *_path, const _index_type	&_start_node_index, const _index_type &_goal_node_index, _Parameters &params);
+	virtual ~CPathManager();
+	IC void setup(const _Graph* graph, _DataStorage* _data_storage, xr_vector<_index_type>* _path,
+	              const _index_type& _start_node_index, const _index_type& _goal_node_index, _Parameters& params);
 	template <typename T>
-	IC		void		create_path		(T &vertex);
+	IC void create_path(T& vertex);
 };
 
 #include "path_manager_level_straight_line_inline.h"

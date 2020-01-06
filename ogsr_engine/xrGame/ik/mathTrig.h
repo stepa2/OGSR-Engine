@@ -1,4 +1,3 @@
- 
 /*
   This source code is a part of IKAN.
   Copyright (c) 2000 University of Pennsylvania
@@ -41,9 +40,9 @@
 #define _TRIGH
 
 
-inline float iszero(float x) 
+inline float iszero(float x)
 {
-    return x*x < 1e-6;
+	return x * x < 1e-6;
 }
 
 #if 0
@@ -61,7 +60,7 @@ double angle_distance(float x, float y);
 #endif
 
 // Solve a*cos(theta) + b*sin(theta) = c
-int   solve_trig1(float a, float b, float c, float theta[2]);
+int solve_trig1(float a, float b, float c, float theta[2]);
 
 // Solves
 //      a*cos(theta) - b*sin(theta) = c
@@ -78,18 +77,17 @@ int myasin(float x, float solns[2]);
 //
 // Use formula a^2 + b^2 - 2abcos(theta) = c^2 to get theta
 //
-inline int law_of_cosines(float a, float b, float c, float &angle)
+inline int law_of_cosines(float a, float b, float c, float& angle)
 {
-    float temp = (a*a+b*b-c*c)/(2*a*b);
+	float temp = (a * a + b * b - c * c) / (2 * a * b);
 
-    if (_abs(temp) > 1.0)
-	return 0;
-    else
-	angle = (float) acos(temp);
+	if (_abs(temp) > 1.0)
+		return 0;
+	else
+		angle = (float)acos(temp);
 
-    return 1;
+	return 1;
 }
-
 
 
 #endif

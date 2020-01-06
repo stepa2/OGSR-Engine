@@ -28,72 +28,76 @@
 
 int g_restriction_checker = 0;
 
-CSpaceRestrictionComposition::~CSpaceRestrictionComposition	()
+CSpaceRestrictionComposition::~CSpaceRestrictionComposition()
 {
 	--g_restriction_checker;
 }
 
-struct CMergePredicate {
-	CSpaceRestrictionComposition *m_restriction;
+struct CMergePredicate
+{
+	CSpaceRestrictionComposition* m_restriction;
 
-	IC	CMergePredicate	(CSpaceRestrictionComposition *restriction)
+	IC CMergePredicate(CSpaceRestrictionComposition* restriction)
 	{
-		m_restriction	= restriction;
+		m_restriction = restriction;
 	}
 
-	IC	bool operator()	(u32 level_vertex_id) const
+	IC bool operator()(u32 level_vertex_id) const
 	{
-		return			(m_restriction->inside(level_vertex_id,false));
+		return (m_restriction->inside(level_vertex_id, false));
 	}
 };
 
-IC	void CSpaceRestrictionComposition::merge	(CBaseRestrictionPtr restriction)
+IC void CSpaceRestrictionComposition::merge(CBaseRestrictionPtr restriction)
 {
-	m_restrictions.push_back	(restriction);
-	m_border.insert				(m_border.begin(),restriction->border().begin(),restriction->border().end());
+	m_restrictions.push_back(restriction);
+	m_border.insert(m_border.begin(), restriction->border().begin(), restriction->border().end());
 }
 
-bool CSpaceRestrictionComposition::inside					(const Fsphere &sphere)
+bool CSpaceRestrictionComposition::inside(const Fsphere& sphere)
 {
-	if (!initialized()) {
-		initialize				();
+	if (!initialized())
+	{
+		initialize();
 		if (!initialized())
-			return				(true);
+			return (true);
 	}
 
 	if (!m_sphere.intersect(sphere))
-		return					(false);
+		return (false);
 
-	RESTRICTIONS::iterator		I = m_restrictions.begin();
-	RESTRICTIONS::iterator		E = m_restrictions.end();
-	for ( ; I != E; ++I)
+	RESTRICTIONS::iterator I = m_restrictions.begin();
+	RESTRICTIONS::iterator E = m_restrictions.end();
+	for (; I != E; ++I)
 		if ((*I)->inside(sphere))
-			return				(true);
+			return (true);
 
-	return						(false);
+	return (false);
 }
 
-void CSpaceRestrictionComposition::initialize	()
+void CSpaceRestrictionComposition::initialize()
 {
-	u32							n = _GetItemCount(*m_space_restrictors);
-	VERIFY						(n);
-	if (n == 1) {
-#ifdef DEBUG		
+	u32 n = _GetItemCount(*m_space_restrictors);
+	VERIFY(n);
+	if (n == 1)
+	{
+#ifdef DEBUG
 		m_correct				= true;
 		check_restrictor_type	();
 #endif
 		return;
 	}
 
-	string256					element;
+	string256 element;
 
-	for (u32 i=0; i<n ;++i)
-		if (!m_space_restriction_holder->restriction(_GetItem(*m_space_restrictors,i,element))->initialized())
+	for (u32 i = 0; i < n; ++i)
+		if (!m_space_restriction_holder->restriction(_GetItem(*m_space_restrictors, i, element))->initialized())
 			return;
 
-	Fsphere						*spheres = (Fsphere*)_alloca(n*sizeof(Fsphere));
-	for (u32 i=0; i<n ;++i) {
-		SpaceRestrictionHolder::CBaseRestrictionPtr	restriction = 
+	Fsphere* spheres = (Fsphere*)_alloca(n * sizeof(Fsphere));
+	for (u32 i = 0; i < n; ++i)
+	{
+		SpaceRestrictionHolder::CBaseRestrictionPtr restriction =
 			m_space_restriction_holder->restriction(
 				_GetItem(
 					*m_space_restrictors,
@@ -102,40 +106,41 @@ void CSpaceRestrictionComposition::initialize	()
 				)
 			);
 
-		merge					(restriction);
+		merge(restriction);
 
-		spheres[i]				= restriction->sphere();
+		spheres[i] = restriction->sphere();
 	}
 
 	// computing almost minimum sphere which covers all the almost minimum spheres
-	Fbox3						temp;
-	temp.min.x					= spheres[0].P.x - spheres[0].R;
-	temp.min.y					= spheres[0].P.y - spheres[0].R;
-	temp.min.z					= spheres[0].P.z - spheres[0].R;
-	temp.max.x					= spheres[0].P.x + spheres[0].R;
-	temp.max.y					= spheres[0].P.y + spheres[0].R;
-	temp.max.z					= spheres[0].P.z + spheres[0].R;
+	Fbox3 temp;
+	temp.min.x = spheres[0].P.x - spheres[0].R;
+	temp.min.y = spheres[0].P.y - spheres[0].R;
+	temp.min.z = spheres[0].P.z - spheres[0].R;
+	temp.max.x = spheres[0].P.x + spheres[0].R;
+	temp.max.y = spheres[0].P.y + spheres[0].R;
+	temp.max.z = spheres[0].P.z + spheres[0].R;
 
-	for (u32 i=1; i<n; ++i) {
-		temp.min.x				= _min(temp.min.x,spheres[i].P.x - spheres[i].R);
-		temp.min.y				= _min(temp.min.y,spheres[i].P.y - spheres[i].R);
-		temp.min.z				= _min(temp.min.z,spheres[i].P.z - spheres[i].R);
-		temp.max.x				= _max(temp.max.x,spheres[i].P.x + spheres[i].R);
-		temp.max.y				= _max(temp.max.y,spheres[i].P.y + spheres[i].R);
-		temp.max.z				= _max(temp.max.z,spheres[i].P.z + spheres[i].R);
+	for (u32 i = 1; i < n; ++i)
+	{
+		temp.min.x = _min(temp.min.x, spheres[i].P.x - spheres[i].R);
+		temp.min.y = _min(temp.min.y, spheres[i].P.y - spheres[i].R);
+		temp.min.z = _min(temp.min.z, spheres[i].P.z - spheres[i].R);
+		temp.max.x = _max(temp.max.x, spheres[i].P.x + spheres[i].R);
+		temp.max.y = _max(temp.max.y, spheres[i].P.y + spheres[i].R);
+		temp.max.z = _max(temp.max.z, spheres[i].P.z + spheres[i].R);
 	}
 
-	m_sphere.P.mad				(temp.min,temp.max,.5f);
-	m_sphere.R					= m_sphere.P.distance_to(spheres[0].P) + spheres[0].R;
+	m_sphere.P.mad(temp.min, temp.max, .5f);
+	m_sphere.R = m_sphere.P.distance_to(spheres[0].P) + spheres[0].R;
 
-	for (u32 i=1; i<n ;++i)
-		m_sphere.R				= _max(m_sphere.R,m_sphere.P.distance_to(spheres[i].P) + spheres[i].R);
+	for (u32 i = 1; i < n; ++i)
+		m_sphere.R = _max(m_sphere.R, m_sphere.P.distance_to(spheres[i].P) + spheres[i].R);
 
-	m_sphere.R					+= EPS_L;
+	m_sphere.R += EPS_L;
 
-	m_initialized				= true;
+	m_initialized = true;
 
-	m_border.erase				(
+	m_border.erase(
 		std::remove_if(
 			m_border.begin(),
 			m_border.end(),
@@ -144,7 +149,7 @@ void CSpaceRestrictionComposition::initialize	()
 		m_border.end()
 	);
 
-	process_borders				();
+	process_borders();
 
 #ifdef DEBUG
 	test_correctness			();
@@ -203,7 +208,7 @@ void CSpaceRestrictionComposition::test_correctness()
 }
 #endif
 
-Fsphere CSpaceRestrictionComposition::sphere	() const
+Fsphere CSpaceRestrictionComposition::sphere() const
 {
 	NODEFAULT;
 #ifdef DEBUG

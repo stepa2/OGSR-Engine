@@ -11,18 +11,20 @@
 #include "graph_abstract.h"
 #include "patrol_point.h"
 
-class CPatrolPath : public CGraphAbstractSerialize<CPatrolPoint,float,u32> {
-  friend class CPatrolPathScript;
+class CPatrolPath : public CGraphAbstractSerialize<CPatrolPoint, float, u32>
+{
+	friend class CPatrolPathScript;
 private:
-	struct CAlwaysTrueEvaluator {
-		IC	bool	operator()	(const Fvector &position) const
+	struct CAlwaysTrueEvaluator
+	{
+		IC bool operator()(const Fvector& position) const
 		{
-			return	(true);
+			return (true);
 		}
 	};
 
 protected:
-	typedef CGraphAbstractSerialize<CPatrolPoint,float,u32> inherited;
+	typedef CGraphAbstractSerialize<CPatrolPoint, float, u32> inherited;
 
 public:
 #ifdef DEBUG
@@ -30,16 +32,17 @@ public:
 #endif
 
 public:
-							CPatrolPath		(shared_str name = "");
-	virtual					~CPatrolPath	();
-			CPatrolPath		&load_raw		(const CLevelGraph *level_graph, const CGameLevelCrossTable *cross, const CGameGraph *game_graph, IReader &stream);
-			CPatrolPath		&load_ini		(CInifile::Sect& section);
-	IC		const CVertex	*point			(shared_str name) const;
+	CPatrolPath(shared_str name = "");
+	virtual ~CPatrolPath();
+	CPatrolPath& load_raw(const CLevelGraph* level_graph, const CGameLevelCrossTable* cross,
+	                      const CGameGraph* game_graph, IReader& stream);
+	CPatrolPath& load_ini(CInifile::Sect& section);
+	IC const CVertex* point(shared_str name) const;
 	template <typename T>
-	IC		const CVertex	*point			(const Fvector &position, const T &evaluator) const;
-	IC		const CVertex	*point			(const Fvector &position) const;
-	CPatrolPoint add_point( Fvector );
-	CPatrolPoint point( u32 );
+	IC const CVertex* point(const Fvector& position, const T& evaluator) const;
+	IC const CVertex* point(const Fvector& position) const;
+	CPatrolPoint add_point(Fvector);
+	CPatrolPoint point(u32);
 
 #ifdef DEBUG
 public:

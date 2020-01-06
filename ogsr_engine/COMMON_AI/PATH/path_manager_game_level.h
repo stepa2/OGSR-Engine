@@ -16,7 +16,8 @@ template <
 	typename _dist_type,
 	typename _index_type,
 	typename _iteration_type
->	class CPathManager <
+>
+class CPathManager<
 		CGameGraph,
 		_DataStorage,
 		SGameLevel<
@@ -27,18 +28,18 @@ template <
 		_dist_type,
 		_index_type,
 		_iteration_type
-	> : public CPathManager <
-			CGameGraph,
-			_DataStorage,
-			SBaseParameters<
-				_dist_type,
-				_index_type,
-				_iteration_type
-			>,
+	> : public CPathManager<
+		CGameGraph,
+		_DataStorage,
+		SBaseParameters<
 			_dist_type,
 			_index_type,
 			_iteration_type
-		>
+		>,
+		_dist_type,
+		_index_type,
+		_iteration_type
+	>
 {
 protected:
 	typedef CGameGraph _Graph;
@@ -47,29 +48,30 @@ protected:
 		_index_type,
 		_iteration_type
 	> _Parameters;
-	typedef typename CPathManager <
-				_Graph,
-				_DataStorage,
-				SBaseParameters<
-					_dist_type,
-					_index_type,
-					_iteration_type
-				>,
-				_dist_type,
-				_index_type,
-				_iteration_type
-			> inherited;
+	typedef typename CPathManager<
+		_Graph,
+		_DataStorage,
+		SBaseParameters<
+			_dist_type,
+			_index_type,
+			_iteration_type
+		>,
+		_dist_type,
+		_index_type,
+		_iteration_type
+	> inherited;
 
 protected:
-	_Parameters			*m_evaluator;
+	_Parameters* m_evaluator;
 
 public:
-	virtual				~CPathManager	();
-	IC		void		setup			(const _Graph *graph, _DataStorage *_data_storage, xr_vector<_index_type> *_path, const _index_type	&_start_node_index, const _index_type &_goal_node_index, _Parameters &params);
-	IC		_dist_type	estimate		(const _index_type &node_index) const;
-	IC		bool		is_goal_reached	(const _index_type &node_index);
+	virtual ~CPathManager();
+	IC void setup(const _Graph* graph, _DataStorage* _data_storage, xr_vector<_index_type>* _path,
+	              const _index_type& _start_node_index, const _index_type& _goal_node_index, _Parameters& params);
+	IC _dist_type estimate(const _index_type& node_index) const;
+	IC bool is_goal_reached(const _index_type& node_index);
 	template <typename T>
-	IC		void		create_path		(T &vertex);
+	IC void create_path(T& vertex);
 };
 
 #include "path_manager_game_level_inline.h"

@@ -5,15 +5,15 @@
 using namespace luabind;
 
 #pragma optimize("s",on)
-void CSE_PHSkeleton::script_register(lua_State *L)
+void CSE_PHSkeleton::script_register(lua_State* L)
 {
 	module(L)[
 		class_<CSE_PHSkeleton>
-			("cse_ph_skeleton")
+		("cse_ph_skeleton")
 	];
 }
 
-void CSE_AbstractVisual::script_register(lua_State *L)
+void CSE_AbstractVisual::script_register(lua_State* L)
 {
 	module(L)[
 		luabind_class_abstract2(
@@ -21,8 +21,8 @@ void CSE_AbstractVisual::script_register(lua_State *L)
 			"CSE_AbstractVisual",
 			CSE_Visual,
 			CSE_Abstract
-			)
-		.def	("getStartupAnimation",		&CSE_AbstractVisual::getStartupAnimation)
+		)
+		.def("getStartupAnimation", &CSE_AbstractVisual::getStartupAnimation)
 	];
 }
 

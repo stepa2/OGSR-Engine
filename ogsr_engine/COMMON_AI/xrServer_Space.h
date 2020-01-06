@@ -25,33 +25,41 @@ public:\
 	SERVER_ENTITY_EDITOR_METHODS \
 };
 
-struct	SRotation
+struct SRotation
 {
-	float  yaw, pitch, roll;
-	SRotation() { yaw=pitch=roll=0; }
-	SRotation(float y, float p, float r) { yaw=y;pitch=p;roll=r; }
+	float yaw, pitch, roll;
+	SRotation() { yaw = pitch = roll = 0; }
+
+	SRotation(float y, float p, float r)
+	{
+		yaw = y;
+		pitch = p;
+		roll = r;
+	}
 };
 
-enum EPOType {
+enum EPOType
+{
 	epotBox,
 	epotFixedChain,
-    epotFreeChain,
-    epotSkeleton
+	epotFreeChain,
+	epotSkeleton
 };
 
-DEFINE_VECTOR	(u32,						DWORD_VECTOR,					DWORD_IT);
-DEFINE_VECTOR	(bool,						BOOL_VECTOR,					BOOL_IT);
-DEFINE_VECTOR	(float,						FLOAT_VECTOR,					FLOAT_IT);
-DEFINE_VECTOR	(LPSTR,						LPSTR_VECTOR,					LPSTR_IT);
-DEFINE_VECTOR	(Fvector,					FVECTOR_VECTOR,					FVECTOR_IT);
+DEFINE_VECTOR(u32, DWORD_VECTOR, DWORD_IT);
+DEFINE_VECTOR(bool, BOOL_VECTOR, BOOL_IT);
+DEFINE_VECTOR(float, FLOAT_VECTOR, FLOAT_IT);
+DEFINE_VECTOR(LPSTR, LPSTR_VECTOR, LPSTR_IT);
+DEFINE_VECTOR(Fvector, FVECTOR_VECTOR, FVECTOR_IT);
 
 #ifdef XRGAME_EXPORTS
 #	define DECLARE_ENTITY_DESTROY
 #endif
 
 #ifdef DECLARE_ENTITY_DESTROY
-template <class T> void	F_entity_Destroy	(T *&P)
+template <class T>
+void F_entity_Destroy(T*& P)
 {
-	xr_delete	(P);
+	xr_delete(P);
 };
 #endif

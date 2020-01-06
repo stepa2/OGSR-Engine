@@ -16,44 +16,45 @@
 
 using namespace StalkerDecisionSpace;
 
-CStalkerDangerBySoundPlanner::CStalkerDangerBySoundPlanner	(CAI_Stalker *object, LPCSTR action_name) :
-	inherited				(object,action_name)
+CStalkerDangerBySoundPlanner::CStalkerDangerBySoundPlanner(CAI_Stalker* object, LPCSTR action_name) :
+	inherited(object, action_name)
 {
 }
 
-void CStalkerDangerBySoundPlanner::setup					(CAI_Stalker *object, CPropertyStorage *storage)
+void CStalkerDangerBySoundPlanner::setup(CAI_Stalker* object, CPropertyStorage* storage)
 {
-	inherited::setup		(object,storage);
-	clear					();
-	add_evaluators			();
-	add_actions				();
+	inherited::setup(object, storage);
+	clear();
+	add_evaluators();
+	add_actions();
 }
 
-void CStalkerDangerBySoundPlanner::initialize				()
+void CStalkerDangerBySoundPlanner::initialize()
 {
-	inherited::initialize	();
+	inherited::initialize();
 }
 
-void CStalkerDangerBySoundPlanner::update					()
+void CStalkerDangerBySoundPlanner::update()
 {
-	inherited::update		();
+	inherited::update();
 }
 
-void CStalkerDangerBySoundPlanner::finalize					()
+void CStalkerDangerBySoundPlanner::finalize()
 {
-	inherited::finalize		();
-}
-void CStalkerDangerBySoundPlanner::add_evaluators			()
-{
-	add_evaluator			(eWorldPropertyDanger			,xr_new<CStalkerPropertyEvaluatorDangers>			(m_object,"danger"));
-	add_evaluator			(eWorldPropertyDangerUnknown	,xr_new<CStalkerPropertyEvaluatorConst>				(false,"fake"));
+	inherited::finalize();
 }
 
-void CStalkerDangerBySoundPlanner::add_actions				()
+void CStalkerDangerBySoundPlanner::add_evaluators()
 {
-	CStalkerActionBase		*action;
+	add_evaluator(eWorldPropertyDanger, xr_new<CStalkerPropertyEvaluatorDangers>(m_object, "danger"));
+	add_evaluator(eWorldPropertyDangerUnknown, xr_new<CStalkerPropertyEvaluatorConst>(false, "fake"));
+}
 
-	action					= xr_new<CStalkerActionDangerBySoundTakeCover>(m_object,"fake");
-	add_effect				(action,eWorldPropertyDanger,		false);
-	add_operator			(eWorldOperatorDangerUnknownTakeCover,	action);
+void CStalkerDangerBySoundPlanner::add_actions()
+{
+	CStalkerActionBase* action;
+
+	action = xr_new<CStalkerActionDangerBySoundTakeCover>(m_object, "fake");
+	add_effect(action, eWorldPropertyDanger, false);
+	add_operator(eWorldOperatorDangerUnknownTakeCover, action);
 }

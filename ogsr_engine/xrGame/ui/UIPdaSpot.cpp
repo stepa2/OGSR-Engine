@@ -37,7 +37,7 @@ void CUIPdaSpot::Init(u16 spot_id, LPCSTR level_name, Fvector pos, bool main_wnd
 		ml->HighlightSpot(true, Fcolor().set(255.f, 36.f, 0.f, 255.f));
 	}
 
-  m_editBox->CaptureFocus(true);
+	m_editBox->CaptureFocus(true);
 }
 
 void CUIPdaSpot::InitControls()
@@ -138,21 +138,23 @@ bool CUIPdaSpot::OnKeyboard(int dik, EUIMessages keyboard_action)
 	{
 	case DIK_RETURN:
 	case DIK_NUMPADENTER:
-	{
-		if (IsShown())
 		{
-			OnApply(nullptr, nullptr);
-			return true;
+			if (IsShown())
+			{
+				OnApply(nullptr, nullptr);
+				return true;
+			}
 		}
-	}break;
+		break;
 	case DIK_ESCAPE:
-	{
-		if (IsShown())
 		{
-			Exit();
-			return true;
+			if (IsShown())
+			{
+				Exit();
+				return true;
+			}
 		}
-	}break;
+		break;
 	}
 
 	return false;

@@ -13,11 +13,11 @@
 
 struct RANK_DATA
 {
-	RANK_DATA (int, shared_str, LPCSTR);
+	RANK_DATA(int, shared_str, LPCSTR);
 
-	shared_str				id;
-	int						index;
-	CHARACTER_RANK_VALUE	threshold;
+	shared_str id;
+	int index;
+	CHARACTER_RANK_VALUE threshold;
 };
 
 
@@ -25,37 +25,42 @@ class CHARACTER_RANK;
 
 typedef CIni_IdToIndex<1, RANK_DATA, shared_str, int, CHARACTER_RANK> CHARACTER_RANK_base;
 
-class CHARACTER_RANK: public CHARACTER_RANK_base
+class CHARACTER_RANK : public CHARACTER_RANK_base
 {
 private:
 	typedef CHARACTER_RANK_base inherited;
 	friend inherited;
 
 public:
-	CHARACTER_RANK			():m_current_value(NO_RANK){};
-	~CHARACTER_RANK			(){};
+	CHARACTER_RANK(): m_current_value(NO_RANK)
+	{
+	};
 
-	void						set				(CHARACTER_RANK_VALUE);
+	~CHARACTER_RANK()
+	{
+	};
 
-	shared_str					id				() const;
-	int							index			() const	{return m_current_index;};
-	CHARACTER_RANK_VALUE		value			() const	{return m_current_value;};
+	void set(CHARACTER_RANK_VALUE);
 
-	static int					ValueToIndex    (CHARACTER_RANK_VALUE);
+	shared_str id() const;
+	int index() const { return m_current_index; };
+	CHARACTER_RANK_VALUE value() const { return m_current_value; };
+
+	static int ValueToIndex(CHARACTER_RANK_VALUE);
 
 private:
-	CHARACTER_RANK_VALUE		m_current_value;
-	int							m_current_index;
+	CHARACTER_RANK_VALUE m_current_value;
+	int m_current_index;
 
-	static	void				InitIdToIndex	();
+	static void InitIdToIndex();
 public:
 	//отношение между рангами
-	static CHARACTER_GOODWILL	relation			(int from, int to);
-	CHARACTER_GOODWILL			relation			(int to);
+	static CHARACTER_GOODWILL relation(int from, int to);
+	CHARACTER_GOODWILL relation(int to);
 
-	static CHARACTER_RANK_VALUE	rank_kill_points	(int);
+	static CHARACTER_RANK_VALUE rank_kill_points(int);
 
-	static void					DeleteIdToIndexData	();
+	static void DeleteIdToIndexData();
 
 private:
 	typedef CIni_Table<CHARACTER_GOODWILL, CHARACTER_RANK> GOODWILL_TABLE;

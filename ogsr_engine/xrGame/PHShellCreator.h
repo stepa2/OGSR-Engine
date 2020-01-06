@@ -3,7 +3,7 @@
 
 #include "ph_shell_interface.h"
 
-class CPHShellSimpleCreator: public IPhysicShellCreator
+class CPHShellSimpleCreator : public IPhysicShellCreator
 {
 public:
 	virtual void CreatePhysicsShell();

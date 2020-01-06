@@ -19,13 +19,12 @@ class CScriptGameObject;
 
 template <
 	typename _object_type,
-	bool	 _reverse_search = false,
+	bool _reverse_search = false,
 	typename _world_operator = CActionBase<_object_type>,
 	typename _condition_evaluator = CPropertyEvaluator<_object_type>,
 	typename _world_operator_ptr = _world_operator*,
-	typename _condition_evaluator_ptr = _condition_evaluator*
->
-class CActionPlanner : 
+	typename _condition_evaluator_ptr = _condition_evaluator*>
+class CActionPlanner :
 	public CProblemSolver<
 		GraphEngineSpace::CWorldProperty,
 		GraphEngineSpace::CWorldState,
@@ -35,7 +34,7 @@ class CActionPlanner :
 		_reverse_search,
 		_world_operator_ptr,
 		_condition_evaluator_ptr
-	> 
+	>
 {
 public:
 	typedef CProblemSolver<
@@ -63,8 +62,8 @@ public:
 	typedef _world_operator _world_operator; //Fuck this shit!
 
 protected:
-	bool						m_initialized;
-	_action_id_type				m_current_action_id;
+	bool m_initialized;
+	_action_id_type m_current_action_id;
 
 #ifdef LOG_ACTION
 public:
@@ -76,9 +75,9 @@ public:
 #endif
 
 public:
-	_object_type				*m_object;
-	CPropertyStorage			m_storage;
-	bool						m_loaded;
+	_object_type* m_object;
+	CPropertyStorage m_storage;
+	bool m_loaded;
 
 #ifdef LOG_ACTION
 public:
@@ -91,25 +90,26 @@ public:
 #endif
 
 public:
-								CActionPlanner			();
-	virtual						~CActionPlanner			();
-	virtual	void				setup					(_object_type *object);
-	virtual	void				update					();
-	IC		COperator			&action					(const _action_id_type &action_id);
-	IC		CConditionEvaluator	&evaluator				(const _condition_type &evaluator_id);
-	IC		_action_id_type		current_action_id		() const;
-	IC		COperator			&current_action			();
-	IC		bool				initialized				() const;
-	IC		void				add_condition			(_world_operator *action, _condition_type condition_id, _value_type condition_value);
-	IC		void				add_effect				(_world_operator *action, _condition_type condition_id, _value_type condition_value);
-	IC		virtual void		add_operator			(const _edge_type &operator_id,	_operator_ptr _operator);
-	IC		virtual void		add_evaluator			(const _condition_type &condition_id, _condition_evaluator_ptr evaluator);
-	IC		_object_type		&object					() const;
-	virtual	void				save					(NET_Packet &packet);
-	virtual	void				load					(IReader &packet);
+	CActionPlanner();
+	virtual ~CActionPlanner();
+	virtual void setup(_object_type* object);
+	virtual void update();
+	IC COperator& action(const _action_id_type& action_id);
+	IC CConditionEvaluator& evaluator(const _condition_type& evaluator_id);
+	IC _action_id_type current_action_id() const;
+	IC COperator& current_action();
+	IC bool initialized() const;
+	IC void add_condition(_world_operator* action, _condition_type condition_id, _value_type condition_value);
+	IC void add_effect(_world_operator* action, _condition_type condition_id, _value_type condition_value);
+	IC virtual void add_operator(const _edge_type& operator_id, _operator_ptr _operator);
+	IC virtual void add_evaluator(const _condition_type& condition_id, _condition_evaluator_ptr evaluator);
+	IC _object_type& object() const;
+	virtual void save(NET_Packet& packet);
+	virtual void load(IReader& packet);
 
-	DECLARE_SCRIPT_REGISTER_FUNCTION
+DECLARE_SCRIPT_REGISTER_FUNCTION
 };
+
 typedef CActionPlanner<CScriptGameObject> CScriptActionPlanner;
 add_to_type_list(CScriptActionPlanner)
 #undef script_type_list

@@ -35,82 +35,85 @@
 #define MAX_ITEM_MEDIKIT_COUNT		3
 #define MAX_AMMO_ATTACH_COUNT		10
 
-CALifeMonsterBrain::CALifeMonsterBrain		(object_type *object)
+CALifeMonsterBrain::CALifeMonsterBrain(object_type* object)
 {
-	VERIFY							(object);
-	m_object						= object;
-	m_last_search_time				= 0;
-	m_smart_terrain					= 0;
+	VERIFY(object);
+	m_object = object;
+	m_last_search_time = 0;
+	m_smart_terrain = 0;
 
 #ifdef XRGAME_EXPORTS
-	m_movement_manager				= xr_new<CALifeMonsterMovementManager>(object);
-#endif
-	
-#ifdef XRGAME_EXPORTS
-	u32								hours,minutes,seconds;
-	sscanf							(pSettings->r_string(this->object().name(),"smart_terrain_choose_interval"),"%d:%d:%d",&hours,&minutes,&seconds);
-	m_time_interval					= (u32)generate_time(1,1,1,hours,minutes,seconds);
+	m_movement_manager = xr_new<CALifeMonsterMovementManager>(object);
 #endif
 
-	m_can_choose_alife_tasks		= true;
+#ifdef XRGAME_EXPORTS
+	u32 hours, minutes, seconds;
+	sscanf(pSettings->r_string(this->object().name(), "smart_terrain_choose_interval"), "%d:%d:%d", &hours, &minutes,
+	       &seconds);
+	m_time_interval = (u32)generate_time(1, 1, 1, hours, minutes, seconds);
+#endif
+
+	m_can_choose_alife_tasks = true;
 }
 
-CALifeMonsterBrain::~CALifeMonsterBrain			()
+CALifeMonsterBrain::~CALifeMonsterBrain()
 {
 #ifdef XRGAME_EXPORTS
-	xr_delete						(m_movement_manager);
+	xr_delete(m_movement_manager);
 #endif
 }
 
-void CALifeMonsterBrain::on_state_write		(NET_Packet &packet)
+void CALifeMonsterBrain::on_state_write(NET_Packet& packet)
 {
 }
 
-void CALifeMonsterBrain::on_state_read		(NET_Packet &packet)
+void CALifeMonsterBrain::on_state_read(NET_Packet& packet)
 {
 }
 
 #ifdef XRGAME_EXPORTS
 
-bool CALifeMonsterBrain::perform_attack		()
+bool CALifeMonsterBrain::perform_attack()
 {
-	return							(false);
+	return (false);
 }
 
-ALife::EMeetActionType CALifeMonsterBrain::action_type	(CSE_ALifeSchedulable *tpALifeSchedulable, const int &iGroupIndex, const bool &bMutualDetection)
+ALife::EMeetActionType CALifeMonsterBrain::action_type(CSE_ALifeSchedulable* tpALifeSchedulable, const int& iGroupIndex,
+                                                       const bool& bMutualDetection)
 {
-	return							(ALife::eMeetActionTypeIgnore);
+	return (ALife::eMeetActionTypeIgnore);
 }
 
-void CALifeMonsterBrain::on_register			()
-{
-}
-
-void CALifeMonsterBrain::on_unregister		()
+void CALifeMonsterBrain::on_register()
 {
 }
 
-void CALifeMonsterBrain::on_location_change	()
+void CALifeMonsterBrain::on_unregister()
 {
 }
 
-IC	CSE_ALifeSmartZone &CALifeMonsterBrain::smart_terrain	()
+void CALifeMonsterBrain::on_location_change()
 {
-	VERIFY							(object().m_smart_terrain_id != 0xffff);
+}
+
+IC CSE_ALifeSmartZone& CALifeMonsterBrain::smart_terrain()
+{
+	VERIFY(object().m_smart_terrain_id != 0xffff);
 	if (m_smart_terrain && (object().m_smart_terrain_id == m_smart_terrain->ID))
-		return						(*m_smart_terrain);
+		return (*m_smart_terrain);
 
-	m_smart_terrain					= ai().alife().smart_terrains().object(object().m_smart_terrain_id);
-	VERIFY							(m_smart_terrain);
-	return							(*m_smart_terrain);
+	m_smart_terrain = ai().alife().smart_terrains().object(object().m_smart_terrain_id);
+	VERIFY(m_smart_terrain);
+	return (*m_smart_terrain);
 }
 
-void CALifeMonsterBrain::process_task			()
+void CALifeMonsterBrain::process_task()
 {
-	CALifeSmartTerrainTask			*task = smart_terrain().task(&object());
-	THROW3							(task,"smart terrain returned nil task, while npc is registered in it",smart_terrain().name_replace());
-	movement().path_type			(MovementManager::ePathTypeGamePath);
-	movement().detail().target		(*task);
+	CALifeSmartTerrainTask* task = smart_terrain().task(&object());
+	THROW3							(task, "smart terrain returned nil task, while npc is registered in it",
+	                                 smart_terrain().name_replace());
+	movement().path_type(MovementManager::ePathTypeGamePath);
+	movement().detail().target(*task);
 }
 
 void CALifeMonsterBrain::select_task(const bool forced)
@@ -121,30 +124,32 @@ void CALifeMonsterBrain::select_task(const bool forced)
 	if (!can_choose_alife_tasks())
 		return;
 
-	ALife::_TIME_ID					current_time = ai().alife().time_manager().game_time();
+	ALife::_TIME_ID current_time = ai().alife().time_manager().game_time();
 
 	if (!forced && (m_last_search_time + m_time_interval > current_time))
 		return;
 
-	m_last_search_time				= current_time;
+	m_last_search_time = current_time;
 
-	float							best_value = flt_min;
+	float best_value = flt_min;
 
-	for (const auto &[id, smart] : ai().alife().smart_terrains().objects())
+	for (const auto& [id, smart] : ai().alife().smart_terrains().objects())
 	{
 		if (!smart->enabled(&object()))
 			continue;
 
 		float value = smart->suitable(&object());
-		if (value > best_value) {
+		if (value > best_value)
+		{
 			best_value = value;
 			object().m_smart_terrain_id = id;
 		}
 	}
 
-	if (object().m_smart_terrain_id != 0xffff) {
-		smart_terrain().register_npc	(&object());
-		m_last_search_time				= 0;
+	if (object().m_smart_terrain_id != 0xffff)
+	{
+		smart_terrain().register_npc(&object());
+		m_last_search_time = 0;
 	}
 }
 
@@ -163,28 +168,28 @@ void CALifeMonsterBrain::update(const bool forced)
 #endif
 
 	select_task(forced);
-	
+
 	if (object().m_smart_terrain_id != 0xffff)
-		process_task				();
+		process_task();
 	else
-		default_behaviour			();
+		default_behaviour();
 
-	movement().update				();
+	movement().update();
 }
 
-void CALifeMonsterBrain::default_behaviour	()
+void CALifeMonsterBrain::default_behaviour()
 {
-	movement().path_type			(MovementManager::ePathTypeNoPath);
+	movement().path_type(MovementManager::ePathTypeNoPath);
 }
 
-void CALifeMonsterBrain::on_switch_online	()
+void CALifeMonsterBrain::on_switch_online()
 {
-	movement().on_switch_online		();
+	movement().on_switch_online();
 }
 
-void CALifeMonsterBrain::on_switch_offline	()
+void CALifeMonsterBrain::on_switch_offline()
 {
-	movement().on_switch_offline	();
+	movement().on_switch_offline();
 }
 
 #endif // XRGAME_EXPORTS

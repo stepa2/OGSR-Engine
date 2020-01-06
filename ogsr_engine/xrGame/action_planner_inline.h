@@ -29,43 +29,43 @@
 	>
 
 TEMPLATE_SPECIALIZATION
-IC	CPlanner::CActionPlanner			()
+IC CPlanner::CActionPlanner()
 {
-	m_initialized			= false;
+	m_initialized = false;
 #ifdef LOG_ACTION
 	m_use_log				= false;
 #endif
 }
 
 TEMPLATE_SPECIALIZATION
-IC	CPlanner::~CActionPlanner			()
+IC CPlanner::~CActionPlanner()
 {
-	m_object						= 0;
+	m_object = 0;
 }
 
 TEMPLATE_SPECIALIZATION
-void CPlanner::setup					(_object_type *object)
+void CPlanner::setup(_object_type* object)
 {
-	inherited::setup		();
-	m_object				= object;
-	m_current_action_id		= _action_id_type(-1);
-	m_storage.clear			();
-	m_initialized			= false;
-	m_loaded				= false;
+	inherited::setup();
+	m_object = object;
+	m_current_action_id = _action_id_type(-1);
+	m_storage.clear();
+	m_initialized = false;
+	m_loaded = false;
 }
 
 TEMPLATE_SPECIALIZATION
-IC	_object_type &CPlanner::object		() const
+IC _object_type&CPlanner::object() const
 {
-	VERIFY					(m_object);
-	return					(*m_object);
+	VERIFY(m_object);
+	return (*m_object);
 }
 
 TEMPLATE_SPECIALIZATION
-void CPlanner::update				()
+void CPlanner::update()
 {
-	__try {
-
+	__try
+	{
 		solve();
 
 #ifdef LOG_ACTION
@@ -98,34 +98,42 @@ void CPlanner::update				()
 
 		THROW(!solution().empty());
 
-		if ( solution().empty() ) {
-		  if ( initialized() ) {
-		    Msg( "! [CPlanner::update]: %s has solution().empty()", m_object->cName().c_str() );
-                    if ( current_action_id() != _action_id_type(-1) ) {
-                      current_action().finalize();
-                      m_current_action_id = _action_id_type(-1);
-                    }
-		    m_initialized = false;
-		  }
+		if (solution().empty())
+		{
+			if (initialized())
+			{
+				Msg("! [CPlanner::update]: %s has solution().empty()", m_object->cName().c_str());
+				if (current_action_id() != _action_id_type(-1))
+				{
+					current_action().finalize();
+					m_current_action_id = _action_id_type(-1);
+				}
+				m_initialized = false;
+			}
 		}
-		else {
-		  if ( initialized() ) {
-			if (current_action_id() != solution().front()) {
-				current_action().finalize();
+		else
+		{
+			if (initialized())
+			{
+				if (current_action_id() != solution().front())
+				{
+					current_action().finalize();
+					m_current_action_id = solution().front();
+					current_action().initialize();
+				}
+			}
+			else
+			{
+				m_initialized = true;
 				m_current_action_id = solution().front();
 				current_action().initialize();
 			}
-		  }
-		  else {
-			m_initialized = true;
-			m_current_action_id = solution().front();
-			current_action().initialize();
-		  }
-		  current_action().execute();
+			current_action().execute();
 		}
 	}
-	//KRodin: чтоб не вылетать при вызове апдейта из скрипта, тут ловим ошибку, шедулер в любом случае повиснет - и с зависшим неписем будет разбираться уже специальный скрипт.
-	__except (ExceptStackTrace("[CPlanner::update] stack_trace:\n")) {
+		//KRodin: чтоб не вылетать при вызове апдейта из скрипта, тут ловим ошибку, шедулер в любом случае повиснет - и с зависшим неписем будет разбираться уже специальный скрипт.
+	__except (ExceptStackTrace("[CPlanner::update] stack_trace:\n"))
+	{
 #ifdef LOG_ACTION
 		Msg("!![CPlanner::update] Fatal Error in object: [%s]", object_name());
 #endif
@@ -133,46 +141,46 @@ void CPlanner::update				()
 }
 
 TEMPLATE_SPECIALIZATION
-IC	typename CPlanner::COperator &CPlanner::action	(const _action_id_type &action_id)
+IC typename CPlanner::COperator&CPlanner::action(const _action_id_type& action_id)
 {
-	return					(*get_operator(action_id));
+	return (*get_operator(action_id));
 }
 
 TEMPLATE_SPECIALIZATION
-IC	typename CPlanner::CConditionEvaluator &CPlanner::evaluator		(const _condition_type &evaluator_id)
+IC typename CPlanner::CConditionEvaluator&CPlanner::evaluator(const _condition_type& evaluator_id)
 {
-	return					(*inherited::evaluator(evaluator_id));
+	return (*inherited::evaluator(evaluator_id));
 }
 
 TEMPLATE_SPECIALIZATION
-IC	typename CPlanner::_action_id_type CPlanner::current_action_id	() const
+IC typename CPlanner::_action_id_type CPlanner::current_action_id() const
 {
-	VERIFY					(initialized());
-	return					(m_current_action_id);
+	VERIFY(initialized());
+	return (m_current_action_id);
 }
 
 TEMPLATE_SPECIALIZATION
-IC	typename CPlanner::COperator &CPlanner::current_action	()
+IC typename CPlanner::COperator&CPlanner::current_action()
 {
-	return					(action(current_action_id()));
+	return (action(current_action_id()));
 }
 
 TEMPLATE_SPECIALIZATION
-IC	bool CPlanner::initialized	() const
+IC bool CPlanner::initialized() const
 {
-	return					(m_initialized);
+	return (m_initialized);
 }
 
 TEMPLATE_SPECIALIZATION
-IC	void CPlanner::add_condition	(_world_operator *action, _condition_type condition_id, _value_type condition_value)
+IC void CPlanner::add_condition(_world_operator* action, _condition_type condition_id, _value_type condition_value)
 {
-	action->add_condition	(CWorldProperty(condition_id,condition_value));
+	action->add_condition(CWorldProperty(condition_id, condition_value));
 }
 
 TEMPLATE_SPECIALIZATION
-IC	void CPlanner::add_effect		(_world_operator *action, _condition_type condition_id, _value_type condition_value)
+IC void CPlanner::add_effect(_world_operator* action, _condition_type condition_id, _value_type condition_value)
 {
-	action->add_effect		(CWorldProperty(condition_id,condition_value));
+	action->add_effect(CWorldProperty(condition_id, condition_value));
 }
 
 #ifdef LOG_ACTION
@@ -196,20 +204,20 @@ LPCSTR CPlanner::object_name		() const
 #endif
 
 TEMPLATE_SPECIALIZATION
-IC	void CPlanner::add_operator		(const _edge_type &operator_id,	_operator_ptr _operator)
+IC void CPlanner::add_operator(const _edge_type& operator_id, _operator_ptr _operator)
 {
-	inherited::add_operator	(operator_id,_operator);
-	_operator->setup		(m_object,&m_storage);
+	inherited::add_operator(operator_id, _operator);
+	_operator->setup(m_object, &m_storage);
 #ifdef LOG_ACTION
 	_operator->set_use_log	(m_use_log);
 #endif
 }
 
 TEMPLATE_SPECIALIZATION
-IC	void CPlanner::add_evaluator	(const _condition_type &condition_id, _condition_evaluator_ptr evaluator)
+IC void CPlanner::add_evaluator(const _condition_type& condition_id, _condition_evaluator_ptr evaluator)
 {
-	inherited::add_evaluator(condition_id,evaluator);
-	evaluator->setup		(m_object,&m_storage);
+	inherited::add_evaluator(condition_id, evaluator);
+	evaluator->setup(m_object, &m_storage);
 }
 
 #ifdef LOG_ACTION
@@ -295,62 +303,64 @@ IC	void CPlanner::show				(LPCSTR offset)
 #endif
 
 TEMPLATE_SPECIALIZATION
-IC	void CPlanner::save	(NET_Packet &packet)
+IC void CPlanner::save(NET_Packet& packet)
 {
 	{
-		EVALUATORS::iterator		I = m_evaluators.begin();
-		EVALUATORS::iterator		E = m_evaluators.end();
-		for ( ; I != E; ++I)
-			(*I).second->save		(packet);
+		EVALUATORS::iterator I = m_evaluators.begin();
+		EVALUATORS::iterator E = m_evaluators.end();
+		for (; I != E; ++I)
+			(*I).second->save(packet);
 	}
 
 	{
-		OPERATOR_VECTOR::iterator	I = m_operators.begin();
-		OPERATOR_VECTOR::iterator	E = m_operators.end();
-		for ( ; I != E; ++I)
-			(*I).m_operator->save	(packet);
+		OPERATOR_VECTOR::iterator I = m_operators.begin();
+		OPERATOR_VECTOR::iterator E = m_operators.end();
+		for (; I != E; ++I)
+			(*I).m_operator->save(packet);
 	}
 
 	{
-		packet.w_u32				(m_storage.m_storage.size());
-		typedef CPropertyStorage::CConditionStorage	CConditionStorage;
-		CConditionStorage::const_iterator	I = m_storage.m_storage.begin();
-		CConditionStorage::const_iterator	E = m_storage.m_storage.end();
-		for ( ; I != E; ++I) {
-			packet.w				(&(*I).m_condition,sizeof((*I).m_condition));
-			packet.w				(&(*I).m_value,sizeof((*I).m_value));
+		packet.w_u32(m_storage.m_storage.size());
+		typedef CPropertyStorage::CConditionStorage CConditionStorage;
+		CConditionStorage::const_iterator I = m_storage.m_storage.begin();
+		CConditionStorage::const_iterator E = m_storage.m_storage.end();
+		for (; I != E; ++I)
+		{
+			packet.w(&(*I).m_condition, sizeof((*I).m_condition));
+			packet.w(&(*I).m_value, sizeof((*I).m_value));
 		}
 	}
 }
 
 TEMPLATE_SPECIALIZATION
-IC	void CPlanner::load	(IReader &packet)
+IC void CPlanner::load(IReader& packet)
 {
 	{
-		EVALUATORS::iterator		I = m_evaluators.begin();
-		EVALUATORS::iterator		E = m_evaluators.end();
-		for ( ; I != E; ++I)
-			(*I).second->load		(packet);
+		EVALUATORS::iterator I = m_evaluators.begin();
+		EVALUATORS::iterator E = m_evaluators.end();
+		for (; I != E; ++I)
+			(*I).second->load(packet);
 	}
 
 	{
-		OPERATOR_VECTOR::iterator	I = m_operators.begin();
-		OPERATOR_VECTOR::iterator	E = m_operators.end();
-		for ( ; I != E; ++I)
-			(*I).m_operator->load	(packet);
+		OPERATOR_VECTOR::iterator I = m_operators.begin();
+		OPERATOR_VECTOR::iterator E = m_operators.end();
+		for (; I != E; ++I)
+			(*I).m_operator->load(packet);
 	}
 
 	{
-		u32							count = packet.r_u32();
-		GraphEngineSpace::_solver_condition_type	condition;
-		GraphEngineSpace::_solver_value_type		value;
-		for (u32 i=0; i<count; ++i) {
-			packet.r				(&condition,sizeof(condition));
-			packet.r				(&value,sizeof(value));
-			m_storage.set_property	(condition,value);
+		u32 count = packet.r_u32();
+		GraphEngineSpace::_solver_condition_type condition;
+		GraphEngineSpace::_solver_value_type value;
+		for (u32 i = 0; i < count; ++i)
+		{
+			packet.r(&condition, sizeof(condition));
+			packet.r(&value, sizeof(value));
+			m_storage.set_property(condition, value);
 		}
 	}
-	m_loaded						= true;
+	m_loaded = true;
 }
 
 #undef TEMPLATE_SPECIALIZATION

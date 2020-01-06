@@ -8,15 +8,15 @@
 
 #pragma once
 
-IC CSquadHierarchyHolder::CSquadHierarchyHolder( CTeamHierarchyHolder *team, u32 id )
+IC CSquadHierarchyHolder::CSquadHierarchyHolder(CTeamHierarchyHolder* team, u32 id)
 {
-	VERIFY						(team);
-	m_team						= team;
+	VERIFY(team);
+	m_team = team;
 #ifdef SQUAD_HIERARCHY_HOLDER_USE_LEADER
 	m_leader					= 0;
 #endif // SQUAD_HIERARCHY_HOLDER_USE_LEADER
-	SeniorityHierarchy::assign_svector	(m_groups,max_group_count,0);
-        squad_id = id;
+	SeniorityHierarchy::assign_svector(m_groups, max_group_count, 0);
+	squad_id = id;
 }
 
 #ifdef SQUAD_HIERARCHY_HOLDER_USE_LEADER
@@ -26,10 +26,10 @@ IC	CEntity	*CSquadHierarchyHolder::leader											() const
 }
 #endif // SQUAD_HIERARCHY_HOLDER_USE_LEADER
 
-IC	CTeamHierarchyHolder &CSquadHierarchyHolder::team								() const
+IC CTeamHierarchyHolder& CSquadHierarchyHolder::team() const
 {
-	VERIFY						(m_team);
-	return						(*m_team);
+	VERIFY(m_team);
+	return (*m_team);
 }
 
 #ifdef SQUAD_HIERARCHY_HOLDER_USE_LEADER
@@ -39,7 +39,7 @@ IC	void CSquadHierarchyHolder::leader												(CEntity *leader)
 }
 #endif // SQUAD_HIERARCHY_HOLDER_USE_LEADER
 
-IC	const SquadHierarchyHolder::GROUP_REGISTRY &CSquadHierarchyHolder::groups		() const
+IC const SquadHierarchyHolder::GROUP_REGISTRY& CSquadHierarchyHolder::groups() const
 {
-	return						(m_groups);
+	return (m_groups);
 }

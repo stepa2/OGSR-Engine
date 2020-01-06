@@ -16,12 +16,14 @@ CUIRadioButton::~CUIRadioButton(void)
 {
 }
 
-void CUIRadioButton::Init(float x, float y, float width, float height){
+void CUIRadioButton::Init(float x, float y, float width, float height)
+{
 	CUI3tButton::Init(x, y, width, height);
 	InitTexture("ui_radio");
 }
 
-void CUIRadioButton::InitTexture(LPCSTR tex_name){
+void CUIRadioButton::InitTexture(LPCSTR tex_name)
+{
 	CUI3tButton::InitTexture(tex_name);
 	Frect r = m_background.GetE()->GetStaticItem()->GetRect();
 	CUI3tButton::SetTextX(r.width());

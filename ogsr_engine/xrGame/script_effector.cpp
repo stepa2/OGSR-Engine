@@ -11,28 +11,28 @@
 #include "actor.h"
 #include "../xr_3da/cameramanager.h"
 
-CScriptEffector::~CScriptEffector	()
+CScriptEffector::~CScriptEffector()
 {
-	Msg								("CScriptEffector::~CScriptEffector() called");
+	Msg("CScriptEffector::~CScriptEffector() called");
 #pragma todo("KRodin: для чего вывод в лог?")
 }
 
-BOOL CScriptEffector::Process		(SPPInfo	&pp)
+BOOL CScriptEffector::Process(SPPInfo& pp)
 {
-	return							(!!process(&pp));
+	return (!!process(&pp));
 }
 
-bool CScriptEffector::process		(SPPInfo *pp)
+bool CScriptEffector::process(SPPInfo* pp)
 {
-	return							(!!inherited::Process(*pp));
+	return (!!inherited::Process(*pp));
 }
 
-void CScriptEffector::Add			()
+void CScriptEffector::Add()
 {
-	Actor()->Cameras().AddPPEffector		(this);
+	Actor()->Cameras().AddPPEffector(this);
 }
 
-void CScriptEffector::Remove		()
+void CScriptEffector::Remove()
 {
-	Actor()->Cameras().RemovePPEffector	(m_tEffectorType);
+	Actor()->Cameras().RemovePPEffector(m_tEffectorType);
 }

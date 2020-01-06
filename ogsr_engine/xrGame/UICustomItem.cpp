@@ -3,56 +3,59 @@
 #include "hudmanager.h"
 
 CUICustomItem::CUICustomItem()
-{    
-	uAlign				= alNone;
+{
+	uAlign = alNone;
 	uFlags.zero();
-	iVisRect.set		(0,0,0,0);
-	iOriginalRect.set	(0,0,0,0);
-	iHeadingPivot.set	(0,0); 
+	iVisRect.set(0, 0, 0, 0);
+	iOriginalRect.set(0, 0, 0, 0);
+	iHeadingPivot.set(0, 0);
 	iHeadingOffset.set(0, 0);
 }
+
 //--------------------------------------------------------------------
 
 CUICustomItem::~CUICustomItem()
 {
 }
 
-void CUICustomItem::Render(const Fvector2& pos, u32 color,  float x1, float y1, float x2, float y2)
+void CUICustomItem::Render(const Fvector2& pos, u32 color, float x1, float y1, float x2, float y2)
 {
 	Fvector2 ts;
 	UIRender->GetActiveTextureResolution(ts);
 
-	if (!uFlags.test(flValidRect)) {
-		SetRect		(0,0,ts.x,ts.y);
+	if (!uFlags.test(flValidRect))
+	{
+		SetRect(0, 0, ts.x, ts.y);
 	}
-	if (!uFlags.test(flValidOriginalRect)) {
-		iOriginalRect.set(0,0,ts.x,ts.y);
+	if (!uFlags.test(flValidOriginalRect))
+	{
+		iOriginalRect.set(0, 0, ts.x, ts.y);
 		uFlags.set(flValidOriginalRect, TRUE);
 	}
 
-	Fvector2 LTp,RBp;
-	Fvector2 LTt,RBt;
+	Fvector2 LTp, RBp;
+	Fvector2 LTt, RBt;
 	//координаты на экране в пикселях
-	UI()->ClientToScreenScaled	(LTp, x1,y1);
-	LTp.add						(pos);
+	UI()->ClientToScreenScaled(LTp, x1, y1);
+	LTp.add(pos);
 
-	UI()->ClientToScreenScaled	(RBp, x2,y2);
-	RBp.add						(pos);
+	UI()->ClientToScreenScaled(RBp, x2, y2);
+	RBp.add(pos);
 
 	//текстурные координаты
-	LTt.set			( iOriginalRect.x1/ts.x, iOriginalRect.y1/ts.y);
-	RBt.set			( iOriginalRect.x2/ts.x, iOriginalRect.y2/ts.y);
+	LTt.set(iOriginalRect.x1 / ts.x, iOriginalRect.y1 / ts.y);
+	RBt.set(iOriginalRect.x2 / ts.x, iOriginalRect.y2 / ts.y);
 
 	float offset = -0.5f;
 	if (UI()->m_currentPointType == IUIRender::pttLIT)
 		offset = 0.0f;
 	// clip poly
-	sPoly2D			S;
+	sPoly2D S;
 	S.resize(4);
-	S[0].set(LTp.x + offset, LTp.y + offset, LTt.x, LTt.y);	// LT
-	S[1].set(RBp.x + offset, LTp.y + offset, RBt.x, LTt.y);	// RT
-	S[2].set(RBp.x + offset, RBp.y + offset, RBt.x, RBt.y);	// RB
-	S[3].set(LTp.x + offset, RBp.y + offset, LTt.x, RBt.y);	// LB
+	S[0].set(LTp.x + offset, LTp.y + offset, LTt.x, LTt.y); // LT
+	S[1].set(RBp.x + offset, LTp.y + offset, RBt.x, LTt.y); // RT
+	S[2].set(RBp.x + offset, RBp.y + offset, RBt.x, RBt.y); // RB
+	S[3].set(LTp.x + offset, RBp.y + offset, LTt.x, RBt.y); // LB
 
 	sPoly2D D;
 	sPoly2D* R = NULL;
@@ -72,11 +75,13 @@ void CUICustomItem::Render(const Fvector2& pos, u32 color,  float x1, float y1, 
 		}
 	}
 }
+
 //--------------------------------------------------------------------
 void CUICustomItem::Render(const Fvector2& pos, u32 color)
 {
-	Render(pos,color,iVisRect.x1,iVisRect.y1,iVisRect.x2,iVisRect.y2);
+	Render(pos, color, iVisRect.x1, iVisRect.y1, iVisRect.x2, iVisRect.y2);
 }
+
 //--------------------------------------------------------------------
 
 void CUICustomItem::Render(const Fvector2& pos_ns, u32 color, float angle)
@@ -85,22 +90,23 @@ void CUICustomItem::Render(const Fvector2& pos_ns, u32 color, float angle)
 	Fvector2 hp;
 
 	UIRender->GetActiveTextureResolution(ts);
-	hp.set(0.5f/ts.x,0.5f/ts.y);
+	hp.set(0.5f / ts.x, 0.5f / ts.y);
 
-	if (!uFlags.test(flValidRect))	SetRect(0, 0, ts.x, ts.y);
+	if (!uFlags.test(flValidRect)) SetRect(0, 0, ts.x, ts.y);
 
-	if (!uFlags.test(flValidOriginalRect)) {
-		iOriginalRect.set(0,0,ts.x,ts.y);
+	if (!uFlags.test(flValidOriginalRect))
+	{
+		iOriginalRect.set(0, 0, ts.x, ts.y);
 		uFlags.set(flValidOriginalRect, TRUE);
 	}
 
-	Fvector2							pivot,offset,SZ;
-	SZ.set								(iVisRect.rb);
+	Fvector2 pivot, offset, SZ;
+	SZ.set(iVisRect.rb);
 
-//	UI()->ClientToScreenScaled			(SZ, iVisRect.x2, iVisRect.y2);
+	//	UI()->ClientToScreenScaled			(SZ, iVisRect.x2, iVisRect.y2);
 
-	float cosA							= _cos(angle);
-	float sinA							= _sin(angle);
+	float cosA = _cos(angle);
+	float sinA = _sin(angle);
 
 	// Rotation
 	if (!uFlags.test(flValidHeadingPivot))
@@ -108,43 +114,44 @@ void CUICustomItem::Render(const Fvector2& pos_ns, u32 color, float angle)
 	else
 		pivot.set(iHeadingPivot.x, iHeadingPivot.y);
 
-//.	UI()->ClientToScreenScaled			(pivot, pivot.x, pivot.y);
+	//.	UI()->ClientToScreenScaled			(pivot, pivot.x, pivot.y);
 	//pivot.set							(pivot); //???
-	offset.set							(pos_ns);
+	offset.set(pos_ns);
 	offset.add(iHeadingOffset);
 
-	Fvector2							LTt,RBt;
-	LTt.set								(iOriginalRect.x1/ts.x+hp.x, iOriginalRect.y1/ts.y+hp.y);
-	RBt.set								(iOriginalRect.x2/ts.x+hp.x, iOriginalRect.y2/ts.y+hp.y);
+	Fvector2 LTt, RBt;
+	LTt.set(iOriginalRect.x1 / ts.x + hp.x, iOriginalRect.y1 / ts.y + hp.y);
+	RBt.set(iOriginalRect.x2 / ts.x + hp.x, iOriginalRect.y2 / ts.y + hp.y);
 
-//	float kx = (UI()->is_16_9_mode())?0.8333f: 1.0f;
+	//	float kx = (UI()->is_16_9_mode())?0.8333f: 1.0f;
 	float kx = UI()->is_16_9_mode() ? UI()->get_current_kx() : 1.0f;
 	// clip poly
-	sPoly2D			S; S.resize(4);
+	sPoly2D S;
+	S.resize(4);
 	// LT
-	S[0].set		(0.f,0.f,LTt.x,LTt.y);
-	S[0].rotate_pt	(pivot,cosA,sinA,kx);
-	S[0].pt.add		(offset);
+	S[0].set(0.f, 0.f, LTt.x, LTt.y);
+	S[0].rotate_pt(pivot, cosA, sinA, kx);
+	S[0].pt.add(offset);
 
 	// RT
-	S[1].set		(SZ.x,0.f,RBt.x,LTt.y);
-	S[1].rotate_pt	(pivot,cosA,sinA,kx);
-	S[1].pt.add		(offset);
+	S[1].set(SZ.x, 0.f, RBt.x, LTt.y);
+	S[1].rotate_pt(pivot, cosA, sinA, kx);
+	S[1].pt.add(offset);
 	// RB
-	S[2].set		(SZ.x,SZ.y,RBt.x,RBt.y);
-	S[2].rotate_pt	(pivot,cosA,sinA,kx);
-	S[2].pt.add		(offset);
+	S[2].set(SZ.x, SZ.y, RBt.x, RBt.y);
+	S[2].rotate_pt(pivot, cosA, sinA, kx);
+	S[2].pt.add(offset);
 	// LB
-	S[3].set		(0.f,SZ.y,LTt.x,RBt.y);
-	S[3].rotate_pt	(pivot,cosA,sinA,kx);
-	S[3].pt.add		(offset);
+	S[3].set(0.f, SZ.y, LTt.x, RBt.y);
+	S[3].rotate_pt(pivot, cosA, sinA, kx);
+	S[3].pt.add(offset);
 
-	for(int i=0; i<4;++i)
-		UI()->ClientToScreenScaled		(S[i].pt);
+	for (int i = 0; i < 4; ++i)
+		UI()->ClientToScreenScaled(S[i].pt);
 
 	sPoly2D D;
-	sPoly2D* R		= UI()->ScreenFrustum().ClipPoly(S,D);
-	if (R&&R->size())
+	sPoly2D* R = UI()->ScreenFrustum().ClipPoly(S, D);
+	if (R && R->size())
 	{
 		for (u32 k = 0; k < R->size() - 2; k++)
 		{
@@ -159,8 +166,8 @@ Frect CUICustomItem::GetOriginalRectScaled()
 {
 	Frect rect = iOriginalRect;
 
-	rect.x2		= rect.x1 + rect.width();
-	rect.y2		= rect.y1 + rect.height();
+	rect.x2 = rect.x1 + rect.width();
+	rect.y2 = rect.y1 + rect.height();
 
 	return rect;
 }
@@ -172,7 +179,7 @@ Frect CUICustomItem::GetOriginalRect() const
 
 void CUICustomItem::SetOriginalRect(float x, float y, float width, float height)
 {
-	iOriginalRect.set(x,y,x+width,y+height); 
+	iOriginalRect.set(x, y, x + width, y + height);
 	uFlags.set(flValidOriginalRect, TRUE);
 }
 

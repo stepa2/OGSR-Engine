@@ -8,9 +8,9 @@
 
 #pragma once
 
-IC	const CALifeSpawnHeader &CALifeSpawnRegistry::header	() const
+IC const CALifeSpawnHeader& CALifeSpawnRegistry::header() const
 {
-	return							(m_header);
+	return (m_header);
 }
 
 //IC	void CALifeSpawnRegistry::assign_artefact_position		(CSE_ALifeAnomalousZone	*anomaly, CSE_ALifeDynamicObject *object) const
@@ -28,15 +28,15 @@ IC	const CALifeSpawnHeader &CALifeSpawnRegistry::header	() const
 //#endif
 //}
 
-IC	const CALifeSpawnRegistry::SPAWN_GRAPH &CALifeSpawnRegistry::spawns	() const
+IC const CALifeSpawnRegistry::SPAWN_GRAPH& CALifeSpawnRegistry::spawns() const
 {
-	return							(m_spawns);
+	return (m_spawns);
 }
 
-IC	void CALifeSpawnRegistry::process_spawns		(SPAWN_IDS &spawns)
+IC void CALifeSpawnRegistry::process_spawns(SPAWN_IDS& spawns)
 {
-	std::sort						(spawns.begin(),spawns.end());
-	spawns.erase					(
+	std::sort(spawns.begin(), spawns.end());
+	spawns.erase(
 		std::unique(
 			spawns.begin(),
 			spawns.end()
@@ -45,9 +45,9 @@ IC	void CALifeSpawnRegistry::process_spawns		(SPAWN_IDS &spawns)
 	);
 }
 
-IC	const ALife::_SPAWN_ID &CALifeSpawnRegistry::spawn_id	(const ALife::_SPAWN_STORY_ID &spawn_story_id) const
+IC const ALife::_SPAWN_ID& CALifeSpawnRegistry::spawn_id(const ALife::_SPAWN_STORY_ID& spawn_story_id) const
 {
-	SPAWN_STORY_IDS::const_iterator	I = m_spawn_story_ids.find(spawn_story_id);
-	VERIFY2							(I != m_spawn_story_ids.end(),"Spawn story id cannot be found");
-	return							((*I).second);
+	SPAWN_STORY_IDS::const_iterator I = m_spawn_story_ids.find(spawn_story_id);
+	VERIFY2(I != m_spawn_story_ids.end(), "Spawn story id cannot be found");
+	return ((*I).second);
 }

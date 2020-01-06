@@ -27,12 +27,12 @@
 class CInventoryItem;
 class CInventory;
 
-typedef CInventoryItem*				PIItem;
-typedef xr_vector<PIItem>			TIItemContainer;
+typedef CInventoryItem* PIItem;
+typedef xr_vector<PIItem> TIItemContainer;
 
 
 enum EItemPlace
-{			
+{
 	eItemPlaceUndefined,
 	eItemPlaceSlot,
 	eItemPlaceBelt,
@@ -40,8 +40,8 @@ enum EItemPlace
 	eItemPlaceBeltActor,
 };
 
-extern u32	INV_STATE_LADDER;
-extern u32	INV_STATE_CAR;
-extern u32	INV_STATE_BLOCK_ALL;
-extern u32	INV_STATE_INV_WND;
-extern u32	INV_STATE_BUY_MENU;
+extern u32 INV_STATE_LADDER;
+extern u32 INV_STATE_CAR;
+extern u32 INV_STATE_BLOCK_ALL;
+extern u32 INV_STATE_INV_WND;
+extern u32 INV_STATE_BUY_MENU;

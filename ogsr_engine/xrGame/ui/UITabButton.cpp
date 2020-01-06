@@ -11,13 +11,15 @@
 #include "UITabButton.h"
 #include "../HUDManager.h"
 
-CUITabButton::CUITabButton(){
-//.	this->m_pAssociatedWindow = NULL;
+CUITabButton::CUITabButton()
+{
+	//.	this->m_pAssociatedWindow = NULL;
 }
 
-CUITabButton::~CUITabButton(){
-
+CUITabButton::~CUITabButton()
+{
 }
+
 /*
 void CUITabButton::AssociateWindow(CUIFrameWindow* pWindow){
 	this->m_pAssociatedWindow = pWindow;
@@ -32,24 +34,29 @@ void CUITabButton::ShowAssociatedWindow(bool bShow){
         this->m_pAssociatedWindow->Show(bShow);
 }
 */
-bool CUITabButton::OnMouse(float x, float y, EUIMessages mouse_action){
+bool CUITabButton::OnMouse(float x, float y, EUIMessages mouse_action)
+{
 	return CUIWindow::OnMouse(x, y, mouse_action);
 }
 
-bool CUITabButton::OnMouseDown(int mouse_btn){
-	if (mouse_btn==MOUSE_1)
+bool CUITabButton::OnMouseDown(int mouse_btn)
+{
+	if (mouse_btn == MOUSE_1)
 	{
-		GetMessageTarget()->SendMessage(this, TAB_CHANGED);		
+		GetMessageTarget()->SendMessage(this, TAB_CHANGED);
 		return true;
-	}else
+	}
+	else
 		return false;
 }
 
-void CUITabButton::Update(){
+void CUITabButton::Update()
+{
 	CUI3tButton::Update();
 }
 
-void CUITabButton::SendMessage(CUIWindow* pWnd, s16 msg, void* pData){
+void CUITabButton::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
+{
 	if (!IsEnabled())
 		return;
 
@@ -58,14 +65,14 @@ void CUITabButton::SendMessage(CUIWindow* pWnd, s16 msg, void* pData){
 	case TAB_CHANGED:
 		if (this == pWnd)
 		{
-            m_eButtonState = BUTTON_PUSHED;			
-//.			ShowAssociatedWindow(true);
+			m_eButtonState = BUTTON_PUSHED;
+			//.			ShowAssociatedWindow(true);
 			OnClick();
 		}
-		else		
+		else
 		{
 			m_eButtonState = BUTTON_NORMAL;
-//.			ShowAssociatedWindow(false);
+			//.			ShowAssociatedWindow(false);
 		}
 		break;
 	default:

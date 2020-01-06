@@ -13,7 +13,7 @@
 using namespace luabind;
 
 #pragma optimize("s",on)
-void CSE_ALifeObjectProjector::script_register(lua_State *L)
+void CSE_ALifeObjectProjector::script_register(lua_State* L)
 {
 	module(L)[
 		luabind_class_dynamic_alife1(
@@ -24,7 +24,7 @@ void CSE_ALifeObjectProjector::script_register(lua_State *L)
 	];
 }
 
-void CSE_ALifeHelicopter::script_register(lua_State *L)
+void CSE_ALifeHelicopter::script_register(lua_State* L)
 {
 	module(L)[
 		luabind_class_dynamic_alife3(
@@ -37,7 +37,7 @@ void CSE_ALifeHelicopter::script_register(lua_State *L)
 	];
 }
 
-void CSE_ALifeCar::script_register(lua_State *L)
+void CSE_ALifeCar::script_register(lua_State* L)
 {
 	module(L)[
 		luabind_class_dynamic_alife2(
@@ -49,7 +49,7 @@ void CSE_ALifeCar::script_register(lua_State *L)
 	];
 }
 
-void CSE_ALifeObjectBreakable::script_register(lua_State *L)
+void CSE_ALifeObjectBreakable::script_register(lua_State* L)
 {
 	module(L)[
 		luabind_class_dynamic_alife1(
@@ -60,7 +60,7 @@ void CSE_ALifeObjectBreakable::script_register(lua_State *L)
 	];
 }
 
-void CSE_ALifeObjectClimable::script_register(lua_State *L)
+void CSE_ALifeObjectClimable::script_register(lua_State* L)
 {
 	module(L)[
 		luabind_class_abstract2(
@@ -68,11 +68,11 @@ void CSE_ALifeObjectClimable::script_register(lua_State *L)
 			"cse_alife_object_climable",
 			CSE_Shape,
 			CSE_Abstract
-			)
+		)
 	];
 }
 
-void CSE_ALifeMountedWeapon::script_register(lua_State *L)
+void CSE_ALifeMountedWeapon::script_register(lua_State* L)
 {
 	module(L)[
 		luabind_class_dynamic_alife1(
@@ -83,7 +83,7 @@ void CSE_ALifeMountedWeapon::script_register(lua_State *L)
 	];
 }
 
-void CSE_ALifeTeamBaseZone::script_register(lua_State *L)
+void CSE_ALifeTeamBaseZone::script_register(lua_State* L)
 {
 	module(L)[
 		luabind_class_dynamic_alife1(
@@ -93,4 +93,3 @@ void CSE_ALifeTeamBaseZone::script_register(lua_State *L)
 		)
 	];
 }
-

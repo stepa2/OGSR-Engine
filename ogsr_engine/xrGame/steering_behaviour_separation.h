@@ -14,23 +14,22 @@
 
 class CAI_Rat;
 
-namespace steering_behaviour {
-
-class separation :
-	public base,
-	private debug::make_final<separation>
+namespace steering_behaviour
 {
-public:
-						separation	(CAI_Rat const *object);
+	class separation :
+		public base,
+		private debug::make_final<separation>
+	{
+	public:
+		separation(CAI_Rat const* object);
 
-    separation(const separation& other) = delete;
-    separation& operator=(const separation& other) = delete;
-	virtual	Fvector		direction	();
+		separation(const separation& other) = delete;
+		separation& operator=(const separation& other) = delete;
+		virtual Fvector direction();
 
-private:
-	typedef base		inherited;
-};
-
+	private:
+		typedef base inherited;
+	};
 } // namespace steering_behaviour
 
 #endif // STEERING_BEHAVIOUR_SEPARATION_H_INCLUDED

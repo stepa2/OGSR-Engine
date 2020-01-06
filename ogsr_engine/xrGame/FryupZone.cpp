@@ -4,6 +4,7 @@
 CFryupZone::CFryupZone()
 {
 }
+
 CFryupZone::~CFryupZone()
 {
 }

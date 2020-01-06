@@ -6,11 +6,11 @@
 #include "UITextBanner.h"
 
 CUITextBanner::CUITextBanner()
-	:	m_bAnimate			(true),
-		m_Cl				(0xffffffff),
-		m_pFont				(NULL),
-		fontSize			(-1.0f),
-		aligment			(CGameFont::alLeft)
+	: m_bAnimate(true),
+	  m_Cl(0xffffffff),
+	  m_pFont(NULL),
+	  fontSize(-1.0f),
+	  aligment(CGameFont::alLeft)
 {
 }
 
@@ -22,7 +22,7 @@ CUITextBanner::~CUITextBanner()
 
 ////////////////////////////////////////////////////////////////////////////////
 
-EffectParams * CUITextBanner::SetStyleParams(const TextBannerStyles styleName)
+EffectParams* CUITextBanner::SetStyleParams(const TextBannerStyles styleName)
 {
 	if (tbsNone == styleName)
 	{
@@ -51,7 +51,7 @@ void CUITextBanner::Update()
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void CUITextBanner::Out(float x, float y, const char *fmt, ...)
+void CUITextBanner::Out(float x, float y, const char* fmt, ...)
 {
 	if (!fmt) return;
 
@@ -72,20 +72,20 @@ void CUITextBanner::Out(float x, float y, const char *fmt, ...)
 		}
 	}
 
-	va_list		Print;                                                                  
-	string256	msg;
+	va_list Print;
+	string256 msg;
 	xr_string buf;
 
 	va_start(Print, fmt);
-		vsprintf(msg, fmt, Print);                   
-		buf += msg;
+	vsprintf(msg, fmt, Print);
+	buf += msg;
 	va_end(Print);
 
 	R_ASSERT(m_pFont);
 	m_pFont->SetColor(m_Cl);
 	m_pFont->SetAligment(aligment);
-//	if(fontSize>0.0f)
-//		m_pFont->SetHeight(fontSize);
+	//	if(fontSize>0.0f)
+	//		m_pFont->SetHeight(fontSize);
 
 	Fvector2 pos;
 	UI()->ClientToScreenScaled(pos, x, y);
@@ -96,7 +96,7 @@ void CUITextBanner::Out(float x, float y, const char *fmt, ...)
 
 void CUITextBanner::EffectFade()
 {
-	EffectParams	&fade = m_StyleParams[tbsFade];
+	EffectParams& fade = m_StyleParams[tbsFade];
 
 	// Проверям включена ли анимация
 	if (!fade.bOn) return;
@@ -131,7 +131,7 @@ void CUITextBanner::EffectFade()
 
 void CUITextBanner::EffectFlicker()
 {
-	EffectParams	&flicker = m_StyleParams[tbsFlicker];
+	EffectParams& flicker = m_StyleParams[tbsFlicker];
 
 	// Проверям включена ли анимация
 	if (!flicker.bOn) return;
@@ -140,11 +140,11 @@ void CUITextBanner::EffectFlicker()
 	if (flicker.fTimePassed > flicker.fPeriod)
 	{
 		if (!flicker.bCyclic)
-		{ 
+		{
 			flicker.bOn = false;
 			return;
 		}
-		
+
 		if (0 == flicker.iEffectStage)
 			flicker.iEffectStage = 1;
 		else
@@ -166,16 +166,15 @@ void CUITextBanner::EffectFlicker()
 
 void CUITextBanner::SetTextColor(u32 cl)
 {
-
 	m_Cl = cl;
 }
 
 //////////////////////////////////////////////////////////////////////////
 
-u32  CUITextBanner::GetTextColor()
+u32 CUITextBanner::GetTextColor()
 {
-	void SetTextColor			(u32 cl);
-	u32  GetTextColor			();
+	void SetTextColor(u32 cl);
+	u32 GetTextColor();
 
 	return m_Cl;
 }

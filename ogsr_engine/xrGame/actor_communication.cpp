@@ -31,123 +31,136 @@
 #include "ai/monsters/basemonster/base_monster.h"
 #include "ai/trader/ai_trader.h"
 
-void CActor::AddEncyclopediaArticle( const CInfoPortion* info_portion, bool revert ) const {
-  VERIFY( info_portion );
-  auto& article_vector = encyclopedia_registry->registry().objects();
+void CActor::AddEncyclopediaArticle(const CInfoPortion* info_portion, bool revert) const
+{
+	VERIFY(info_portion);
+	auto& article_vector = encyclopedia_registry->registry().objects();
 
-  std::vector<pda_section::part> updated_pda;
-  auto update_pda_section = [ &updated_pda ]( const auto& data ) {
-    pda_section::part p = pda_section::encyclopedia;
-    switch ( data.article_type ) {
-        case ARTICLE_DATA::eEncyclopediaArticle:
-          p = pda_section::encyclopedia; break;
-        case ARTICLE_DATA::eJournalArticle:
-          p = pda_section::journal; break;
-        case ARTICLE_DATA::eInfoArticle:
-          p = pda_section::info; break;
-        case ARTICLE_DATA::eTaskArticle:
-          p = pda_section::quests; break;
-        default: NODEFAULT;
-      };
-      auto it = std::find( updated_pda.begin(), updated_pda.end(), p );
-      if ( it == updated_pda.end() )
-        updated_pda.push_back( p );
-  };
+	std::vector<pda_section::part> updated_pda;
+	auto update_pda_section = [ &updated_pda ](const auto& data)
+	{
+		pda_section::part p = pda_section::encyclopedia;
+		switch (data.article_type)
+		{
+		case ARTICLE_DATA::eEncyclopediaArticle:
+			p = pda_section::encyclopedia;
+			break;
+		case ARTICLE_DATA::eJournalArticle:
+			p = pda_section::journal;
+			break;
+		case ARTICLE_DATA::eInfoArticle:
+			p = pda_section::info;
+			break;
+		case ARTICLE_DATA::eTaskArticle:
+			p = pda_section::quests;
+			break;
+		default: NODEFAULT;
+		};
+		auto it = std::find(updated_pda.begin(), updated_pda.end(), p);
+		if (it == updated_pda.end())
+			updated_pda.push_back(p);
+	};
 
-  auto last_end = article_vector.end();
-  for ( const auto& id : ( revert ? info_portion->Articles() : info_portion->ArticlesDisable() ) ) {
-    last_end = std::remove_if(
-      article_vector.begin(), last_end, [ & ]( const auto& it ) {
-        if ( it.article_id == id ) {
-          update_pda_section( it );
-          return true;
-        }
-        return false;
-      }
-    );
-  }
-  article_vector.erase( last_end, article_vector.end() );
+	auto last_end = article_vector.end();
+	for (const auto& id : (revert ? info_portion->Articles() : info_portion->ArticlesDisable()))
+	{
+		last_end = std::remove_if(
+			article_vector.begin(), last_end, [ & ](const auto& it)
+			{
+				if (it.article_id == id)
+				{
+					update_pda_section(it);
+					return true;
+				}
+				return false;
+			}
+		);
+	}
+	article_vector.erase(last_end, article_vector.end());
 
-  if ( !revert )
-    for ( const auto& id : info_portion->Articles() ) {
-      const auto it = std::find_if(
-        article_vector.begin(), article_vector.end(), [&id]( const auto& it ) {
-          return it.article_id == id;
-        }
-      );
-      if ( it != article_vector.end() ) continue;
+	if (!revert)
+		for (const auto& id : info_portion->Articles())
+		{
+			const auto it = std::find_if(
+				article_vector.begin(), article_vector.end(), [&id](const auto& it)
+				{
+					return it.article_id == id;
+				}
+			);
+			if (it != article_vector.end()) continue;
 
-      CEncyclopediaArticle article;
-      article.Load( id );
-      article_vector.push_back(
-        ARTICLE_DATA( id, Level().GetGameTime(), article.data()->articleType )
-      );
-      LPCSTR g, n;
-      int _atype = article.data()->articleType;
-      g = *( article.data()->group );
-      n = *( article.data()->name  );
-      callback( GameObject::eArticleInfo )( lua_game_object(), g, n, _atype );
+			CEncyclopediaArticle article;
+			article.Load(id);
+			article_vector.push_back(
+				ARTICLE_DATA(id, Level().GetGameTime(), article.data()->articleType)
+			);
+			LPCSTR g, n;
+			int _atype = article.data()->articleType;
+			g = *(article.data()->group);
+			n = *(article.data()->name);
+			callback(GameObject::eArticleInfo)(lua_game_object(), g, n, _atype);
 
-      update_pda_section( article_vector.back() );
-    }
+			update_pda_section(article_vector.back());
+		}
 
-  if ( !updated_pda.empty() && HUD().GetUI() ) {
-    auto* pGameSP = smart_cast<CUIGameSP*>( HUD().GetUI()->UIGame() );
-    for ( const auto& p : updated_pda )
-      pGameSP->PdaMenu->PdaContentsChanged( p, !revert );
-  }
+	if (!updated_pda.empty() && HUD().GetUI())
+	{
+		auto* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
+		for (const auto& p : updated_pda)
+			pGameSP->PdaMenu->PdaContentsChanged(p, !revert);
+	}
 }
 
 
-void CActor::AddGameTask			 (const CInfoPortion* info_portion) const
+void CActor::AddGameTask(const CInfoPortion* info_portion) const
 {
 	VERIFY(info_portion);
 
-	if(info_portion->GameTasks().empty()) return;
-	for(TASK_ID_VECTOR::const_iterator it = info_portion->GameTasks().begin();
-		it != info_portion->GameTasks().end(); it++)
+	if (info_portion->GameTasks().empty()) return;
+	for (TASK_ID_VECTOR::const_iterator it = info_portion->GameTasks().begin();
+	     it != info_portion->GameTasks().end(); it++)
 	{
 		GameTaskManager().GiveGameTaskToActor(*it, 0);
 	}
 }
 
 
-void  CActor::AddGameNews			 (GAME_NEWS_DATA& news_data)
+void CActor::AddGameNews(GAME_NEWS_DATA& news_data)
 {
+	GAME_NEWS_VECTOR& news_vector = game_news_registry->registry().objects();
+	news_data.receive_time = Level().GetGameTime();
+	news_vector.push_back(news_data);
 
-	GAME_NEWS_VECTOR& news_vector	= game_news_registry->registry().objects();
-	news_data.receive_time			= Level().GetGameTime();
-	news_vector.push_back			(news_data);
-
-	if(HUD().GetUI()){
+	if (HUD().GetUI())
+	{
 		HUD().GetUI()->UIMainIngameWnd->ReceiveNews(&news_data);
 		CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
-		if(pGameSP) 
-			pGameSP->PdaMenu->PdaContentsChanged	(pda_section::news);
+		if (pGameSP)
+			pGameSP->PdaMenu->PdaContentsChanged(pda_section::news);
 	}
 }
 
 
 bool CActor::OnReceiveInfo(shared_str info_id) const
 {
-	if(!CInventoryOwner::OnReceiveInfo(info_id))
+	if (!CInventoryOwner::OnReceiveInfo(info_id))
 		return false;
 
 	CInfoPortion info_portion;
 	info_portion.Load(info_id);
 
-	AddEncyclopediaArticle	(&info_portion);
-	AddGameTask				(&info_portion);
+	AddEncyclopediaArticle(&info_portion);
+	AddGameTask(&info_portion);
 
 	callback(GameObject::eInventoryInfo)(lua_game_object(), *info_id);
 
-	if(!HUD().GetUI())
+	if (!HUD().GetUI())
 		return false;
 	//только если находимся в режиме single
 	CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
-	if(!pGameSP) return false;
+	if (!pGameSP) return false;
 
-	if(pGameSP->TalkMenu->IsShown())
+	if (pGameSP->TalkMenu->IsShown())
 	{
 		pGameSP->TalkMenu->NeedUpdateQuestions();
 	}
@@ -167,52 +180,54 @@ void CActor::OnDisableInfo(shared_str info_id) const
 	AddEncyclopediaArticle( &info_portion, true );
 #endif
 
-	if(!HUD().GetUI())
+	if (!HUD().GetUI())
 		return;
 
 	//только если находимся в режиме single
 	CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
-	if(!pGameSP) return;
+	if (!pGameSP) return;
 
-	if(pGameSP->TalkMenu->IsShown())
+	if (pGameSP->TalkMenu->IsShown())
 		pGameSP->TalkMenu->NeedUpdateQuestions();
 }
 
-void  CActor::ReceivePhrase		(DIALOG_SHARED_PTR& phrase_dialog)
+void CActor::ReceivePhrase(DIALOG_SHARED_PTR& phrase_dialog)
 {
 	//только если находимся в режиме single
 	CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
-	if(!pGameSP) return;
+	if (!pGameSP) return;
 
-	if(pGameSP->TalkMenu->IsShown())
+	if (pGameSP->TalkMenu->IsShown())
 		pGameSP->TalkMenu->NeedUpdateQuestions();
 
 	CPhraseDialogManager::ReceivePhrase(phrase_dialog);
 }
 
-void   CActor::UpdateAvailableDialogs	(CPhraseDialogManager* partner)
+void CActor::UpdateAvailableDialogs(CPhraseDialogManager* partner)
 {
 	m_AvailableDialogs.clear();
 	m_CheckedDialogs.clear();
 
-	if(CInventoryOwner::m_known_info_registry->registry().objects_ptr())
+	if (CInventoryOwner::m_known_info_registry->registry().objects_ptr())
 	{
-		for(KNOWN_INFO_VECTOR::const_iterator it = CInventoryOwner::m_known_info_registry->registry().objects_ptr()->begin();
-			CInventoryOwner::m_known_info_registry->registry().objects_ptr()->end() != it; ++it)
+		for (KNOWN_INFO_VECTOR::const_iterator it = CInventoryOwner::m_known_info_registry
+		                                            ->registry().objects_ptr()->begin();
+		     CInventoryOwner::m_known_info_registry->registry().objects_ptr()->end() != it; ++it)
 		{
 			//подгрузить кусочек информации с которым мы работаем
 			CInfoPortion info_portion;
 			info_portion.Load((*it).info_id);
 
-			for(u32 i = 0; i<info_portion.DialogNames().size(); i++)
+			for (u32 i = 0; i < info_portion.DialogNames().size(); i++)
 				AddAvailableDialog(*info_portion.DialogNames()[i], partner);
 		}
 	}
 
 	//добавить актерский диалог собеседника
-	CInventoryOwner* pInvOwnerPartner = smart_cast<CInventoryOwner*>(partner); VERIFY(pInvOwnerPartner);
-	
-	for(u32 i = 0; i<pInvOwnerPartner->CharacterInfo().ActorDialogs().size(); i++)
+	CInventoryOwner* pInvOwnerPartner = smart_cast<CInventoryOwner*>(partner);
+	VERIFY(pInvOwnerPartner);
+
+	for (u32 i = 0; i < pInvOwnerPartner->CharacterInfo().ActorDialogs().size(); i++)
 		AddAvailableDialog(pInvOwnerPartner->CharacterInfo().ActorDialogs()[i], partner);
 
 	CPhraseDialogManager::UpdateAvailableDialogs(partner);
@@ -222,7 +237,7 @@ void CActor::TryToTalk()
 {
 	VERIFY(m_pPersonWeLookingAt);
 
-	if(!IsTalking())
+	if (!IsTalking())
 	{
 		RunTalkDialog(m_pPersonWeLookingAt);
 	}
@@ -231,29 +246,30 @@ void CActor::TryToTalk()
 void CActor::RunTalkDialog(CInventoryOwner* talk_partner)
 {
 	//предложить поговорить с нами
-	if(talk_partner->OfferTalk(this))
-	{	
+	if (talk_partner->OfferTalk(this))
+	{
 		StartTalk(talk_partner);
 		//только если находимся в режиме single
 		CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
-		if(pGameSP)
+		if (pGameSP)
 		{
-			if(pGameSP->MainInputReceiver())
-				Game().StartStopMenu(pGameSP->MainInputReceiver(),true);
+			if (pGameSP->MainInputReceiver())
+				Game().StartStopMenu(pGameSP->MainInputReceiver(), true);
 			pGameSP->StartTalk();
 		}
 	}
 }
 
-void CActor::StartTalk (CInventoryOwner* talk_partner)
+void CActor::StartTalk(CInventoryOwner* talk_partner)
 {
 	//обновить информацию о контакте
 	VERIFY(smart_cast<CGameObject*>(talk_partner));
-//.	CGameObject* GO = smart_cast<CGameObject*>(talk_partner);
-//.	UpdateContact(GO->ID());
+	//.	CGameObject* GO = smart_cast<CGameObject*>(talk_partner);
+	//.	UpdateContact(GO->ID());
 
 	CInventoryOwner::StartTalk(talk_partner);
 }
+
 /*
 void CActor::UpdateContact		(u16 contact_id)
 {
@@ -274,75 +290,83 @@ void CActor::UpdateContact		(u16 contact_id)
 	}
 }
 */
-void CActor::NewPdaContact		(CInventoryOwner* pInvOwner)
+void CActor::NewPdaContact(CInventoryOwner* pInvOwner)
 {
 	bool b_alive = !!(smart_cast<CEntityAlive*>(pInvOwner))->g_Alive();
 	HUD().GetUI()->UIMainIngameWnd->AnimateContacts(b_alive);
 
-	Level().MapManager().AddRelationLocation		( pInvOwner );
+	Level().MapManager().AddRelationLocation(pInvOwner);
 
-	if( HUD().GetUI() ){
+	if (HUD().GetUI())
+	{
 		CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
 
-		if(pGameSP)
-			pGameSP->PdaMenu->PdaContentsChanged	(pda_section::contacts);
+		if (pGameSP)
+			pGameSP->PdaMenu->PdaContentsChanged(pda_section::contacts);
 	}
 }
 
-void CActor::LostPdaContact		(CInventoryOwner* pInvOwner)
+void CActor::LostPdaContact(CInventoryOwner* pInvOwner)
 {
 	CGameObject* GO = smart_cast<CGameObject*>(pInvOwner);
-	if (GO){
-
-		for(int t = ALife::eRelationTypeFriend; t<ALife::eRelationTypeLast; ++t){
+	if (GO)
+	{
+		for (int t = ALife::eRelationTypeFriend; t < ALife::eRelationTypeLast; ++t)
+		{
 			ALife::ERelationType tt = (ALife::ERelationType)t;
-			Level().MapManager().RemoveMapLocation(RELATION_REGISTRY().GetSpotName(tt),	GO->ID());
+			Level().MapManager().RemoveMapLocation(RELATION_REGISTRY().GetSpotName(tt), GO->ID());
 		}
-		Level().MapManager().RemoveMapLocation("deadbody_location",	GO->ID());
+		Level().MapManager().RemoveMapLocation("deadbody_location", GO->ID());
 	};
 
-	if( HUD().GetUI() ){
+	if (HUD().GetUI())
+	{
 		CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
-		if(pGameSP){
-			pGameSP->PdaMenu->PdaContentsChanged	(pda_section::contacts);
+		if (pGameSP)
+		{
+			pGameSP->PdaMenu->PdaContentsChanged(pda_section::contacts);
 		}
 	}
-
 }
 
-void CActor::AddGameNews_deffered	 (GAME_NEWS_DATA& news_data, u32 delay)
+void CActor::AddGameNews_deffered(GAME_NEWS_DATA& news_data, u32 delay)
 {
-	GAME_NEWS_DATA * d = xr_new<GAME_NEWS_DATA>(news_data);
+	GAME_NEWS_DATA* d = xr_new<GAME_NEWS_DATA>(news_data);
 	//*d = news_data;
-	m_defferedMessages.push_back( SDefNewsMsg() );
+	m_defferedMessages.push_back(SDefNewsMsg());
 	m_defferedMessages.back().news_data = d;
-	m_defferedMessages.back().time = Device.dwTimeGlobal+delay;
-	std::sort(m_defferedMessages.begin(), m_defferedMessages.end() );
+	m_defferedMessages.back().time = Device.dwTimeGlobal + delay;
+	std::sort(m_defferedMessages.begin(), m_defferedMessages.end());
 }
+
 void CActor::UpdateDefferedMessages()
 {
-	while( m_defferedMessages.size() ){
+	while (m_defferedMessages.size())
+	{
 		SDefNewsMsg& M = m_defferedMessages.back();
-		if(M.time <=Device.dwTimeGlobal){
-			AddGameNews(*M.news_data);		
+		if (M.time <= Device.dwTimeGlobal)
+		{
+			AddGameNews(*M.news_data);
 			xr_delete(M.news_data);
 			m_defferedMessages.pop_back();
-		}else
+		}
+		else
 			break;
 	}
 }
 
-bool CActor::OnDialogSoundHandlerStart(CInventoryOwner *inv_owner, LPCSTR phrase)
+bool CActor::OnDialogSoundHandlerStart(CInventoryOwner* inv_owner, LPCSTR phrase)
 {
-	CAI_Trader *trader = smart_cast<CAI_Trader*>(inv_owner);
+	CAI_Trader* trader = smart_cast<CAI_Trader*>(inv_owner);
 	if (!trader) return false;
 
 	trader->dialog_sound_start(phrase);
 	return true;
 }
-bool CActor::OnDialogSoundHandlerStop(CInventoryOwner *inv_owner)
+
+bool CActor::OnDialogSoundHandlerStop(CInventoryOwner* inv_owner)
 {
-	CAI_Trader *trader = smart_cast<CAI_Trader*>(inv_owner);
+	CAI_Trader* trader = smart_cast<CAI_Trader*>(inv_owner);
 	if (!trader) return false;
 
 	trader->dialog_sound_stop();

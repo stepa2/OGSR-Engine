@@ -4,6 +4,4 @@
 #include "../MathUtils.h"
 
 
-
-
 #endif

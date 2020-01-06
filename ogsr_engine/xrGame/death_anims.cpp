@@ -13,7 +13,7 @@ rnd_motion::rnd_motion()
 {
 }
 
-rnd_motion*	rnd_motion::setup(IKinematicsAnimated* k, const char* s)
+rnd_motion* rnd_motion::setup(IKinematicsAnimated* k, const char* s)
 {
 	VERIFY(k);
 	VERIFY(s);
@@ -36,7 +36,7 @@ rnd_motion*	rnd_motion::setup(IKinematicsAnimated* k, const char* s)
 	return this;
 }
 
-MotionID rnd_motion::motion()	const
+MotionID rnd_motion::motion() const
 {
 	if (motions.empty())
 		return MotionID();
@@ -54,7 +54,7 @@ void type_motion::set_motion(IKinematicsAnimated* k, u16 id_motion, const char* 
 	anims[id_motion] = xr_new<rnd_motion>()->setup(k, dir_anim);
 }
 
-type_motion* type_motion::setup(IKinematicsAnimated* k, CInifile * ini, const char* section, const char* type)
+type_motion* type_motion::setup(IKinematicsAnimated* k, CInifile* ini, const char* section, const char* type)
 {
 	anims.resize(dirs_number, 0);
 	if (ini->line_exist(section, type))
@@ -91,17 +91,17 @@ type_motion::~type_motion()
 	VERIFY(anims.empty());
 }
 
-MotionID type_motion::motion(type_motion::edirection dr)const
+MotionID type_motion::motion(type_motion::edirection dr) const
 {
 	VERIFY(dr < not_definite);
-	rnd_motion *rm = anims[dr];
+	rnd_motion* rm = anims[dr];
 	MotionID m;
 	if (rm)
 		m = rm->motion();
 	return m;
 }
 
-type_motion::edirection	type_motion::dir(CEntityAlive& ea, const SHit& H, float& angle)
+type_motion::edirection type_motion::dir(CEntityAlive& ea, const SHit& H, float& angle)
 {
 	Fvector dir = H.direction();
 	dir.y = 0;
@@ -109,15 +109,16 @@ type_motion::edirection	type_motion::dir(CEntityAlive& ea, const SHit& H, float&
 	if (fis_zero(m))
 	{
 		edirection dr;
-		dr = (edirection) ::Random.randI(0, (s32)not_definite);
+		dr = (edirection)::Random.randI(0, (s32)not_definite);
 		VERIFY(dr < not_definite);
-		return	dr;
+		return dr;
 	}
 	dir.mul(1.f / m);
 
-	Fvector z_dir = { ea.XFORM().k.x, 0.f, ea.XFORM().k.z };
-	Fvector x_dir = { ea.XFORM().i.x, 0.f, ea.XFORM().i.z };
-	z_dir.normalize_safe(); x_dir.normalize_safe();
+	Fvector z_dir = {ea.XFORM().k.x, 0.f, ea.XFORM().k.z};
+	Fvector x_dir = {ea.XFORM().i.x, 0.f, ea.XFORM().i.z};
+	z_dir.normalize_safe();
+	x_dir.normalize_safe();
 
 	float front_factor = dir.dotproduct(z_dir);
 	float sidefactor = dir.dotproduct(x_dir);
@@ -156,7 +157,7 @@ void death_anims::clear()
 	anims.clear();
 }
 
-MotionID death_anims::motion(CEntityAlive& ea, const SHit& H, float &angle) const
+MotionID death_anims::motion(CEntityAlive& ea, const SHit& H, float& angle) const
 {
 	angle = 0;
 	if (anims.empty())
@@ -173,10 +174,10 @@ MotionID death_anims::motion(CEntityAlive& ea, const SHit& H, float &angle) cons
 	return rnd_anims.motion();
 }
 
-Fvector& global_hit_position(Fvector &gp, CEntityAlive& ea, const SHit& H)
+Fvector& global_hit_position(Fvector& gp, CEntityAlive& ea, const SHit& H)
 {
 	VERIFY(ea.Visual());
-	IKinematics	*K = ea.Visual()->dcast_PKinematics();
+	IKinematics* K = ea.Visual()->dcast_PKinematics();
 	VERIFY(K);
 	K->LL_GetTransform(H.bone()).transform_tiny(gp, H.bone_space_position());
 	ea.XFORM().transform_tiny(gp);
@@ -186,13 +187,13 @@ Fvector& global_hit_position(Fvector &gp, CEntityAlive& ea, const SHit& H)
 #pragma warning(push)
 #pragma warning(disable: 4273)
 
-bool find_in_parents(const u16 bone_to_find, const u16 from_bone, IKinematics &ca)
+bool find_in_parents(const u16 bone_to_find, const u16 from_bone, IKinematics& ca)
 {
 	const u16 root = ca.LL_GetBoneRoot();
 
-	for (u16 bi = from_bone; bi != root && bi != BI_NONE; )
+	for (u16 bi = from_bone; bi != root && bi != BI_NONE;)
 	{
-		const CBoneData &bd = ca.LL_GetData(bi);
+		const CBoneData& bd = ca.LL_GetData(bi);
 		if (bi == bone_to_find)
 			return true;
 		bi = bd.GetParentID();
@@ -201,7 +202,7 @@ bool find_in_parents(const u16 bone_to_find, const u16 from_bone, IKinematics &c
 	return false;
 }
 
-inline bool is_bone_head(IKinematics &K, u16 bone)
+inline bool is_bone_head(IKinematics& K, u16 bone)
 {
 	const u16 head_bone = K.LL_BoneID("bip01_head");
 	const u16 neck_bone = K.LL_BoneID("bip01_neck");
@@ -211,14 +212,14 @@ inline bool is_bone_head(IKinematics &K, u16 bone)
 //1.	Инерционное движение вперед от попадания в голову 
 class type_motion0 : public type_motion
 {
-	bool predicate(CEntityAlive& pEntity, const SHit& H, MotionID &m, float &angle)	const override
+	bool predicate(CEntityAlive& pEntity, const SHit& H, MotionID& m, float& angle) const override
 	{
 		m = MotionID();
 		if (H.initiator() != g_pGameLevel->CurrentEntity())
 			return false;
 
 		VERIFY(pEntity.Visual());
-		IKinematics *K = pEntity.Visual()->dcast_PKinematics();
+		IKinematics* K = pEntity.Visual()->dcast_PKinematics();
 		VERIFY(K);
 		if (!is_bone_head(*K, H.bone()))
 			return false;
@@ -256,7 +257,7 @@ class type_motion0 : public type_motion
 //2.	Изрешетить пулями (заглушка)
 class type_motion1 : public type_motion
 {
-	bool predicate(CEntityAlive& pEntity, const SHit& H, MotionID &m, float &angle) const override
+	bool predicate(CEntityAlive& pEntity, const SHit& H, MotionID& m, float& angle) const override
 	{
 		m = MotionID();
 
@@ -267,7 +268,7 @@ class type_motion1 : public type_motion
 //3.	Шотган 
 class type_motion2 : public type_motion
 {
-	bool predicate(CEntityAlive& pEntity, const SHit& H, MotionID &m, float &angle) const override
+	bool predicate(CEntityAlive& pEntity, const SHit& H, MotionID& m, float& angle) const override
 	{
 		m = MotionID();
 		if (H.initiator() != g_pGameLevel->CurrentEntity())
@@ -282,7 +283,7 @@ class type_motion2 : public type_motion
 			return false;
 		Fvector p;
 
-		const	float max_distance = 20.f;
+		const float max_distance = 20.f;
 		if (Fvector().sub(H.initiator()->Position(), global_hit_position(p, pEntity, H)).magnitude() > max_distance)
 			return false;
 
@@ -296,14 +297,14 @@ class type_motion2 : public type_motion
 //4.	Хедшот (по вероятности), кроме 5 (4) 
 class type_motion3 : public type_motion
 {
-	bool predicate(CEntityAlive& pEntity, const SHit& H, MotionID &m, float &angle) const override
+	bool predicate(CEntityAlive& pEntity, const SHit& H, MotionID& m, float& angle) const override
 	{
 		m = MotionID();
 		if (H.initiator() != g_pGameLevel->CurrentEntity())
 			return false;
 
 		VERIFY(pEntity.Visual());
-		IKinematics *K = pEntity.Visual()->dcast_PKinematics();
+		IKinematics* K = pEntity.Visual()->dcast_PKinematics();
 		VERIFY(K);
 
 		if (is_bone_head(*K, H.bone()))
@@ -330,14 +331,14 @@ bool is_snipper(u16 weaponID)
 //5.	Снайперка в голову. 
 class type_motion4 : public type_motion
 {
-	bool predicate(CEntityAlive& pEntity, const SHit& H, MotionID &m, float &angle) const override
+	bool predicate(CEntityAlive& pEntity, const SHit& H, MotionID& m, float& angle) const override
 	{
 		if (H.initiator() != g_pGameLevel->CurrentEntity())
 			return false;
 
 		m = MotionID();
 		VERIFY(pEntity.Visual());
-		IKinematics *K = pEntity.Visual()->dcast_PKinematics();
+		IKinematics* K = pEntity.Visual()->dcast_PKinematics();
 		VERIFY(K);
 
 		if (!is_bone_head(*K, H.bone()))
@@ -357,14 +358,14 @@ class type_motion4 : public type_motion
 //6.	Снайперка в тело. 
 class type_motion5 : public type_motion
 {
-	bool predicate(CEntityAlive& pEntity, const SHit& H, MotionID &m, float &angle) const override
+	bool predicate(CEntityAlive& pEntity, const SHit& H, MotionID& m, float& angle) const override
 	{
 		if (H.initiator() != g_pGameLevel->CurrentEntity())
 			return false;
 
 		m = MotionID();
 		VERIFY(pEntity.Visual());
-		IKinematics *K = pEntity.Visual()->dcast_PKinematics();
+		IKinematics* K = pEntity.Visual()->dcast_PKinematics();
 		VERIFY(K);
 
 		if (is_snipper(H.weaponID) && !is_bone_head(*K, H.bone()))
@@ -381,7 +382,7 @@ class type_motion5 : public type_motion
 //7.	Гранта 
 class type_motion6 : public type_motion
 {
-	bool predicate(CEntityAlive& pEntity, const SHit& H, MotionID &m, float &angle) const override
+	bool predicate(CEntityAlive& pEntity, const SHit& H, MotionID& m, float& angle) const override
 	{
 		if (H.initiator() != g_pGameLevel->CurrentEntity())
 			return false;

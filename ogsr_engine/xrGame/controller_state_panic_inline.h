@@ -1,4 +1,3 @@
-
 #pragma once
 
 #define TEMPLATE_SPECIALIZATION template <\
@@ -8,7 +7,7 @@
 #define CStateControllerPanicAbstract CStateControllerPanic<_Object>
 
 TEMPLATE_SPECIALIZATION
-CStateControllerPanicAbstract::CStateControllerPanic(_Object *obj) : inherited(obj)
+CStateControllerPanicAbstract::CStateControllerPanic(_Object* obj) : inherited(obj)
 {
 	//state_ptr state_run;
 	//add_state	(eStateRun,	state_run);

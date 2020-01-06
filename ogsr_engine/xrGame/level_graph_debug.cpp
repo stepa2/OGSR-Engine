@@ -29,7 +29,7 @@ void CLevelGraph::render()
 	draw_nodes();
 	draw_restrictions();
 
-#else 
+#else
 	if (psAI_Flags.test(aiDrawGameGraph)) {
 		//		if (psHUD_Flags.test(HUD_DRAW))
 		draw_game_graph();

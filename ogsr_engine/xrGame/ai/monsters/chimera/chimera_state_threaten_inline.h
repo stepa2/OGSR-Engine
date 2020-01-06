@@ -12,11 +12,11 @@
 #define CStateChimeraThreatenAbstract CStateChimeraThreaten<_Object>
 
 TEMPLATE_SPECIALIZATION
-CStateChimeraThreatenAbstract::CStateChimeraThreaten(_Object *obj) : inherited(obj)
+CStateChimeraThreatenAbstract::CStateChimeraThreaten(_Object* obj) : inherited(obj)
 {
-	add_state(eStateWalk,		xr_new<CStateChimeraThreatenWalk<_Object> >	(obj));
-	add_state(eStateThreaten,	xr_new<CStateChimeraThreatenRoar<_Object> >	(obj));
-	add_state(eStateSteal,		xr_new<CStateChimeraThreatenSteal<_Object> >(obj));
+	add_state(eStateWalk, xr_new<CStateChimeraThreatenWalk<_Object>>(obj));
+	add_state(eStateThreaten, xr_new<CStateChimeraThreatenRoar<_Object>>(obj));
+	add_state(eStateSteal, xr_new<CStateChimeraThreatenSteal<_Object>>(obj));
 }
 
 TEMPLATE_SPECIALIZATION
@@ -27,7 +27,7 @@ CStateChimeraThreatenAbstract::~CStateChimeraThreaten()
 TEMPLATE_SPECIALIZATION
 void CStateChimeraThreatenAbstract::reinit()
 {
-	inherited::reinit	();
+	inherited::reinit();
 
 	m_last_time_threaten = 0;
 }
@@ -42,8 +42,8 @@ bool CStateChimeraThreatenAbstract::check_start_conditions()
 {
 	if (object->tfGetRelationType(object->EnemyMan.get_enemy()) == ALife::eRelationTypeWorstEnemy) return false;
 	if (object->Position().distance_to(object->EnemyMan.get_enemy_position()) < MIN_DIST_TO_ENEMY) return false;
-	if (object->HitMemory.is_hit())						return false;
-	if (object->hear_dangerous_sound)					return false;
+	if (object->HitMemory.is_hit()) return false;
+	if (object->hear_dangerous_sound) return false;
 	if (m_last_time_threaten + THREATEN_DELAY > Device.dwTimeGlobal) return false;
 
 	return true;
@@ -62,27 +62,33 @@ bool CStateChimeraThreatenAbstract::check_completion()
 TEMPLATE_SPECIALIZATION
 void CStateChimeraThreatenAbstract::initialize()
 {
-	inherited::initialize	();
+	inherited::initialize();
 }
 
 TEMPLATE_SPECIALIZATION
 void CStateChimeraThreatenAbstract::reselect_state()
 {
-	if (prev_substate == u32(-1)) {
+	if (prev_substate == u32(-1))
+	{
 		select_state(eStateThreaten);
 		return;
 	}
 
-	if (prev_substate == eStateSteal) {
+	if (prev_substate == eStateSteal)
+	{
 		select_state(eStateThreaten);
 		return;
 	}
 
-	if (prev_substate == eStateThreaten) {
-		if (get_state(eStateSteal)->check_start_conditions()) {
+	if (prev_substate == eStateThreaten)
+	{
+		if (get_state(eStateSteal)->check_start_conditions())
+		{
 			select_state(eStateSteal);
 			return;
-		} else if (get_state(eStateWalk)->check_start_conditions()) {
+		}
+		else if (get_state(eStateWalk)->check_start_conditions())
+		{
 			select_state(eStateWalk);
 			return;
 		}
@@ -94,15 +100,15 @@ void CStateChimeraThreatenAbstract::reselect_state()
 TEMPLATE_SPECIALIZATION
 void CStateChimeraThreatenAbstract::finalize()
 {
-	inherited::finalize		();
-	m_last_time_threaten	 = Device.dwTimeGlobal;
+	inherited::finalize();
+	m_last_time_threaten = Device.dwTimeGlobal;
 }
 
 TEMPLATE_SPECIALIZATION
 void CStateChimeraThreatenAbstract::critical_finalize()
 {
 	inherited::critical_finalize();
-	m_last_time_threaten	 = Device.dwTimeGlobal;
+	m_last_time_threaten = Device.dwTimeGlobal;
 }
 
 

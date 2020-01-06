@@ -18,25 +18,23 @@ TEMPLATE_SPECIALIZATION
 void CStateControllerFastMoveAbstract::finalize()
 {
 	inherited::finalize();
-	object->set_mental_state	(CController::eStateDanger);	
+	object->set_mental_state(CController::eStateDanger);
 }
 
 TEMPLATE_SPECIALIZATION
 void CStateControllerFastMoveAbstract::critical_finalize()
 {
 	inherited::critical_finalize();
-	object->set_mental_state	(CController::eStateDanger);
+	object->set_mental_state(CController::eStateDanger);
 }
 
 
 TEMPLATE_SPECIALIZATION
 void CStateControllerFastMoveAbstract::execute()
 {
-	object->set_action	(ACT_RUN);
+	object->set_action(ACT_RUN);
 
 	//select another cover
-
-
 }
 
 #undef TEMPLATE_SPECIALIZATION

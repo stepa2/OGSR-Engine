@@ -15,14 +15,14 @@
 
 #include "object_broker.h"
 
-string128	ErrMsgBoxTemplate[] = {
+string128 ErrMsgBoxTemplate[] = {
 	"message_box_session_full",
 	"msg_box_error_loading"
 };
 
 extern bool b_shniaganeed_pp;
 
-CMainMenu*	MainMenu() { return (CMainMenu*)g_pGamePersistent->m_pMainMenu; };
+CMainMenu* MainMenu() { return (CMainMenu*)g_pGamePersistent->m_pMainMenu; };
 //----------------------------------------------------------------------------------
 #define INIT_MSGBOX(_box, _template)	{ _box = xr_new<CUIMessageBoxEx>(); _box->Init(_template);}
 //----------------------------------------------------------------------------------
@@ -33,7 +33,7 @@ CMainMenu::CMainMenu()
 	m_startDialog = NULL;
 	m_screenshotFrame = u32(-1);
 	g_pGamePersistent->m_pMainMenu = this;
-	if (Device.b_is_Ready)			
+	if (Device.b_is_Ready)
 		OnDeviceCreate();
 
 	ReadTextureInfo();
@@ -46,14 +46,14 @@ CMainMenu::CMainMenu()
 	m_NeedErrDialog = ErrNoError;
 	m_start_time = 0;
 
-		g_btnHint = xr_new<CUIButtonHint>();
+	g_btnHint = xr_new<CUIButtonHint>();
 
-		for (u32 i = 0; i<u32(ErrMax); i++)
-		{
-			CUIMessageBoxEx*			pNewErrDlg;
-			INIT_MSGBOX(pNewErrDlg, ErrMsgBoxTemplate[i]);
-			m_pMB_ErrDlgs.push_back(pNewErrDlg);
-		}
+	for (u32 i = 0; i < u32(ErrMax); i++)
+	{
+		CUIMessageBoxEx* pNewErrDlg;
+		INIT_MSGBOX(pNewErrDlg, ErrMsgBoxTemplate[i]);
+		m_pMB_ErrDlgs.push_back(pNewErrDlg);
+	}
 }
 
 CMainMenu::~CMainMenu()
@@ -83,16 +83,17 @@ void CMainMenu::ReadTextureInfo()
 	}
 }
 
-extern ENGINE_API BOOL	bShowPauseString;
+extern ENGINE_API BOOL bShowPauseString;
 
 void CMainMenu::Activate(bool bActivate)
 {
-	if (!!m_Flags.test(flActive) == bActivate)		return;
-	if (m_Flags.test(flGameSaveScreenshot))		return;
+	if (!!m_Flags.test(flActive) == bActivate) return;
+	if (m_Flags.test(flGameSaveScreenshot)) return;
 
 	if ((m_screenshotFrame == Device.dwFrame) ||
 		(m_screenshotFrame == Device.dwFrame - 1) ||
-		(m_screenshotFrame == Device.dwFrame + 1))	return;
+		(m_screenshotFrame == Device.dwFrame + 1))
+		return;
 
 	if (bActivate)
 	{
@@ -135,9 +136,9 @@ void CMainMenu::Activate(bool bActivate)
 			CCameraManager::ResetPP();
 		};
 		Device.seqRender.Add(this, 4); // 1-console 2-cursor 3-tutorial
-
 	}
-	else {
+	else
+	{
 		m_deactivated_frame = Device.dwFrame;
 		m_Flags.set(flActive, FALSE);
 		m_Flags.set(flNeedChangeCapture, TRUE);
@@ -145,12 +146,14 @@ void CMainMenu::Activate(bool bActivate)
 		Device.seqRender.Remove(this);
 
 		bool b = !!Console->bVisible;
-		if (b) {
+		if (b)
+		{
 			Console->Hide();
 		}
 
 		IR_Release();
-		if (b) {
+		if (b)
+		{
 			Console->Show();
 		}
 
@@ -194,43 +197,42 @@ bool CMainMenu::CanSkipSceneRendering()
 
 
 //IInputReceiver
-static int mouse_button_2_key[] = { MOUSE_1,MOUSE_2,MOUSE_3 };
-void	CMainMenu::IR_OnMousePress(int btn)
+static int mouse_button_2_key[] = {MOUSE_1,MOUSE_2,MOUSE_3};
+
+void CMainMenu::IR_OnMousePress(int btn)
 {
 	if (!IsActive()) return;
 
 	IR_OnKeyboardPress(mouse_button_2_key[btn]);
 };
 
-void	CMainMenu::IR_OnMouseRelease(int btn)
+void CMainMenu::IR_OnMouseRelease(int btn)
 {
 	if (!IsActive()) return;
 
 	IR_OnKeyboardRelease(mouse_button_2_key[btn]);
 };
 
-void	CMainMenu::IR_OnMouseHold(int btn)
+void CMainMenu::IR_OnMouseHold(int btn)
 {
 	if (!IsActive()) return;
 
 	IR_OnKeyboardHold(mouse_button_2_key[btn]);
-
 };
 
-void	CMainMenu::IR_OnMouseMove(int x, int y)
+void CMainMenu::IR_OnMouseMove(int x, int y)
 {
 	if (!IsActive()) return;
 
 	if (MainInputReceiver())
 		MainInputReceiver()->IR_OnMouseMove(x, y);
-
 };
 
-void	CMainMenu::IR_OnMouseStop(int x, int y)
+void CMainMenu::IR_OnMouseStop(int x, int y)
 {
 };
 
-void	CMainMenu::IR_OnKeyboardPress(int dik)
+void CMainMenu::IR_OnKeyboardPress(int dik)
 {
 	if (!IsActive()) return;
 
@@ -239,26 +241,25 @@ void	CMainMenu::IR_OnKeyboardPress(int dik)
 		Console->Show();
 		return;
 	}
-	if (DIK_F12 == dik) {
+	if (DIK_F12 == dik)
+	{
 		Render->Screenshot();
 		return;
 	}
 
 	if (MainInputReceiver())
 		MainInputReceiver()->IR_OnKeyboardPress(dik);
-
 };
 
-void	CMainMenu::IR_OnKeyboardRelease(int dik)
+void CMainMenu::IR_OnKeyboardRelease(int dik)
 {
 	if (!IsActive()) return;
 
 	if (MainInputReceiver())
 		MainInputReceiver()->IR_OnKeyboardRelease(dik);
-
 };
 
-void	CMainMenu::IR_OnKeyboardHold(int dik)
+void CMainMenu::IR_OnKeyboardHold(int dik)
 {
 	if (!IsActive()) return;
 
@@ -282,6 +283,7 @@ bool CMainMenu::OnRenderPPUI_query()
 
 
 extern void draw_wnds_rects();
+
 void CMainMenu::OnRender()
 {
 	if (m_Flags.test(flGameSaveScreenshot))
@@ -321,7 +323,7 @@ void CMainMenu::OnRenderPPUI_PP()
 {
 	if (!IsActive()) return;
 
-	if (m_Flags.test(flGameSaveScreenshot))	return;
+	if (m_Flags.test(flGameSaveScreenshot)) return;
 
 	UI()->pp_start();
 
@@ -345,8 +347,8 @@ void CMainMenu::OnFrame()
 	if (m_Flags.test(flNeedChangeCapture))
 	{
 		m_Flags.set(flNeedChangeCapture, FALSE);
-		if (m_Flags.test(flActive))	IR_Capture();
-		else						IR_Release();
+		if (m_Flags.test(flActive)) IR_Capture();
+		else IR_Release();
 	}
 	CDialogHolder::OnFrame();
 
@@ -382,10 +384,12 @@ void CMainMenu::Screenshot(IRender_interface::ScreenshotMode mode, LPCSTR name)
 	{
 		::Render->Screenshot(mode, name);
 	}
-	else {
+	else
+	{
 		m_Flags.set(flGameSaveScreenshot, TRUE);
 		strcpy(m_screenshot_name, name);
-		if (g_pGameLevel && m_Flags.test(flActive)) {
+		if (g_pGameLevel && m_Flags.test(flActive))
+		{
 			Device.seqFrame.Add(g_pGameLevel);
 			Device.seqRender.Add(g_pGameLevel);
 		};
@@ -420,7 +424,7 @@ void CMainMenu::SetErrorDialog(EErrorDlg ErrDlg)
 
 void CMainMenu::CheckForErrorDlg()
 {
-	if (m_NeedErrDialog == ErrNoError)	return;
+	if (m_NeedErrDialog == ErrNoError) return;
 	StartStopMenu(m_pMB_ErrDlgs[m_NeedErrDialog], false);
 	m_NeedErrDialog = ErrNoError;
 };

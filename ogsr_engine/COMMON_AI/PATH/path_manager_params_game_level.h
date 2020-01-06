@@ -16,20 +16,21 @@ template <
 	typename _iteration_type
 >
 struct SGameLevel : public SBaseParameters<
-	_dist_type,
-	_index_type,
-	_iteration_type
-> {
-	u32				m_level_id;
-	_index_type		m_vertex_id;
-	xr_vector<_index_type> *m_path;
+		_dist_type,
+		_index_type,
+		_iteration_type
+	>
+{
+	u32 m_level_id;
+	_index_type m_vertex_id;
+	xr_vector<_index_type>* m_path;
 
-	IC	SGameLevel (
-			u32						level_id,
-			_dist_type				max_range = _dist_type(6000),
-			_iteration_type			max_iteration_count = _iteration_type(-1),
-			_index_type				max_visited_node_count = _index_type(-1)
-		)
+	IC SGameLevel(
+		u32 level_id,
+		_dist_type max_range = _dist_type(6000),
+		_iteration_type max_iteration_count = _iteration_type(-1),
+		_index_type max_visited_node_count = _index_type(-1)
+	)
 		:
 		SBaseParameters<
 			_dist_type,
@@ -44,8 +45,8 @@ struct SGameLevel : public SBaseParameters<
 	{
 	}
 
-	IC	_index_type	selected_vertex_id() const
+	IC _index_type selected_vertex_id() const
 	{
-		return		(m_vertex_id);
+		return (m_vertex_id);
 	}
 };

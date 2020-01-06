@@ -7,15 +7,15 @@
 typedef u32 TTime;
 
 #define COLOR		D3DCOLOR_XRGB
-#define COLOR_RED	COLOR(255,0,0)	
-#define COLOR_GREEN	COLOR(0,255,0)	
-#define COLOR_BLUE	COLOR(0,0,255)	
+#define COLOR_RED	COLOR(255,0,0)
+#define COLOR_GREEN	COLOR(0,255,0)
+#define COLOR_BLUE	COLOR(0,0,255)
 
 class CBlend;
 
 // специальные параметры анимаций (animation spec params)
-#define ASP_MOVE_BKWD			(1 << 0) 
-#define ASP_DRAG_CORPSE			(1 << 1) 
+#define ASP_MOVE_BKWD			(1 << 0)
+#define ASP_DRAG_CORPSE			(1 << 1)
 #define ASP_CHECK_CORPSE		(1 << 2)
 #define ASP_ATTACK_RAT			(1 << 3)
 #define ASP_ATTACK_RAT_JUMP		(1 << 4)
@@ -35,7 +35,6 @@ class CBlend;
 
 #define CRITICAL_STAND_TIME		1400
 #define TIME_STAND_RECHECK		2000
-
 
 
 #define HIT_SIDE_COUNT			2
@@ -70,55 +69,63 @@ class CBlend;
 
 
 // StepSounds
-struct SStepSound {
-	float	vol;
-	float	freq;
+struct SStepSound
+{
+	float vol;
+	float freq;
 };
 
-struct SAttackEffector {
-	SPPInfo	ppi;
-	float	time;
-	float	time_attack;
-	float	time_release;
+struct SAttackEffector
+{
+	SPPInfo ppi;
+	float time;
+	float time_attack;
+	float time_release;
 
 	// camera effects
-	float	ce_time;
-	float	ce_amplitude;
-	float	ce_period_number;
-	float	ce_power;
+	float ce_time;
+	float ce_amplitude;
+	float ce_period_number;
+	float ce_power;
 };
 
-struct SVelocityParam {
-	struct {
+struct SVelocityParam
+{
+	struct
+	{
 		float linear;
 		float angular_path;
 		float angular_real;
 	} velocity;
-	float	min_factor;
-	float	max_factor;
 
-	SVelocityParam() {
-		velocity.linear			= 0.f;
-		velocity.angular_real	= 0.f;
-		velocity.angular_path	= 0.f;
-		min_factor				= 1.0f;
-		max_factor				= 1.0f;
+	float min_factor;
+	float max_factor;
+
+	SVelocityParam()
+	{
+		velocity.linear = 0.f;
+		velocity.angular_real = 0.f;
+		velocity.angular_path = 0.f;
+		min_factor = 1.0f;
+		max_factor = 1.0f;
 	}
 
-	void	Load (LPCSTR section, LPCSTR line) {
+	void Load(LPCSTR section, LPCSTR line)
+	{
 		string32 buffer;
-		velocity.linear			= float(atof(_GetItem(pSettings->r_string(section,line),0,buffer)));
-		velocity.angular_real	= float(atof(_GetItem(pSettings->r_string(section,line),1,buffer)));
-		velocity.angular_path	= float(atof(_GetItem(pSettings->r_string(section,line),2,buffer)));
-		min_factor				= float(atof(_GetItem(pSettings->r_string(section,line),3,buffer)));
-		max_factor				= float(atof(_GetItem(pSettings->r_string(section,line),4,buffer)));
+		velocity.linear = float(atof(_GetItem(pSettings->r_string(section, line), 0, buffer)));
+		velocity.angular_real = float(atof(_GetItem(pSettings->r_string(section, line), 1, buffer)));
+		velocity.angular_path = float(atof(_GetItem(pSettings->r_string(section, line), 2, buffer)));
+		min_factor = float(atof(_GetItem(pSettings->r_string(section, line), 3, buffer)));
+		max_factor = float(atof(_GetItem(pSettings->r_string(section, line), 4, buffer)));
 	}
 };
 
 
 // Activities
-enum EMotionAnim {
-	eAnimStandIdle			= u32(0),
+enum EMotionAnim
+{
+	eAnimStandIdle = u32(0),
 	eAnimStandTurnLeft,
 	eAnimStandTurnRight,
 
@@ -166,7 +173,7 @@ enum EMotionAnim {
 	eAnimSteal,
 
 	eAnimJumpStart,
-	eAnimJumpGlide,		
+	eAnimJumpGlide,
 	eAnimJumpFinish,
 
 	eAnimJumpLeft,
@@ -193,7 +200,7 @@ enum EMotionAnim {
 	eAnimUpperWalkFwd,
 	eAnimUpperThreaten,
 	eAnimUpperAttack,
-	
+
 	eAnimAttackPsi,
 
 	eAnimTeleRaise,
@@ -215,8 +222,8 @@ enum EMotionAnim {
 	eAnimHomeIdleGrowl,*/
 	eAnimHomeWalkGrowl,
 	eAnimHomeWalkSmelling,
-	
-	
+
+
 	//end mob home animations
 
 	eAnimAttackOnRunLeft,
@@ -227,12 +234,13 @@ enum EMotionAnim {
 	eAnimFastStandTurnRight,
 
 	eAnimCount,
-	eAnimUndefined			= u32(-1)
+	eAnimUndefined = u32(-1)
 };
 
 // Generic actions
-enum EAction {
-	ACT_STAND_IDLE	= u32(0),
+enum EAction
+{
+	ACT_STAND_IDLE = u32(0),
 	ACT_SIT_IDLE,
 	ACT_LIE_IDLE,
 	ACT_WALK_FWD,
@@ -248,195 +256,229 @@ enum EAction {
 	ACT_LOOK_AROUND,
 	ACT_HOME_WALK_GROWL,
 	ACT_HOME_WALK_SMELLING,
-	ACT_NONE		= u32(-1)
+	ACT_NONE = u32(-1)
 };
 
-enum EPState {
+enum EPState
+{
 	PS_STAND,
-	PS_SIT, 
+	PS_SIT,
 	PS_LIE,
 	PS_STAND_UPPER
 };
 
-typedef		shared_str			anim_string;
+typedef shared_str anim_string;
 #define		DEFAULT_ANIM		eAnimStandIdle
 
 // элемент анимации
-struct SAnimItem {
+struct SAnimItem
+{
+	anim_string target_name; // "stand_idle_"
+	int spec_id; // (-1) - any,  (0 - ...) - идентификатор 3
+	u8 count; // количество анимаций : "idle_0", "idle_1", "idle_2" 
 
-	anim_string		target_name;	// "stand_idle_"
-	int				spec_id;		// (-1) - any,  (0 - ...) - идентификатор 3
-	u8				count;			// количество анимаций : "idle_0", "idle_1", "idle_2" 
-	
-	SVelocityParam	velocity;
+	SVelocityParam velocity;
 
-	EPState			pos_state;
+	EPState pos_state;
 
-	struct {
+	struct
+	{
 		anim_string front;
-		anim_string	back;
-		anim_string	left;
-		anim_string	right;
+		anim_string back;
+		anim_string left;
+		anim_string right;
 	} fxs;
 };
 
 #define SKIP_IF_AGGRESSIVE	true
 
 // описание перехода
-struct STransition {
-
-	struct {
-		bool		state_used;
+struct STransition
+{
+	struct
+	{
+		bool state_used;
 		EMotionAnim anim;
-		EPState		state;
+		EPState state;
 	} from, target;
 
-	EMotionAnim		anim_transition;
-	bool			chain;
-	bool			skip_if_aggressive;
+	EMotionAnim anim_transition;
+	bool chain;
+	bool skip_if_aggressive;
 };
 
 // элемент движения
-struct SMotionItem {
-	EMotionAnim		anim;
-	bool			is_turn_params;
+struct SMotionItem
+{
+	EMotionAnim anim;
+	bool is_turn_params;
 
-	struct{
-		EMotionAnim	anim_left;			// speed, r_speed got from turn_left member
-		EMotionAnim	anim_right;
-		float		min_angle;
+	struct
+	{
+		EMotionAnim anim_left; // speed, r_speed got from turn_left member
+		EMotionAnim anim_right;
+		float min_angle;
 	} turn;
 };
 
 // подмена анимаций (если *flag == true, то необходимо заменить анимацию)
-struct SReplacedAnim {
+struct SReplacedAnim
+{
 	EMotionAnim cur_anim;
 	EMotionAnim new_anim;
-	bool		*flag;
+	bool* flag;
 };
 
 // Определение времени аттаки по анимации
-typedef struct {
-	EMotionAnim	anim;				// параметры конкретной анимации 
-	u32			anim_i3;
+typedef struct
+{
+	EMotionAnim anim; // параметры конкретной анимации 
+	u32 anim_i3;
 
-	TTime		time_from;			// диапазон времени когда можно наносить hit (от)
-	TTime		time_to;		    // диапазон времени когда можно наносить hit (до)
+	TTime time_from; // диапазон времени когда можно наносить hit (от)
+	TTime time_to; // диапазон времени когда можно наносить hit (до)
 
-	Fvector		trace_from;			// направление трассировки (относительно центра)
-	Fvector		trace_to;
+	Fvector trace_from; // направление трассировки (относительно центра)
+	Fvector trace_to;
 
-	u32			flags;				// специальные флаги
+	u32 flags; // специальные флаги
 
-	float		damage;				// урон при данной атаке
-	Fvector		hit_dir;			// угол направления приложения силы к объекту
+	float damage; // урон при данной атаке
+	Fvector hit_dir; // угол направления приложения силы к объекту
 
 	//-----------------------------------------
 	// temp 
-	float	yaw_from;
-	float	yaw_to;
-	float	pitch_from;
-	float	pitch_to;
-	float	dist;
-
+	float yaw_from;
+	float yaw_to;
+	float pitch_from;
+	float pitch_to;
+	float dist;
 } SAttackAnimation;
 
 
-struct SAAParam {
-	MotionID	motion;
-	float		time;
-	float		hit_power;		// damage
-	float		impulse;
-	Fvector		impulse_dir;
+struct SAAParam
+{
+	MotionID motion;
+	float time;
+	float hit_power; // damage
+	float impulse;
+	Fvector impulse_dir;
 
 	// field of hit
-	struct {
-		float	from_yaw;
-		float	to_yaw;
-		float	from_pitch;
-		float	to_pitch;
+	struct
+	{
+		float from_yaw;
+		float to_yaw;
+		float from_pitch;
+		float to_pitch;
 	} foh;
-	
-	float		dist;
+
+	float dist;
 };
 
 DEFINE_VECTOR(SAAParam, AA_VECTOR, AA_VECTOR_IT);
 
-struct SCurrentAnimationInfo {
-	shared_str		name;
+struct SCurrentAnimationInfo
+{
+	shared_str name;
 
-	EMotionAnim	motion;
-	u8			index;
+	EMotionAnim motion;
+	u8 index;
 
-	TTime		time_started;
+	TTime time_started;
 
-	struct {
-		IC void		_set_current	(float v)			{ current=v; VERIFY2(_abs(v)<1000,"_set_current(). monster speed is too big"); }
-		IC void		_set_target		(float v)			{ target=v;	VERIFY2(_abs(v)<1000,"_set_target(). monster speed is too big");}
-		IC float	_get_current	()					{ return current; }
-		IC float	_get_target		()					{ return target; }
+	struct
+	{
+		IC void _set_current(float v)
+		{
+			current = v;
+			VERIFY2(_abs(v)<1000, "_set_current(). monster speed is too big");
+		}
+
+		IC void _set_target(float v)
+		{
+			target = v;
+			VERIFY2(_abs(v)<1000, "_set_target(). monster speed is too big");
+		}
+
+		IC float _get_current() { return current; }
+		IC float _get_target() { return target; }
 	private:
-		float		current;
-		float		target;
+		float current;
+		float target;
 	} speed;
 
-	float			speed_change_vel;
-	CBlend			*blend;
+	float speed_change_vel;
+	CBlend* blend;
 
-	void		set_motion (EMotionAnim	new_motion);
-	EMotionAnim	get_motion () const { return motion; }
+	void set_motion(EMotionAnim new_motion);
+	EMotionAnim get_motion() const { return motion; }
 };
-
 
 
 //////////////////////////////////////////////////////////////////////////
 
-struct t_fx_index {
-	s8 front;	
-	s8 back;	
+struct t_fx_index
+{
+	s8 front;
+	s8 back;
 };
 
-enum EHitSide {
-	eSideFront	= u32(0),
+enum EHitSide
+{
+	eSideFront = u32(0),
 	eSideBack,
 	eSideLeft,
 	eSideRight
 };
 
 
-DEFINE_VECTOR	(SAnimItem*,		ANIM_ITEM_VECTOR,		ANIM_ITEM_VECTOR_IT);
-DEFINE_VECTOR	(STransition,		TRANSITION_ANIM_VECTOR, TRANSITION_ANIM_VECTOR_IT);
-DEFINE_MAP		(EAction,			SMotionItem,			MOTION_ITEM_MAP,			MOTION_ITEM_MAP_IT);
-DEFINE_VECTOR	(EMotionAnim,		SEQ_VECTOR,				SEQ_VECTOR_IT);
-DEFINE_VECTOR	(SAttackAnimation,	ATTACK_ANIM,			ATTACK_ANIM_IT);
-DEFINE_VECTOR	(SReplacedAnim,		REPLACED_ANIM,			REPLACED_ANIM_IT);
+DEFINE_VECTOR(SAnimItem*, ANIM_ITEM_VECTOR, ANIM_ITEM_VECTOR_IT);
+DEFINE_VECTOR(STransition, TRANSITION_ANIM_VECTOR, TRANSITION_ANIM_VECTOR_IT);
+DEFINE_MAP(EAction, SMotionItem, MOTION_ITEM_MAP, MOTION_ITEM_MAP_IT);
+DEFINE_VECTOR(EMotionAnim, SEQ_VECTOR, SEQ_VECTOR_IT);
+DEFINE_VECTOR(SAttackAnimation, ATTACK_ANIM, ATTACK_ANIM_IT);
+DEFINE_VECTOR(SReplacedAnim, REPLACED_ANIM, REPLACED_ANIM_IT);
 
-DEFINE_MAP		(u16,				t_fx_index,				FX_MAP_U16,					FX_MAP_U16_IT);	
-DEFINE_MAP		(shared_str,			t_fx_index,				FX_MAP_STRING,				FX_MAP_STRING_IT);
-
-
-DEFINE_VECTOR	(SEQ_VECTOR, VELOCITY_CHAIN_VEC, VELOCITY_CHAIN_VEC_IT);
+DEFINE_MAP(u16, t_fx_index, FX_MAP_U16, FX_MAP_U16_IT);
+DEFINE_MAP(shared_str, t_fx_index, FX_MAP_STRING, FX_MAP_STRING_IT);
 
 
-struct SVelocity {
-	float	current;
-	float	target;
-	
-	void	set		(float c, float t) {current = c; target = t;}
-}; 
+DEFINE_VECTOR(SEQ_VECTOR, VELOCITY_CHAIN_VEC, VELOCITY_CHAIN_VEC_IT);
 
-struct SMotionVel {
-	float linear;
-	float angular;
-	void	set		(float l, float a) {linear = l; angular = a;}
+
+struct SVelocity
+{
+	float current;
+	float target;
+
+	void set(float c, float t)
+	{
+		current = c;
+		target = t;
+	}
 };
 
-enum EAccelType {
+struct SMotionVel
+{
+	float linear;
+	float angular;
+
+	void set(float l, float a)
+	{
+		linear = l;
+		angular = a;
+	}
+};
+
+enum EAccelType
+{
 	eAT_Calm,
 	eAT_Aggressive
 };
 
-enum EAccelValue {
+enum EAccelValue
+{
 	eAV_Accel,
 	eAV_Braking
 };
@@ -447,7 +489,7 @@ enum EAccelValue {
 
 ///////////////////////////////////////////////////////////////////////////////
 // State Management
-#define DO_ONCE_BEGIN(flag)	if (!flag) {flag = true;  
+#define DO_ONCE_BEGIN(flag)	if (!flag) {flag = true;
 #define DO_ONCE_END()		}
 
 #define TIME_OUT(a,b) a+b<m_dwCurrentTime
@@ -465,42 +507,46 @@ enum EAccelValue {
 #define BIPEDAL			2
 
 
-struct SMonsterEnemy {
+struct SMonsterEnemy
+{
 	Fvector position;
-	u32		vertex;
-	TTime	time;
-	float	danger;
+	u32 vertex;
+	TTime time;
+	float danger;
 };
 
 class CEntityAlive;
 
-DEFINE_MAP(const CEntityAlive *,SMonsterEnemy,ENEMIES_MAP, ENEMIES_MAP_IT);
+DEFINE_MAP(const CEntityAlive *, SMonsterEnemy, ENEMIES_MAP, ENEMIES_MAP_IT);
 
-struct SMonsterCorpse {
+struct SMonsterCorpse
+{
 	Fvector position;
-	u32		vertex;
-	TTime	time;
+	u32 vertex;
+	TTime time;
 };
 
-DEFINE_MAP(const CEntityAlive *,SMonsterCorpse,CORPSE_MAP, CORPSE_MAP_IT);
+DEFINE_MAP(const CEntityAlive *, SMonsterCorpse, CORPSE_MAP, CORPSE_MAP_IT);
 
 
+struct SMonsterHit
+{
+	CObject* object;
+	TTime time;
+	EHitSide side;
+	Fvector position;
 
-struct SMonsterHit {
-	CObject		*object;
-	TTime		time;
-	EHitSide	side;
-	Fvector		position;
-
-	bool	operator==(const CObject *obj) {
+	bool operator==(const CObject* obj)
+	{
 		return (object == obj);
 	}
 };
 
-DEFINE_VECTOR(SMonsterHit,MONSTER_HIT_VECTOR, MONSTER_HIT_VECTOR_IT);
+DEFINE_VECTOR(SMonsterHit, MONSTER_HIT_VECTOR, MONSTER_HIT_VECTOR_IT);
 
 
-enum EDangerType {
+enum EDangerType
+{
 	eWeak,
 	eNormal,
 	eStrong,
@@ -509,7 +555,3 @@ enum EDangerType {
 };
 
 DEFINE_MAP(MotionID, shared_str, ANIM_TO_MOTION_MAP, ANIM_TO_MOTION_MAP_IT);
-
-
-
-

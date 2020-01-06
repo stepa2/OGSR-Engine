@@ -8,28 +8,29 @@
 
 #pragma once
 
-IC	CSpaceRestrictor::CSpaceRestrictor		()
+IC CSpaceRestrictor::CSpaceRestrictor()
 {
-	b_scheduled             = false;
+	b_scheduled = false;
 	m_space_restrictor_type = RestrictionSpace::eRestrictorTypeNone;
 }
 
-IC	bool CSpaceRestrictor::actual			() const
+IC bool CSpaceRestrictor::actual() const
 {
-	return							(m_actuality);
+	return (m_actuality);
 }
 
-IC	void CSpaceRestrictor::actual			(bool value) const
+IC void CSpaceRestrictor::actual(bool value) const
 {
-	m_actuality						= value;
+	m_actuality = value;
 }
 
-IC RestrictionSpace::ERestrictorTypes CSpaceRestrictor::restrictor_type	() const
+IC RestrictionSpace::ERestrictorTypes CSpaceRestrictor::restrictor_type() const
 {
 	return RestrictionSpace::ERestrictorTypes(m_space_restrictor_type);
 }
 
 
-IC void CSpaceRestrictor::change_restrictor_type ( RestrictionSpace::ERestrictorTypes restrictor_type ) {
-  m_space_restrictor_type = u8( restrictor_type );
+IC void CSpaceRestrictor::change_restrictor_type(RestrictionSpace::ERestrictorTypes restrictor_type)
+{
+	m_space_restrictor_type = u8(restrictor_type);
 }

@@ -8,10 +8,10 @@
 
 #include "customoutfit.h"
 
-class CMilitaryOutfit: public CCustomOutfit
+class CMilitaryOutfit : public CCustomOutfit
 {
 private:
-    typedef	CCustomOutfit inherited;
+	typedef CCustomOutfit inherited;
 public:
 	CMilitaryOutfit(void);
 	virtual ~CMilitaryOutfit(void);

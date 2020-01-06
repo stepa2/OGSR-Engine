@@ -14,36 +14,37 @@
 
 CMonsterEnemyMemory::CMonsterEnemyMemory()
 {
-	monster			= 0;
-	time_memory		= 15000; 
+	monster = 0;
+	time_memory = 15000;
 }
 
 CMonsterEnemyMemory::~CMonsterEnemyMemory()
 {
 }
 
-void CMonsterEnemyMemory::init_external(CBaseMonster *M, TTime mem_time) 
+void CMonsterEnemyMemory::init_external(CBaseMonster* M, TTime mem_time)
 {
-	monster = M; 
+	monster = M;
 	time_memory = mem_time;
 }
 
-void CMonsterEnemyMemory::update() 
+void CMonsterEnemyMemory::update()
 {
-	VERIFY		(monster->g_Alive());
+	VERIFY(monster->g_Alive());
 
 	CMonsterHitMemory& monster_hit_memory = monster->HitMemory;
 
-	typedef CObjectManager<const CEntityAlive>::OBJECTS	objects_list;
+	typedef CObjectManager<const CEntityAlive>::OBJECTS objects_list;
 
-	objects_list const& objects	=	monster->memory().enemy().objects();
+	objects_list const& objects = monster->memory().enemy().objects();
 
 	if (monster_hit_memory.is_hit() && time() < monster_hit_memory.get_last_hit_time() + 1000)
 	{
 		if (CEntityAlive* enemy = smart_cast<CEntityAlive*>(monster->HitMemory.get_last_hit_object()))
 		{
 			if (monster->CCustomMonster::useful(&monster->memory().enemy(), enemy) &&
-				monster->Position().distance_to(enemy->Position()) < monster->get_feel_enemy_who_just_hit_max_distance())
+				monster->Position().distance_to(enemy->Position()) < monster->get_feel_enemy_who_just_hit_max_distance()
+			)
 			{
 				add_enemy(enemy);
 
@@ -57,17 +58,17 @@ void CMonsterEnemyMemory::update()
 		}
 	}
 
-	if ( monster->SoundMemory.IsRememberSound()/* && Actor() && Actor()->memory().visual().visible_now( monster )*/ )
+	if (monster->SoundMemory.IsRememberSound()/* && Actor() && Actor()->memory().visual().visible_now( monster )*/)
 	{
 		SoundElem sound;
 		bool dangerous;
 		monster->SoundMemory.GetSound(sound, dangerous);
-		if ( dangerous && Device.dwTimeGlobal < sound.time + 2000 )
+		if (dangerous && Device.dwTimeGlobal < sound.time + 2000)
 		{
 			if (CEntityAlive const* enemy = smart_cast<CEntityAlive const*>(sound.who))
 			{
-				float const xz_dist = monster->Position().distance_to_xz( enemy->Position() );
-				float const y_dist = _abs( monster->Position().y - enemy->Position().y );
+				float const xz_dist = monster->Position().distance_to_xz(enemy->Position());
+				float const y_dist = _abs(monster->Position().y - enemy->Position().y);
 
 				if (monster->CCustomMonster::useful(&monster->memory().enemy(), enemy) && y_dist < 10 &&
 					xz_dist < monster->get_feel_enemy_who_made_sound_max_distance())
@@ -85,99 +86,114 @@ void CMonsterEnemyMemory::update()
 		}
 	}
 
-	for (objects_list::const_iterator I	= objects.begin(); I !=	objects.end(); ++I) 
+	for (objects_list::const_iterator I = objects.begin(); I != objects.end(); ++I)
 	{
 		const CEntityAlive* enemy = *I;
-		const bool feel_enemy = monster->Position().distance_to(enemy->Position()) < monster->get_feel_enemy_max_distance();
+		const bool feel_enemy = monster->Position().distance_to(enemy->Position()) < monster->
+			get_feel_enemy_max_distance();
 
 		if (feel_enemy || monster->memory().visual().visible_now(*I))
 			add_enemy(*I);
 	}
 
-	float const feel_enemy_max_distance	= monster->get_feel_enemy_max_distance();
+	float const feel_enemy_max_distance = monster->get_feel_enemy_max_distance();
 
 	if (Actor())
 	{
-		float const xz_dist	= monster->Position().distance_to_xz(Actor()->Position());
+		float const xz_dist = monster->Position().distance_to_xz(Actor()->Position());
 		float const y_dist = _abs(monster->Position().y - Actor()->Position().y);
 
-		if (xz_dist < feel_enemy_max_distance && y_dist < 10 && monster->memory().enemy().is_useful(Actor()) && Actor()->memory().visual().visible_now(monster))
+		if (xz_dist < feel_enemy_max_distance && y_dist < 10 && monster->memory().enemy().is_useful(Actor()) && Actor()
+		                                                                                                        ->
+		                                                                                                        memory()
+		                                                                                                        .visual()
+		                                                                                                        .visible_now(
+			                                                                                                        monster)
+		)
 			add_enemy(Actor());
 	}
-	
+
 	// удалить устаревших врагов
 	remove_non_actual();
 
 	// обновить опасность 
-	for (ENEMIES_MAP_IT it = m_objects.begin(); it != m_objects.end(); it++) {
-		u8		relation_value = u8(monster->tfGetRelationType(it->first));
-		float	dist = monster->Position().distance_to(it->second.position);
-		it->second.danger = (1 + relation_value*relation_value*relation_value) / (1 + dist);
+	for (ENEMIES_MAP_IT it = m_objects.begin(); it != m_objects.end(); it++)
+	{
+		u8 relation_value = u8(monster->tfGetRelationType(it->first));
+		float dist = monster->Position().distance_to(it->second.position);
+		it->second.danger = (1 + relation_value * relation_value * relation_value) / (1 + dist);
 	}
 }
 
-void CMonsterEnemyMemory::add_enemy(const CEntityAlive *enemy)
+void CMonsterEnemyMemory::add_enemy(const CEntityAlive* enemy)
 {
 	SMonsterEnemy enemy_info;
 	enemy_info.position = enemy->Position();
-	enemy_info.vertex   = enemy->ai_location().level_vertex_id();
-	enemy_info.time		= Device.dwTimeGlobal;
-	enemy_info.danger	= 0.f;
+	enemy_info.vertex = enemy->ai_location().level_vertex_id();
+	enemy_info.time = Device.dwTimeGlobal;
+	enemy_info.danger = 0.f;
 
 	ENEMIES_MAP_IT it = m_objects.find(enemy);
-	if (it != m_objects.end()) {
+	if (it != m_objects.end())
+	{
 		// обновить данные о враге
 		it->second = enemy_info;
-	} else {
+	}
+	else
+	{
 		// добавить врага в список объектов
 		m_objects.insert(std::make_pair(enemy, enemy_info));
 	}
 }
 
-void CMonsterEnemyMemory::add_enemy(const CEntityAlive *enemy, const Fvector &pos, u32 vertex, u32 time)
+void CMonsterEnemyMemory::add_enemy(const CEntityAlive* enemy, const Fvector& pos, u32 vertex, u32 time)
 {
 	SMonsterEnemy enemy_info;
 	enemy_info.position = pos;
-	enemy_info.vertex   = vertex;
-	enemy_info.time		= time;
-	enemy_info.danger	= 0.f;
+	enemy_info.vertex = vertex;
+	enemy_info.time = time;
+	enemy_info.danger = 0.f;
 
 	ENEMIES_MAP_IT it = m_objects.find(enemy);
-	if (it != m_objects.end()) {
+	if (it != m_objects.end())
+	{
 		// обновить данные о враге
 		if (it->second.time < enemy_info.time) it->second = enemy_info;
-	} else {
+	}
+	else
+	{
 		// добавить врага в список объектов
 		m_objects.insert(std::make_pair(enemy, enemy_info));
 	}
 }
 
-void CMonsterEnemyMemory::remove_non_actual() 
+void CMonsterEnemyMemory::remove_non_actual()
 {
 	TTime cur_time = Device.dwTimeGlobal;
 
 	// удалить 'старых' врагов и тех, расстояние до которых > 30м и др.
-	for ( ENEMIES_MAP_IT	it	=	m_objects.begin(), nit; 
-							it	!=	m_objects.end(); 
-							it	=	nit	)
+	for (ENEMIES_MAP_IT it = m_objects.begin(), nit;
+	     it != m_objects.end();
+	     it = nit)
 	{
-		nit = it; ++nit;
+		nit = it;
+		++nit;
 		// проверить условия удаления
-		if ( !it->first									|| 
-			 !it->first->g_Alive()						|| 
-			 it->first->getDestroy()					||
-			 (it->second.time + time_memory < cur_time) ||
-			 (it->first->g_Team() == monster->g_Team()) ||
-			 !monster->memory().enemy().is_useful(it->first) ) 
+		if (!it->first ||
+			!it->first->g_Alive() ||
+			it->first->getDestroy() ||
+			(it->second.time + time_memory < cur_time) ||
+			(it->first->g_Team() == monster->g_Team()) ||
+			!monster->memory().enemy().is_useful(it->first))
 		{
-			m_objects.erase (it);
+			m_objects.erase(it);
 		}
 	}
 }
 
-const CEntityAlive *CMonsterEnemyMemory::get_enemy()
+const CEntityAlive* CMonsterEnemyMemory::get_enemy()
 {
-	ENEMIES_MAP_IT	it = find_best_enemy();
+	ENEMIES_MAP_IT it = find_best_enemy();
 	if (it != m_objects.end()) return it->first;
 	return (0);
 }
@@ -187,7 +203,7 @@ SMonsterEnemy CMonsterEnemyMemory::get_enemy_info()
 	SMonsterEnemy ret_val;
 	ret_val.time = 0;
 
-	ENEMIES_MAP_IT	it = find_best_enemy();
+	ENEMIES_MAP_IT it = find_best_enemy();
 	if (it != m_objects.end()) ret_val = it->second;
 
 	return ret_val;
@@ -195,24 +211,29 @@ SMonsterEnemy CMonsterEnemyMemory::get_enemy_info()
 
 ENEMIES_MAP_IT CMonsterEnemyMemory::find_best_enemy()
 {
-	ENEMIES_MAP_IT	it = m_objects.end();
-	float			max_value = 0.f;
+	ENEMIES_MAP_IT it = m_objects.end();
+	float max_value = 0.f;
 
 	// find best at home first
-	for (ENEMIES_MAP_IT I = m_objects.begin(); I != m_objects.end(); I++) {
+	for (ENEMIES_MAP_IT I = m_objects.begin(); I != m_objects.end(); I++)
+	{
 		if (!monster->Home->at_home(I->second.position)) continue;
-		if (I->second.danger > max_value) {
+		if (I->second.danger > max_value)
+		{
 			max_value = I->second.danger;
 			it = I;
 		}
 	}
 
 	// there is no best enemies at home
-	if (it == m_objects.end()) {
+	if (it == m_objects.end())
+	{
 		// find any
 		max_value = 0.f;
-		for (ENEMIES_MAP_IT I = m_objects.begin(); I != m_objects.end(); I++) {
-			if (I->second.danger > max_value) {
+		for (ENEMIES_MAP_IT I = m_objects.begin(); I != m_objects.end(); I++)
+		{
+			if (I->second.danger > max_value)
+			{
 				max_value = I->second.danger;
 				it = I;
 			}
@@ -222,18 +243,19 @@ ENEMIES_MAP_IT CMonsterEnemyMemory::find_best_enemy()
 	return it;
 }
 
-void CMonsterEnemyMemory::remove_links(CObject *O)
+void CMonsterEnemyMemory::remove_links(CObject* O)
 {
-	if ( monster )
+	if (monster)
 	{
 		monster->EnemyMan.remove_links(O);
 	}
 
-	for (ENEMIES_MAP_IT	I = m_objects.begin();I!=m_objects.end();++I) {
-		if ((*I).first == O) {
+	for (ENEMIES_MAP_IT I = m_objects.begin(); I != m_objects.end(); ++I)
+	{
+		if ((*I).first == O)
+		{
 			m_objects.erase(I);
 			break;
 		}
 	}
 }
-

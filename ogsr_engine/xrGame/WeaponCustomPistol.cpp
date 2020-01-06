@@ -7,16 +7,17 @@
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-CWeaponCustomPistol::CWeaponCustomPistol(LPCSTR name) : CWeaponMagazined(name,SOUND_TYPE_WEAPON_PISTOL)
+CWeaponCustomPistol::CWeaponCustomPistol(LPCSTR name) : CWeaponMagazined(name, SOUND_TYPE_WEAPON_PISTOL)
 {
 }
 
 CWeaponCustomPistol::~CWeaponCustomPistol()
 {
 }
+
 void CWeaponCustomPistol::switch2_Fire()
 {
-	if (GetCurrentFireMode() == 1) 
+	if (GetCurrentFireMode() == 1)
 	{
 		m_bFireSingleShot = true;
 		bWorking = true;
@@ -25,13 +26,13 @@ void CWeaponCustomPistol::switch2_Fire()
 
 		StateSwitchCallback(GameObject::eOnActorWeaponStartFiring, GameObject::eOnNPCWeaponStartFiring);
 	}
-	else 
+	else
 	{
 		inherited::switch2_Fire();
 	}
 }
 
-void CWeaponCustomPistol::FireEnd() 
+void CWeaponCustomPistol::FireEnd()
 {
 	//if (fTime <= 0 && GetCurrentFireMode() == 1)
 	//{
@@ -41,7 +42,7 @@ void CWeaponCustomPistol::FireEnd()
 	inherited::FireEnd();
 }
 
-void CWeaponCustomPistol::net_Relcase(CObject *object)
+void CWeaponCustomPistol::net_Relcase(CObject* object)
 {
 	inherited::net_Relcase(object);
 }

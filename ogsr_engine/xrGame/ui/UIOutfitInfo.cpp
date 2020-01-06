@@ -9,19 +9,19 @@
 
 CUIOutfitInfo::CUIOutfitInfo()
 {
-	Memory.mem_fill			(m_items, 0, sizeof(m_items));
+	Memory.mem_fill(m_items, 0, sizeof(m_items));
 }
 
 CUIOutfitInfo::~CUIOutfitInfo()
 {
-	for(u32 i=_item_start; i<_max_item_index; ++i)
+	for (u32 i = _item_start; i < _max_item_index; ++i)
 	{
-		CUIStatic* _s			= m_items[i];
-		xr_delete				(_s);
+		CUIStatic* _s = m_items[i];
+		xr_delete(_s);
 	}
 }
 
-LPCSTR _imm_names []={
+LPCSTR _imm_names [] = {
 	"health_restore_speed",
 	"radiation_restore_speed",
 	"satiety_restore_speed",
@@ -33,7 +33,7 @@ LPCSTR _imm_names []={
 	"burn_immunity",
 	"shock_immunity",
 	"strike_immunity",
-	"wound_immunity",		
+	"wound_immunity",
 	"radiation_immunity",
 	"telepatic_immunity",
 	"chemical_burn_immunity",
@@ -41,7 +41,7 @@ LPCSTR _imm_names []={
 	"fire_wound_immunity",
 };
 
-LPCSTR _imm_st_names[]={
+LPCSTR _imm_st_names[] = {
 	"ui_inv_health",
 	"ui_inv_radiation",
 	"ui_inv_satiety",
@@ -73,15 +73,16 @@ LPCSTR _actor_param_names[] = {
 
 void CUIOutfitInfo::InitFromXml(CUIXml& xml_doc)
 {
-	LPCSTR _base				= "outfit_info";
+	LPCSTR _base = "outfit_info";
 
-	string256					_buff;
-	CUIXmlInit::InitWindow		(xml_doc, _base, 0, this);
+	string256 _buff;
+	CUIXmlInit::InitWindow(xml_doc, _base, 0, this);
 
-	m_listWnd					= xr_new<CUIScrollView>(); m_listWnd->SetAutoDelete(true);
-	AttachChild					(m_listWnd);
-	strconcat					(sizeof(_buff),_buff, _base, ":scroll_view");
-	CUIXmlInit::InitScrollView	(xml_doc, _buff, 0, m_listWnd);
+	m_listWnd = xr_new<CUIScrollView>();
+	m_listWnd->SetAutoDelete(true);
+	AttachChild(m_listWnd);
+	strconcat(sizeof(_buff), _buff, _base, ":scroll_view");
+	CUIXmlInit::InitScrollView(xml_doc, _buff, 0, m_listWnd);
 
 	for (u32 i = _item_start; i < _max_item_index; ++i)
 	{
@@ -95,7 +96,6 @@ void CUIOutfitInfo::InitFromXml(CUIXml& xml_doc)
 			CUIXmlInit::InitStatic(xml_doc, _buff, 0, _s);
 		}
 	}
-
 }
 
 float CUIOutfitInfo::GetArtefactParam(ActorRestoreParams params, u32 i)
@@ -104,19 +104,26 @@ float CUIOutfitInfo::GetArtefactParam(ActorRestoreParams params, u32 i)
 	switch (i)
 	{
 	case _item_health_restore_speed:
-		r = params.HealthRestoreSpeed; break;
+		r = params.HealthRestoreSpeed;
+		break;
 	case _item_radiation_restore_speed:
-		r = params.RadiationRestoreSpeed; break;
+		r = params.RadiationRestoreSpeed;
+		break;
 	case _item_satiety_restore_speed:
-		r = params.SatietyRestoreSpeed; break;
+		r = params.SatietyRestoreSpeed;
+		break;
 	case _item_thirst_restore_speed:
-		r = params.ThirstRestoreSpeed; break;
+		r = params.ThirstRestoreSpeed;
+		break;
 	case _item_power_restore_speed:
-		r = params.PowerRestoreSpeed; break;
+		r = params.PowerRestoreSpeed;
+		break;
 	case _item_bleeding_restore_speed:
-		r = params.BleedingRestoreSpeed; break;
+		r = params.BleedingRestoreSpeed;
+		break;
 	case _item_psy_health_restore_speed:
-		r = params.PsyHealthRestoreSpeed; break;
+		r = params.PsyHealthRestoreSpeed;
+		break;
 	}
 	return r;
 }
@@ -185,7 +192,8 @@ void CUIOutfitInfo::Update(CCustomOutfit* outfit)
 
 		if (!fsimilar(_val_af, 0.0f))
 		{
-			_sz += sprintf_s(_buff + _sz, sizeof(_buff) - _sz, "%s %+3.0f%%", (_val_af > 0.0f) ? "%c[green]" : "%c[red]", _val_af);
+			_sz += sprintf_s(_buff + _sz, sizeof(_buff) - _sz, "%s %+3.0f%%",
+			                 (_val_af > 0.0f) ? "%c[green]" : "%c[red]", _val_af);
 		}
 
 		_s->SetText(_buff);
